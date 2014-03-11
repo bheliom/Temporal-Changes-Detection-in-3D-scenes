@@ -1,0 +1,21 @@
+#include "utilIO.hpp"
+
+void callVsfm(std::string dataPath, std::string outputPath){
+  
+  // system("pwd");
+  //   system("VisualSFM sfm+pmvs "+dataPath+" "+outputPath);
+}
+
+void getPlyFileVcg(std::string filename, MyMesh *m){
+
+  if(vcg::tri::io::ImporterOFF<MyMesh>::Open(m,filename)!=vcg::tri::io::ImporterOFF<MyMesh>::NoError)
+    {
+      printf("Error reading file  %s\n",argv[1]);
+      exit(0);
+    }
+ 
+  vcg::tri::RequirePerVertexNormal(m);
+  vcg::tri::UpdateNormal<MyMesh>::PerVertexNormalized(m);
+}
+
+

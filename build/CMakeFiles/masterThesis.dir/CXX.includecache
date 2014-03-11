@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/bheliom/develop/masterTh/util/../common/common.hpp
+vcg/complex/complex.h
+-
+wrap/io_trimesh/import.h
+-
+vcg/complex/algorithms/update/topology.h
+-
+vcg/complex/algorithms/update/normal.h
+-
+
+/home/bheliom/develop/masterTh/util/meshProcess.cpp
+meshProcess.hpp
+/home/bheliom/develop/masterTh/util/meshProcess.hpp
+
+/home/bheliom/develop/masterTh/util/meshProcess.hpp
+../common/common.hpp
+/home/bheliom/develop/masterTh/util/../common/common.hpp
+
