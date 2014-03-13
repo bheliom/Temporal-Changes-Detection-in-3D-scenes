@@ -12,7 +12,7 @@ void callVsfm(std::string dataPath, std::string outputPath){
 void getPlyFileVcg(std::string filename, MyMesh &m){
 
   vcg::tri::io::ImporterPLY<MyMesh> importVar;
-
+  
   if(importVar.Open(m,filename.c_str()))
     {
       printf("Error reading file  %s\n",filename.c_str());
@@ -22,4 +22,10 @@ void getPlyFileVcg(std::string filename, MyMesh &m){
   std::cout<<"Mesh loaded correctly. No. of faces:"<<m.FN()<<" no. of vertices:"<<m.VN()<<std::endl;
 }
 
+void savePlyFileVcg(std::string filename, MyMesh &m){
+  
+  vcg::tri::io::ExporterPLY<MyMesh> exportVar;
 
+  exportVar.Save(m,filename.c_str(),vcg::tri::io::Mask::IOM_VERTCOLOR);
+
+}

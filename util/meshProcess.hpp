@@ -4,5 +4,7 @@
 #include "../common/common.hpp"
 
 double getEdgeAverage(MyMesh &m);
+double getFaceEdgeAverage(MyFace &f);
+
 
 #endif

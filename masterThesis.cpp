@@ -6,11 +6,12 @@ using namespace std;
 void test1(string filename);
 void test2();
 void test3(string filename);
+void testRemove(string filename);
 
 int main(int argc, char** argv){
 
   string filename(argv[1]);
-  test3(filename);
+  testRemove(filename);
 
   return 0;
 }
@@ -34,5 +35,33 @@ void test2(){
 void test3(string filename){
   MyMesh m;
   getPlyFileVcg(filename, m);
-  cout<<"Edge average length: "<<getEdgeAverage(m)<<endl;
+}
+
+void testRemove(string filename){
+  MyMesh m;
+  getPlyFileVcg(filename, m); 
+ 
+
+  double avgEdge;
+  avgEdge = getEdgeAverage(m);
+
+  cout<<"Edge average length: "<<avgEdge<<endl;
+  vcg::tri::UpdateTopology<MyMesh>::VertexFace(m); 
+  
+  MyMesh::FaceIterator fi;
+  double tmp;
+  int count = 0;
+
+  for(fi=m.face.begin(); fi!=m.face.end(); ++fi){
+   
+    tmp = getFaceEdgeAverage(*fi);
+    if(tmp>20*avgEdge) {
+      vcg::tri::Allocator<MyMesh>::DeleteFace(m, *fi);
+      count++;
+    }
+  }
+  //  vcg::tri::UpdateColor<MyMesh>::PerFaceFromVertex(m);
+  savePlyFileVcg("testMesh.ply",m);
+
+  cout<<count<<endl;
 }
