@@ -1,6 +1,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include<vcg/math/shot.h>
+#include<wrap/io_trimesh/import_out.h>
 #include<vcg/complex/complex.h>
 #include<wrap/io_trimesh/import.h>
 #include<wrap/io_trimesh/export_ply.h>

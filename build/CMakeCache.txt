@@ -226,6 +226,23 @@ OPENNI_INCLUDE_DIRS:PATH=/usr/include/ni
 //Path to a library.
 OPENNI_LIBRARY:FILEPATH=/usr/lib/libOpenNI.so
 
+//Path where debug 3rdpaty OpenCV dependencies are located
+OpenCV_3RDPARTY_LIB_DIR_DBG:PATH=
+
+//Path where release 3rdpaty OpenCV dependencies are located
+OpenCV_3RDPARTY_LIB_DIR_OPT:PATH=
+
+OpenCV_CONFIG_PATH:FILEPATH=/usr/local/share/OpenCV
+
+//The directory containing a CMake configuration file for OpenCV.
+OpenCV_DIR:PATH=/usr/local/share/OpenCV
+
+//Path where debug OpenCV libraries are located
+OpenCV_LIB_DIR_DBG:PATH=
+
+//Path where release OpenCV libraries are located
+OpenCV_LIB_DIR_OPT:PATH=
+
 //path to common headers
 PCL_COMMON_INCLUDE_DIR:PATH=/usr/include/pcl-1.7
 
@@ -446,7 +463,7 @@ CMAKE_USE_RELATIVE_PATHS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding PCL
-FIND_PACKAGE_MESSAGE_DETAILS_PCL:INTERNAL=[/usr/lib/libboost_system-mt.so;/usr/lib/libboost_filesystem-mt.so;/usr/lib/libboost_thread-mt.so;/usr/lib/libboost_date_time-mt.so;/usr/lib/libboost_iostreams-mt.so;/usr/lib/libboost_serialization-mt.so;optimized;/usr/lib/libpcl_common.so;debug;/usr/lib/libpcl_common.so;optimized;/usr/lib/libpcl_octree.so;debug;/usr/lib/libpcl_octree.so;/usr/lib/libOpenNI.so;vtkCommon;vtkRendering;vtkHybrid;vtkCharts;optimized;/usr/lib/libpcl_io.so;debug;/usr/lib/libpcl_io.so;/usr/lib/libboost_system-mt.so;/usr/lib/libboost_filesystem-mt.so;/usr/lib/libboost_thread-mt.so;/usr/lib/libboost_date_time-mt.so;/usr/lib/libboost_iostreams-mt.so;/usr/lib/libboost_serialization-mt.so;/usr/lib/libOpenNI.so;vtkCommon;vtkRendering;vtkHybrid;vtkCharts][/usr/include/pcl-1.7;/usr/local/include/eigen3;/usr/include;/usr/include/ni;/usr/include/vtk-5.8][v(1.3)]
+FIND_PACKAGE_MESSAGE_DETAILS_PCL:INTERNAL=[/usr/lib/libboost_system-mt.so;/usr/lib/libboost_filesystem-mt.so;/usr/lib/libboost_thread-mt.so;pthread;/usr/lib/libboost_date_time-mt.so;/usr/lib/libboost_iostreams-mt.so;/usr/lib/libboost_serialization-mt.so;optimized;/usr/lib/libpcl_common.so;debug;/usr/lib/libpcl_common.so;optimized;/usr/lib/libpcl_octree.so;debug;/usr/lib/libpcl_octree.so;/usr/lib/libOpenNI.so;vtkCommon;vtkRendering;vtkHybrid;vtkCharts;optimized;/usr/lib/libpcl_io.so;debug;/usr/lib/libpcl_io.so;/usr/lib/libboost_system-mt.so;/usr/lib/libboost_filesystem-mt.so;/usr/lib/libboost_thread-mt.so;pthread;/usr/lib/libboost_date_time-mt.so;/usr/lib/libboost_iostreams-mt.so;/usr/lib/libboost_serialization-mt.so;/usr/lib/libOpenNI.so;vtkCommon;vtkRendering;vtkHybrid;vtkCharts][/usr/include/pcl-1.7;/usr/local/include/eigen3;/usr/include;/usr/include/ni;/usr/include/vtk-5.8][v(1.3)]
 //Details about finding PCL_COMMON
 FIND_PACKAGE_MESSAGE_DETAILS_PCL_COMMON:INTERNAL=[/usr/lib/libpcl_common.so][/usr/include/pcl-1.7][v()]
 //Details about finding PCL_IO
@@ -459,6 +476,16 @@ FIND_PACKAGE_MESSAGE_DETAILS_eigen:INTERNAL=[/usr/local/include/eigen3][v()]
 FIND_PACKAGE_MESSAGE_DETAILS_libusb-1.0:INTERNAL=[/usr/include][v()]
 //Details about finding openni
 FIND_PACKAGE_MESSAGE_DETAILS_openni:INTERNAL=[/usr/lib/libOpenNI.so][/usr/include/ni][v()]
+//ADVANCED property for variable: OpenCV_3RDPARTY_LIB_DIR_DBG
+OpenCV_3RDPARTY_LIB_DIR_DBG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: OpenCV_3RDPARTY_LIB_DIR_OPT
+OpenCV_3RDPARTY_LIB_DIR_OPT-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: OpenCV_CONFIG_PATH
+OpenCV_CONFIG_PATH-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: OpenCV_LIB_DIR_DBG
+OpenCV_LIB_DIR_DBG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: OpenCV_LIB_DIR_OPT
+OpenCV_LIB_DIR_OPT-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: PCL_COMMON_LIBRARY
 PCL_COMMON_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: PCL_COMMON_LIBRARY_DEBUG

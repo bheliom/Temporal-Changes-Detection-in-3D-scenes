@@ -29,3 +29,22 @@ void savePlyFileVcg(std::string filename, MyMesh &m){
   exportVar.Save(m,filename.c_str(),vcg::tri::io::Mask::IOM_VERTCOLOR);
 
 }
+
+void getBundlerFile(MyMesh &m, std::string filename, std::string filename_images, std::vector<vcg::Shot<float> > &shots, std::vector<std::string> &image_filenames){
+
+  vcg::tri::io::ImporterOUT<MyMesh> importVar;
+
+  if(importVar.Open(m, shots , image_filenames, filename.c_str(), filename_images.c_str()))
+     std::cout<<"Error reading the bundler files!"<<std::endl;
+
+}
+
+
+
+
+
+
+
+
+
+

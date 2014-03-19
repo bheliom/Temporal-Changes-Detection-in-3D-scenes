@@ -5,6 +5,6 @@
 
 double getEdgeAverage(MyMesh &m);
 double getFaceEdgeAverage(MyFace &f);
-
+void removeUnnFaces(MyMesh &m, int thresVal);
 
 #endif

@@ -44,3 +44,24 @@ double getFaceEdgeAverage(MyFace &f){
   
   return (sqrt(tmp1.dot(tmp1))+sqrt(tmp2.dot(tmp2))+sqrt(tmp3.dot(tmp3)))/3;    
 }
+
+/*Function removes faces basing on the face average edge length*/
+void removeUnnFaces(MyMesh &m, int thresVal){
+  
+  double avgEdge, tmp;
+  MyMesh::FaceIterator fi;
+
+  avgEdge = getEdgeAverage(m);
+
+  std::cout<<"Edge average length: "<<avgEdge<<std::endl;
+  
+  vcg::tri::UpdateTopology<MyMesh>::VertexFace(m); 
+  
+  for(fi=m.face.begin(); fi!=m.face.end(); ++fi){
+    tmp = getFaceEdgeAverage(*fi);
+
+    if(tmp>thresVal*avgEdge)
+      vcg::tri::Allocator<MyMesh>::DeleteFace(m, *fi);
+  }  
+
+}

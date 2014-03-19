@@ -3,25 +3,24 @@
 #include "util/meshProcess.hpp"
 
 using namespace std;
-void test1(string filename);
+
+void testBundler(string filename, string filename2, string filename3);
 void test2();
 void test3(string filename);
 void testRemove(string filename);
+void testNN(string filename);
 
 int main(int argc, char** argv){
 
   string filename(argv[1]);
-  testRemove(filename);
+  //  string filename2(argv[2]);
+  //  string filename3(argv[3]);
+
+  // testBundler(filename, filename2, filename3);
+
+  testNN(filename);
 
   return 0;
-}
-
-void test1(string filename){
-
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
-
-  getPlyFile<pcl::PointXYZRGB>(filename, cloud);
-  
 }
 
 void test2(){
@@ -38,30 +37,42 @@ void test3(string filename){
 }
 
 void testRemove(string filename){
+
   MyMesh m;
   getPlyFileVcg(filename, m); 
- 
-
-  double avgEdge;
-  avgEdge = getEdgeAverage(m);
-
-  cout<<"Edge average length: "<<avgEdge<<endl;
-  vcg::tri::UpdateTopology<MyMesh>::VertexFace(m); 
   
-  MyMesh::FaceIterator fi;
-  double tmp;
-  int count = 0;
+  removeUnnFaces(m,20);
 
-  for(fi=m.face.begin(); fi!=m.face.end(); ++fi){
-   
-    tmp = getFaceEdgeAverage(*fi);
-    if(tmp>20*avgEdge) {
-      vcg::tri::Allocator<MyMesh>::DeleteFace(m, *fi);
-      count++;
-    }
-  }
-  //  vcg::tri::UpdateColor<MyMesh>::PerFaceFromVertex(m);
   savePlyFileVcg("testMesh.ply",m);
+}
 
-  cout<<count<<endl;
+
+void testBundler(string filename, string filename2, string filename3){
+
+  MyMesh m;
+  getPlyFileVcg(filename, m); 
+
+  vector<vcg::Shot<float> > shots;
+  vector<string> image_filenames;
+
+  getBundlerFile(m, filename2, filename3, shots, image_filenames);
+
+  cout<<shots.size()<<endl;
+  cout<<image_filenames.size()<<endl;
+  cout<<image_filenames[0].c_str()<<endl;
+
+  MyMesh::PerVertexAttributeHandle<vcg::tri::io::CorrVec> named_hv = vcg::tri::Allocator<MyMesh>:: GetPerVertexAttribute<vcg::tri::io::CorrVec> (m,std::string("correspondences"));
+
+  cout<<named_hv[2].at(0).id_img<<endl;
+
+}
+
+void testNN(string filename){
+  //  pcl::PointCloud<PointXYZ>::Pointer
+  //  pcl::PointCloud<PointXYZ>::
+  pcl::PointCloud<pcl::PointXYZ>::Ptr pmvsCloud;
+
+  getPlyFilePCL(filename, pmvsCloud);
+  
+  
 }
