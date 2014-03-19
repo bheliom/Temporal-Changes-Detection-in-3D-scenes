@@ -4,7 +4,7 @@ project(masterThesis)
 
 find_package( OpenCV REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
-find_package(PCL 1.3 REQUIRED COMPONENTS common io)
+find_package(PCL 1.3 REQUIRED)
 
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
@@ -13,7 +13,6 @@ add_definitions(${PCL_DEFINITIONS})
 add_executable(masterThesis masterThesis.cpp util/utilIO.cpp util/meshProcess.cpp
  /usr/include/wrap/ply/plylib.cpp)
  
-#target_link_libraries(masterThesis QImageReader)
-target_link_libraries(masterThesis ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
+target_link_libraries(masterThesis ${PCL_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
 
 target_link_libraries(masterThesis ${OpenCV_LIBS})

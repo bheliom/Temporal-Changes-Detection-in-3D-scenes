@@ -1,5 +1,44 @@
 #include "utilIO.hpp"
 
+void readCmdInput(std::map<int,std::string> &inStrings, int argc, char** argv){
+  
+  int flags, opt;
+  int nsecs, tfnd;
+
+  nsecs = 0;
+  tfnd = 0;
+  flags = 0;
+
+  while ((opt = getopt(argc, argv, "m:p:b:i:o:")) != -1) {
+    switch (opt) {
+   
+    case 'm':
+      inStrings[MESH] = optarg;
+      break;
+    case 'p':
+      inStrings[PMVS] = optarg;
+      break;
+    case 'b':
+      inStrings[BUNDLER] = optarg;
+      break;
+    case 'i':
+      inStrings[IMAGELIST] = optarg;
+      break;
+    case 'o':
+      inStrings[OUTDIR] = optarg;
+      break;
+    
+    default: /* '?' */
+      fprintf(stderr, "Usage: %s [-m input mesh] [-p input PMVS] [-b input bundler file] [-i input image list]\n",
+	      argv[0]);
+    }
+  }
+}
+
+void inputHandler(std::vector<std::string> inputStrings){
+
+}
+
 void callVsfm(std::string dataPath, std::string outputPath){
   
   std::string outCommand;
@@ -33,7 +72,7 @@ void savePlyFileVcg(std::string filename, MyMesh &m){
 void getBundlerFile(MyMesh &m, std::string filename, std::string filename_images, std::vector<vcg::Shot<float> > &shots, std::vector<std::string> &image_filenames){
 
   vcg::tri::io::ImporterOUT<MyMesh> importVar;
-
+  std::cout<<"jestem tu";
   if(importVar.Open(m, shots , image_filenames, filename.c_str(), filename_images.c_str()))
      std::cout<<"Error reading the bundler files!"<<std::endl;
 

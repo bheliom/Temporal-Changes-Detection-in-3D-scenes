@@ -15,6 +15,8 @@ util/meshProcess.hpp
 /home/bheliom/develop/masterTh/util/meshProcess.hpp
 
 /home/bheliom/develop/masterTh/util/../common/common.hpp
+globVariables.hpp
+/home/bheliom/develop/masterTh/util/../common/globVariables.hpp
 vcg/math/shot.h
 -
 wrap/io_trimesh/import_out.h
@@ -32,16 +34,18 @@ vcg/complex/algorithms/update/normal.h
 vcg/complex/algorithms/update/color.h
 -
 
+/home/bheliom/develop/masterTh/util/../common/globVariables.hpp
+
 /home/bheliom/develop/masterTh/util/meshProcess.hpp
 ../common/common.hpp
 /home/bheliom/develop/masterTh/util/../common/common.hpp
 
-/home/bheliom/develop/masterTh/util/utilIO.cpp
-utilIO.hpp
-/home/bheliom/develop/masterTh/util/utilIO.hpp
-
 /home/bheliom/develop/masterTh/util/utilIO.hpp
 string
+-
+unistd.h
+-
+map
 -
 ../common/common.hpp
 /home/bheliom/develop/masterTh/util/../common/common.hpp
@@ -547,6 +551,8 @@ boost/type_traits.hpp
 -
 stddef.h
 -
+
+/usr/include/qhull/io.h
 
 /usr/local/include/eigen3/Eigen/Cholesky
 Core

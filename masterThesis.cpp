@@ -8,18 +8,14 @@ void testBundler(string filename, string filename2, string filename3);
 void test2();
 void test3(string filename);
 void testRemove(string filename);
-void testNN(string filename);
+void testNN(map<int,string> inputStrings);
 
 int main(int argc, char** argv){
 
-  string filename(argv[1]);
-  //  string filename2(argv[2]);
-  //  string filename3(argv[3]);
-
   // testBundler(filename, filename2, filename3);
-
-  testNN(filename);
-
+  map<int,string> inputStrings;
+  readCmdInput(inputStrings, argc, argv);
+  testNN(inputStrings);
   return 0;
 }
 
@@ -67,12 +63,31 @@ void testBundler(string filename, string filename2, string filename3){
 
 }
 
-void testNN(string filename){
-  //  pcl::PointCloud<PointXYZ>::Pointer
-  //  pcl::PointCloud<PointXYZ>::
-  pcl::PointCloud<pcl::PointXYZ>::Ptr pmvsCloud;
+void testNN(map<int,string> inputStrings){
+  pcl::PointCloud<pcl::PointXYZ>::Ptr pmvsCloud(new pcl::PointCloud<pcl::PointXYZ>);
 
-  getPlyFilePCL(filename, pmvsCloud);
+  MyMesh m;
+  MyMesh pmvsMesh;
+  vector<vcg::Shot<float> > shots;
+  vector<string> image_filenames;
+
+  getPlyFileVcg(inputStrings[MESH], m);
+
+  getPlyFileVcg(inputStrings[PMVS], pmvsMesh);
+
+  getPlyFilePCL(inputStrings[PMVS], pmvsCloud);
+
+  getBundlerFile(pmvsMesh, inputStrings[BUNDLER], inputStrings[IMAGELIST], shots, image_filenames); 
+
+  MyMesh::PerVertexAttributeHandle<vcg::tri::io::CorrVec> named_hv = vcg::tri::Allocator<MyMesh>:: GetPerVertexAttribute<vcg::tri::io::CorrVec> (m,std::string("correspondences"));
+
+  int counter = 0;
+  for (int i = 0 ; i< pmvsMesh.vert.size(); i++)
+    if(named_hv[i].size())
+      counter++;
   
-  
+  cout<<counter<<endl;
+  visibilityEstimation(m, pmvsCloud, 3);
+
+
 }

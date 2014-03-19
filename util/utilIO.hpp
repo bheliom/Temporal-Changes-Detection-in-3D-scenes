@@ -2,13 +2,21 @@
 #define __UTILIO_H_INCLUDED__
 
 #include <string>
+#include <unistd.h>
+#include <map>
+
 #include "../common/common.hpp"
+
 #include<wrap/io_trimesh/import_off.h>
 
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
+
+void readCmdInput(std::map<int,std::string> &inputStrings, int argc, char** argv);
+
+void inputHandler(std::vector<std::string> inputStrings);
 
 void callVsfm(std::string dataPath, std::string outputPath);
 
@@ -36,8 +44,9 @@ for(int i = 0; i < m.vert.size(); i++){
   searchPoint.y = m.vert[i].P().Y();
   searchPoint.z = m.vert[i].P().Z();
 
-  kdtree.nearestKSearch(searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance);
-}
+  if(kdtree.nearestKSearch(searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance)){}
+
+ }
 }
 
 template <typename T>
