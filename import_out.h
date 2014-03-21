@@ -30,7 +30,8 @@
 #include <vcg/complex/algorithms/update/bounding.h>
 #include <wrap/callback.h>
 #include <wrap/io_trimesh/io_mask.h>
-#include <QtGui/QImageReader>
+//MY MODIFICATION
+//#include <QtGui/QImageReader>
 
 //MY MODIFICATION WITH OPENCV
 #include <opencv2/core/core.hpp>
