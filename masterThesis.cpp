@@ -1,5 +1,4 @@
 #include <iostream>
-//#include "util/utilIO.hpp"
 #include "util/meshProcess.hpp"
 
 using namespace std;
@@ -14,6 +13,7 @@ int main(int argc, char** argv){
 
   map<int,string> inputStrings;
   readCmdInput(inputStrings, argc, argv);
+
   testNN(inputStrings);
   return 0;
 

@@ -15,6 +15,8 @@ void removeUnnFaces(MyMesh &m, int thresVal);
 
 void findOcc(std::map<int,int> inMap, std::vector<int> &outVector, int noOfOut);
 
+void findVertNeigh();
+
 template <typename T>
 void visibilityEstimation(MyMesh &m, MyMesh &pmvsMesh, boost::shared_ptr<pcl::PointCloud<T> > pmvsCloud, int K){
   

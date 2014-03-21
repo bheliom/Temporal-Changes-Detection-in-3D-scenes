@@ -1,6 +1,0 @@
-#ifndef MESHPROCESS_H
-#define MESHPROCESS_H
-
-float getEdgeAverage(MyMesh &m);
-
-#endif

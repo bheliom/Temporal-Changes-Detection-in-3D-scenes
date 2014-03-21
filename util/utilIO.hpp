@@ -13,6 +13,8 @@
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 
+void getImgSet(std::vector<std::string> fileDirs);
+
 void readCmdInput(std::map<int,std::string> &inputStrings, int argc, char** argv);
 
 void inputHandler(std::vector<std::string> inputStrings);

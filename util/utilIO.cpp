@@ -9,30 +9,35 @@ void readCmdInput(std::map<int,std::string> &inStrings, int argc, char** argv){
   tfnd = 0;
   flags = 0;
 
-  while ((opt = getopt(argc, argv, "m:p:b:i:o:")) != -1) {
-    switch (opt) {
+  if((opt = getopt(argc, argv, "m:p:b:i:o:")) != -1){
+
+    while ((opt = getopt(argc, argv, "m:p:b:i:o:")) != -1) {
+      switch (opt) {
    
-    case 'm':
-      inStrings[MESH] = optarg;
-      break;
-    case 'p':
-      inStrings[PMVS] = optarg;
-      break;
-    case 'b':
-      inStrings[BUNDLER] = optarg;
-      break;
-    case 'i':
-      inStrings[IMAGELIST] = optarg;
-      break;
-    case 'o':
-      inStrings[OUTDIR] = optarg;
-      break;
-    
-    default: /* '?' */
-      fprintf(stderr, "Usage: %s [-m input mesh] [-p input PMVS] [-b input bundler file] [-i input image list]\n",
-	      argv[0]);
+      case 'm':
+	inStrings[MESH] = optarg;
+	break;
+      case 'p':
+	inStrings[PMVS] = optarg;
+	break;
+      case 'b':
+	inStrings[BUNDLER] = optarg;
+	break;
+      case 'i':
+	inStrings[IMAGELIST] = optarg;
+	break;
+      case 'o':
+	inStrings[OUTDIR] = optarg;
+	break;
+	
+      default: /* '?' */
+	fprintf(stderr, "Usage: %s [-m input mesh] [-p input PMVS] [-b input bundler file] [-i input image list]\n",
+		argv[0]);
+      }
     }
   }
+  else
+    std::cout<<"Input arguments required!\nUsage: [-m input mesh] [-p input PMVS] [-b input bundler file] [-i input image list]\n"<<std::endl;
 }
 
 void inputHandler(std::vector<std::string> inputStrings){

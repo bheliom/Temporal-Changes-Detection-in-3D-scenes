@@ -1,6 +1,0 @@
-#include "meshProcess.hpp"
-
-
-double getEdgeAverage(MyMesh &m){
-
-}
