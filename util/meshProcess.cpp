@@ -45,9 +45,7 @@ double getEdgeAverage(MyMesh &m){
     tmp = vp1->P() - vp2->P();
     
     tmpSum+=sqrt(tmp.dot(tmp));
-
   }
-
   return tmpSum/edgesSize;
 }
 

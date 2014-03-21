@@ -9,8 +9,6 @@ void readCmdInput(std::map<int,std::string> &inStrings, int argc, char** argv){
   tfnd = 0;
   flags = 0;
 
-  if((opt = getopt(argc, argv, "m:p:b:i:o:")) != -1){
-
     while ((opt = getopt(argc, argv, "m:p:b:i:o:")) != -1) {
       switch (opt) {
    
@@ -35,9 +33,6 @@ void readCmdInput(std::map<int,std::string> &inStrings, int argc, char** argv){
 		argv[0]);
       }
     }
-  }
-  else
-    std::cout<<"Input arguments required!\nUsage: [-m input mesh] [-p input PMVS] [-b input bundler file] [-i input image list]\n"<<std::endl;
 }
 
 void inputHandler(std::vector<std::string> inputStrings){

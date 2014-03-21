@@ -66,19 +66,21 @@ void testBundler(string filename, string filename2, string filename3){
 void testNN(map<int,string> inputStrings){
 
   pcl::PointCloud<pcl::PointXYZ>::Ptr pmvsCloud(new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr mCloud(new pcl::PointCloud<pcl::PointXYZ>);
 
   MyMesh m;
   MyMesh pmvsMesh;
+
   vector<vcg::Shot<float> > shots;
   vector<string> image_filenames;
 
   getPlyFileVcg(inputStrings[MESH], m);
-
   getPlyFileVcg(inputStrings[PMVS], pmvsMesh);
 
   getPlyFilePCL(inputStrings[PMVS], pmvsCloud);
+  getPlyFilePCL(inputStrings[MESH], mCloud);
 
   getBundlerFile(pmvsMesh, inputStrings[BUNDLER], inputStrings[IMAGELIST], shots, image_filenames); 
   
-  visibilityEstimation(m, pmvsMesh, pmvsCloud, 30);
+  visibilityEstimation(m, pmvsMesh, pmvsCloud, 30, mCloud, shots);
 }
