@@ -1,5 +1,28 @@
 #include "utilIO.hpp"
 
+void getImgSet(std::vector<std::string> fileDirs, std::vector<cv::Mat> &outImgSet){
+
+  std::cout<<"Loading images..."<<std::endl;
+  cv::Mat image;
+
+  for(std::vector<std::string>::iterator it = fileDirs.begin(); it!=fileDirs.end(); ++it){
+    image = cv::imread("/home/bheliom/Pictures/NotreDame/"+*it, CV_LOAD_IMAGE_COLOR);
+    std::cout<<"/home/bheliom/Pictures/NotreDame/"+*it<<std::endl;
+
+    if(!image.data)
+      std::cout<<"Could not open the file!"<<std::endl;
+    else
+      outImgSet.push_back(image);
+  }
+
+  std::cout<<"Done."<<std::endl;
+}
+
+cv::Mat getImg(std::string fileDirs){
+  
+    return cv::imread(fileDirs.c_str(), CV_LOAD_IMAGE_COLOR);
+}
+
 void readCmdInput(std::map<int,std::string> &inStrings, int argc, char** argv){
   
   int flags, opt;

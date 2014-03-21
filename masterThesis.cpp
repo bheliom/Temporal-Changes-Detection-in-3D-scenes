@@ -82,5 +82,5 @@ void testNN(map<int,string> inputStrings){
 
   getBundlerFile(pmvsMesh, inputStrings[BUNDLER], inputStrings[IMAGELIST], shots, image_filenames); 
   
-  visibilityEstimation(m, pmvsMesh, pmvsCloud, 30, mCloud, shots);
+  visibilityEstimation(m, pmvsMesh, pmvsCloud, 30, mCloud, shots, image_filenames);
 }

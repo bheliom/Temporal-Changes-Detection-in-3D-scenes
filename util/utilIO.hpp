@@ -13,7 +13,12 @@
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 
-void getImgSet(std::vector<std::string> fileDirs);
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+void getImgSet(std::vector<std::string> fileDirs, std::vector<cv::Mat> &outImgSet);
+
+cv::Mat getImg(std::string fileDir);
 
 void readCmdInput(std::map<int,std::string> &inputStrings, int argc, char** argv);
 
