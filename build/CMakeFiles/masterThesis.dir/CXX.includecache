@@ -9,8 +9,6 @@
 /home/bheliom/develop/masterTh/masterThesis.cpp
 iostream
 -
-util/utilIO.hpp
-/home/bheliom/develop/masterTh/util/utilIO.hpp
 util/meshProcess.hpp
 /home/bheliom/develop/masterTh/util/meshProcess.hpp
 
@@ -36,9 +34,21 @@ vcg/complex/algorithms/update/color.h
 
 /home/bheliom/develop/masterTh/util/../common/globVariables.hpp
 
+/home/bheliom/develop/masterTh/util/meshProcess.cpp
+meshProcess.hpp
+/home/bheliom/develop/masterTh/util/meshProcess.hpp
+
 /home/bheliom/develop/masterTh/util/meshProcess.hpp
 ../common/common.hpp
 /home/bheliom/develop/masterTh/util/../common/common.hpp
+utilIO.hpp
+/home/bheliom/develop/masterTh/util/utilIO.hpp
+map
+-
+pcl/kdtree/kdtree_flann.h
+-
+vector
+-
 
 /home/bheliom/develop/masterTh/util/utilIO.hpp
 string
@@ -50,8 +60,6 @@ map
 ../common/common.hpp
 /home/bheliom/develop/masterTh/util/../common/common.hpp
 wrap/io_trimesh/import_off.h
--
-pcl/kdtree/kdtree_flann.h
 -
 pcl/io/pcd_io.h
 -

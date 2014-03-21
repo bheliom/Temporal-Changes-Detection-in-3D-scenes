@@ -2,6 +2,24 @@
 
 typedef vcg::tri::UpdateTopology<MyMesh>::PEdge SingleEdge;
 
+void findOcc(std::map<int, int> inMap, std::vector<int> &outVector, int noOfOut){
+  int tmpMax = 0;
+  int tmpMaxId;
+  
+  if(inMap.size()<noOfOut) noOfOut = inMap.size();
+
+  for (int k = 0; k < noOfOut; k++){
+    for (std::map<int,int>::iterator it = inMap.begin(); it != inMap.end(); it++)
+      if (tmpMax<it->second) {
+	tmpMax = it->second;
+	tmpMaxId = it->first;
+      }
+    tmpMax = 0;
+    outVector.push_back(tmpMaxId);
+    inMap.erase(inMap.find(tmpMaxId));		
+  }
+}
+
 /*Function returns average length of the edge in the whole mesh*/
 double getEdgeAverage(MyMesh &m){
 

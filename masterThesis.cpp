@@ -1,5 +1,5 @@
 #include <iostream>
-#include "util/utilIO.hpp"
+//#include "util/utilIO.hpp"
 #include "util/meshProcess.hpp"
 
 using namespace std;
@@ -12,11 +12,11 @@ void testNN(map<int,string> inputStrings);
 
 int main(int argc, char** argv){
 
-  // testBundler(filename, filename2, filename3);
   map<int,string> inputStrings;
   readCmdInput(inputStrings, argc, argv);
   testNN(inputStrings);
   return 0;
+
 }
 
 void test2(){
@@ -64,6 +64,7 @@ void testBundler(string filename, string filename2, string filename3){
 }
 
 void testNN(map<int,string> inputStrings){
+
   pcl::PointCloud<pcl::PointXYZ>::Ptr pmvsCloud(new pcl::PointCloud<pcl::PointXYZ>);
 
   MyMesh m;
@@ -78,16 +79,6 @@ void testNN(map<int,string> inputStrings){
   getPlyFilePCL(inputStrings[PMVS], pmvsCloud);
 
   getBundlerFile(pmvsMesh, inputStrings[BUNDLER], inputStrings[IMAGELIST], shots, image_filenames); 
-
-  MyMesh::PerVertexAttributeHandle<vcg::tri::io::CorrVec> named_hv = vcg::tri::Allocator<MyMesh>:: GetPerVertexAttribute<vcg::tri::io::CorrVec> (m,std::string("correspondences"));
-
-  int counter = 0;
-  for (int i = 0 ; i< pmvsMesh.vert.size(); i++)
-    if(named_hv[i].size())
-      counter++;
   
-  cout<<counter<<endl;
-  visibilityEstimation(m, pmvsCloud, 3);
-
-
+  visibilityEstimation(m, pmvsMesh, pmvsCloud, 30);
 }
