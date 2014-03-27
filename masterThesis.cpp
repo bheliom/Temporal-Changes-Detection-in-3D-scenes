@@ -68,6 +68,8 @@ void testNN(map<int,string> inputStrings){
   pcl::PointCloud<pcl::PointXYZ>::Ptr pmvsCloud(new pcl::PointCloud<pcl::PointXYZ>);
   pcl::PointCloud<pcl::PointXYZ>::Ptr mCloud(new pcl::PointCloud<pcl::PointXYZ>);
 
+
+
   MyMesh m;
   MyMesh pmvsMesh;
 
@@ -77,10 +79,35 @@ void testNN(map<int,string> inputStrings){
   getPlyFileVcg(inputStrings[MESH], m);
   getPlyFileVcg(inputStrings[PMVS], pmvsMesh);
 
-  getPlyFilePCL(inputStrings[PMVS], pmvsCloud);
-  getPlyFilePCL(inputStrings[MESH], mCloud);
+  //  getPlyFilePCL(inputStrings[PMVS], pmvsCloud);
+  //  getPlyFilePCL(inputStrings[MESH], mCloud);
  
   getBundlerFile(pmvsMesh, inputStrings[BUNDLER], inputStrings[IMAGELIST], shots, image_filenames); 
+
+  MyMesh::PerVertexAttributeHandle<vcg::tri::io::CorrVec> named_hv = vcg::tri::Allocator<MyMesh>:: GetPerVertexAttribute<vcg::tri::io::CorrVec> (pmvsMesh, std::string("correspondences"));
+
+
+  for(int i = 0 ; i < pmvsMesh.vert.size(); i++)
+    {
+
+      if(!named_hv[i].empty())
+	{
+	  cv::Mat image = getImg(image_filenames[i]);
+	  cv::Size s = image.size();
+	  
+	  vcg::Point2i tmpDisp(named_hv[i].at(0).x+s.width/2,named_hv[i].at(0).y+s.height/2);
+	  vcg::Point3f tmpDisp2 = pmvsMesh.vert[i].P();
+	  
+	  vcg::Point2i tmpDisp3 = getPtImgCoord(shots[i].Project(tmpDisp2), shots[i]);
+	  
+	  std::cout<<"Dimensions:"<< s.width << " " << s.height << std::endl;
+	  std::cout<<"Point X Y:" << tmpDisp3.X()<< " " <<tmpDisp3.Y() << std::endl;
+	  
+	  dispProjPt(tmpDisp3, image);
+	  dispProjPt(tmpDisp, image);
+	}
+    }
+
   
-  visibilityEstimation(m, pmvsMesh, pmvsCloud, 30, mCloud, shots, image_filenames);
+  //  visibilityEstimation(m, pmvsMesh, pmvsCloud, 30, mCloud, shots, image_filenames);
 }

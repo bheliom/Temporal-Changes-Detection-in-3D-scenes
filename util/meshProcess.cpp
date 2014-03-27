@@ -2,42 +2,52 @@
 
 typedef vcg::tri::UpdateTopology<MyMesh>::PEdge SingleEdge;
 
+
+pcl::PointXYZ vcg2pclPt(vcg::Point3<float> inPt)
+{
+  pcl::PointXYZ outPt;
+  outPt.x = inPt.X();
+  outPt.y = inPt.Y();
+  outPt.z = inPt.Z();
+  
+  return outPt;
+}
+
 /*Function calculates image coordinates of the point projected using vcg::Shot class member function*/
 vcg::Point2i getPtImgCoord(const vcg::Point2f &inPoint, const vcg::Shot<float> &inShot){
   
   vcg::Point2f checkIt = inPoint;
-  vcg::Point2i tmpPoint(static_cast<int>(checkIt.X()), static_cast<int>(checkIt.Y())); 
-  
-  
-   tmpPoint[0]+=inShot.Intrinsics.ViewportPx.X();
-   tmpPoint[1]+=inShot.Intrinsics.ViewportPx.Y();
+  //checkIt[0]/=inShot.Intrinsics.PixelSizeMm.X();
 
-  //  vcg::Point2i tmpPoint(static_cast<int>(inPoint.X()), static_cast<int>(inPoint.Y()));    
-  
-  //  vcg::Point2i out(tmpPoint.X(),tmpPoint.Y()-inShot.Intrinsics.ViewportPx.Y());
+  //  checkIt[1]/=inShot.Intrinsics.PixelSizeMm.Y();
+  vcg::Point2i tmpPoint(static_cast<int>(checkIt.X()), static_cast<int>(checkIt.Y()));
 
-  
   return tmpPoint;
 
 }
 
 
-void findOcc(std::map<int, int> inMap, std::vector<int> &outVector, int noOfOut){
+void findOcc(std::map<int, int> &inMap, std::vector<int> &outVector, int noOfOut){
   int tmpMax = 0;
   int tmpMaxId = 0;
   
-  noOfOut =  inMap.size() < noOfOut ? inMap.size() : 0;
-
-  for (int k = 0; k < noOfOut; k++){
+  if(inMap.size() < noOfOut){
     for (std::map<int,int>::iterator it = inMap.begin(); it != inMap.end(); it++)
-      if (tmpMax<it->second) {
-	tmpMax = it->second;
-	tmpMaxId = it->first;
-      }
-    outVector.push_back(tmpMaxId);
-    inMap.erase(inMap.find(tmpMaxId));		
-    tmpMax = 0;
-    tmpMaxId = 0;
+      outVector.push_back(it->first);
+  }
+  
+  else {
+    for (int k = 0; k < noOfOut; k++){
+      for (std::map<int,int>::iterator it = inMap.begin(); it != inMap.end(); it++)
+	if (tmpMax<it->second) {
+	  tmpMax = it->second;
+	  tmpMaxId = it->first;
+	}
+      outVector.push_back(tmpMaxId);
+      inMap.erase(inMap.find(tmpMaxId));		
+      tmpMax = 0;
+      tmpMaxId = 0;
+    }
   }
 }
 
