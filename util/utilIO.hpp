@@ -16,6 +16,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+void dispProjPt(const vcg::Point2i &inPt, cv::Mat &inImg);
+
 void getImgSet(std::vector<std::string> fileDirs, std::vector<cv::Mat> &outImgSet);
 
 cv::Mat getImg(std::string fileDir);

@@ -1,5 +1,18 @@
 #include "utilIO.hpp"
 
+void dispProjPt(const vcg::Point2i &inPt, cv::Mat &inImg){
+  
+  static cv::Scalar color = cv::Scalar(0, 0, 0);	
+    
+  cv::circle(inImg, cv::Point(inPt.X(),inPt.Y()), 50 , color, 15);
+  
+  cv::namedWindow( "Display window", cv::WINDOW_NORMAL );// Create a window for display.
+  cv::imshow( "Display window", inImg);                   // Show our image inside it.
+      
+  cv::waitKey(0);                        
+
+}
+
 void getImgSet(std::vector<std::string> fileDirs, std::vector<cv::Mat> &outImgSet){
 
   std::cout<<"Loading images..."<<std::endl;
@@ -20,7 +33,7 @@ void getImgSet(std::vector<std::string> fileDirs, std::vector<cv::Mat> &outImgSe
 
 cv::Mat getImg(std::string fileDirs){
   
-    return cv::imread(fileDirs.c_str(), CV_LOAD_IMAGE_COLOR);
+  return cv::imread(fileDirs.c_str());//, CV_LOAD_IMAGE_COLOR);
 }
 
 void readCmdInput(std::map<int,std::string> &inStrings, int argc, char** argv){
@@ -94,10 +107,11 @@ void savePlyFileVcg(std::string filename, MyMesh &m){
 
 void getBundlerFile(MyMesh &m, std::string filename, std::string filename_images, std::vector<vcg::Shot<float> > &shots, std::vector<std::string> &image_filenames){
 
+  std::cout<<"Get bundler file..."<<std::endl;
   vcg::tri::io::ImporterOUT<MyMesh> importVar;
 
   if(importVar.Open(m, shots , image_filenames, filename.c_str(), filename_images.c_str()))
-     std::cout<<"Error reading the bundler files!"<<std::endl;
+     std::cout<<"Error reading the bundler file!"<<std::endl;
 
 }
 
