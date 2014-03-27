@@ -92,19 +92,23 @@ void testNN(map<int,string> inputStrings){
 
       if(!named_hv[i].empty())
 	{
-	  cv::Mat image = getImg(image_filenames[i]);
-	  cv::Size s = image.size();
 	  
-	  vcg::Point2i tmpDisp(named_hv[i].at(0).x+s.width/2,named_hv[i].at(0).y+s.height/2);
-	  vcg::Point3f tmpDisp2 = pmvsMesh.vert[i].P();
+	  for(int j = 0; j< named_hv[i].size(); j++)
+	    {
+	      cv::Mat image = getImg(image_filenames[named_hv[i].at(j).id_img]);
+	      cv::Size s = image.size();
 	  
-	  vcg::Point2i tmpDisp3 = getPtImgCoord(shots[i].Project(tmpDisp2), shots[i]);
-	  
-	  std::cout<<"Dimensions:"<< s.width << " " << s.height << std::endl;
-	  std::cout<<"Point X Y:" << tmpDisp3.X()<< " " <<tmpDisp3.Y() << std::endl;
-	  
-	  dispProjPt(tmpDisp3, image);
-	  dispProjPt(tmpDisp, image);
+	      vcg::Point2i tmpDisp(named_hv[i].at(j).x+s.width/2,named_hv[i].at(j).y+s.height/2);
+	      vcg::Point3f tmpDisp2 = pmvsMesh.vert[i].P();
+	      
+	      vcg::Point2i tmpDisp3 = getPtImgCoord(shots[i].Project(tmpDisp2), shots[i]);
+	      
+	      std::cout<<"Dimensions:"<< s.width << " " << s.height << std::endl;
+	      std::cout<<"Point X Y:" << tmpDisp3.X()<< " " <<tmpDisp3.Y() << std::endl;
+	      
+	      dispProjPt(tmpDisp3, image);
+	      dispProjPt(tmpDisp, image);
+	    }
 	}
     }
 
