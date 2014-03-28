@@ -109,6 +109,8 @@ void testNN(map<int,string> inputStrings){
 	      std::cout<<"SIFT:"<< tmpDisp.X()<<" "<<tmpDisp.Y()<<std::endl;
 	      std::cout<<"Point X Y:" << tmpDisp3.X()<< " " <<tmpDisp3.Y() << std::endl;
 	      std::cout<<"difference"<< tmpDisp.X()-tmpDisp3.X() << " "<<tmpDisp.Y()-tmpDisp3.Y()<<std::endl;
+	      static cv::Scalar color = cv::Scalar(255, 0, 0);	
+	      cv::circle(image, cv::Point(tmpDisp.X(),tmpDisp.Y()), 50 , color, 15);
 	      dispProjPt(tmpDisp3, image);
 	      dispProjPt(tmpDisp, image);
 	    }
