@@ -107,6 +107,15 @@ void testNN(map<int,string> inputStrings){
 	      tmpDisp4[0] = s.width-tmpDisp4.X();
 	      tmpDisp4[1] = s.height - tmpDisp4.Y();
 
+
+	      pmvsMesh.vert[i].SetS();
+      
+	      vcg::tri::UpdateSelection<MyMesh>::FaceFromVertexLoose(m);
+	      vcg::tri::UpdateColor<MyMesh>::PerFaceConstant(pmvsMesh,vcg::Color4b::Red, true);
+	      vcg::tri::UpdateColor<MyMesh>::PerVertexConstant(pmvsMesh,vcg::Color4b::Red, true);
+      
+	      savePlyFileVcg("testColor3.ply", pmvsMesh);
+
 	      std::cout<<"Dimensions:"<< s.width << " " << s.height << std::endl;
 	      std::cout<<"SIFT:"<< tmpDisp.X()<<" "<<tmpDisp.Y()<<std::endl;
 	      std::cout<<"Point X Y:" << tmpDisp3.X()<< " " <<tmpDisp3.Y() << std::endl;
