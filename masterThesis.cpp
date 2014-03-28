@@ -108,7 +108,7 @@ void testNN(map<int,string> inputStrings){
 	      std::cout<<"Dimensions:"<< s.width << " " << s.height << std::endl;
 	      std::cout<<"SIFT:"<< tmpDisp.X()<<" "<<tmpDisp.Y()<<std::endl;
 	      std::cout<<"Point X Y:" << tmpDisp3.X()<< " " <<tmpDisp3.Y() << std::endl;
-	      std::cout<<"difference"<< tmpDisp.X()-tmpDisp3.X() << " "tmpDisp.Y()-tmpDisp3.Y()<<std::endl;
+	      std::cout<<"difference"<< tmpDisp.X()-tmpDisp3.X() << " "<<tmpDisp.Y()-tmpDisp3.Y()<<std::endl;
 	      dispProjPt(tmpDisp3, image);
 	      dispProjPt(tmpDisp, image);
 	    }
