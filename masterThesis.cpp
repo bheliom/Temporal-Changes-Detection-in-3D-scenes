@@ -103,12 +103,17 @@ void testNN(map<int,string> inputStrings){
 	      vcg::Point3f tmpDisp2 = pmvsMesh.vert[i].P();
 	      
 	      vcg::Point2i tmpDisp3 = getPtImgCoord(shots[idImg].Project(tmpDisp2), shots[i]);
-	      
+	      vcg::Point2f tmpDisp4 = shots[idImg].Project(tmpDisp2);
+	      tmpDisp4[0] = s.width-tmpDisp4.X();
+	      tmpDisp4[1] = s.height - tmpDisp4.Y();
+
 	      std::cout<<"Dimensions:"<< s.width << " " << s.height << std::endl;
 	      std::cout<<"SIFT:"<< tmpDisp.X()<<" "<<tmpDisp.Y()<<std::endl;
 	      std::cout<<"Point X Y:" << tmpDisp3.X()<< " " <<tmpDisp3.Y() << std::endl;
 	      std::cout<<"difference"<< tmpDisp.X()-tmpDisp3.X() << " "<<tmpDisp.Y()-tmpDisp3.Y()<<std::endl;
 	      static cv::Scalar color = cv::Scalar(255, 0, 0);	
+	      static cv::Scalar color1 = cv::Scalar(0, 255, 0);	
+	      cv::circle(image, cv::Point(tmpDisp4.X(),tmpDisp4.Y()), 50 , color1, 15);
 	      cv::circle(image, cv::Point(tmpDisp.X(),tmpDisp.Y()), 50 , color, 15);
 	      dispProjPt(tmpDisp3, image);
 	      dispProjPt(tmpDisp, image);
