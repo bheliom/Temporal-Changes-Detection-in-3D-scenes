@@ -99,7 +99,7 @@ void testNN(map<int,string> inputStrings){
 	      cv::Mat image = getImg(image_filenames[idImg]);
 	      cv::Size s = image.size();
 
-	      vcg::Point2i tmpDisp(s.width/2+named_hv[i].at(j).x,s.height-named_hv[i].at(j).y);
+	      vcg::Point2i tmpDisp(s.width/2+named_hv[i].at(j).x,s.height/2-named_hv[i].at(j).y);
 	      vcg::Point3f tmpDisp2 = pmvsMesh.vert[i].P();
 	      
 	      vcg::Point2i tmpDisp3 = getPtImgCoord(shots[idImg].Project(tmpDisp2), shots[i]);
