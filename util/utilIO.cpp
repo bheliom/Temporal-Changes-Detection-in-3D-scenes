@@ -107,12 +107,13 @@ void savePlyFileVcg(std::string filename, MyMesh &m){
 
 void getBundlerFile(MyMesh &m, std::string filename, std::string filename_images, std::vector<vcg::Shot<float> > &shots, std::vector<std::string> &image_filenames){
 
-  std::cout<<"Get bundler file..."<<std::endl;
+  std::cout<<"Start reading bundler file..."<<std::endl;
   vcg::tri::io::ImporterOUT<MyMesh> importVar;
 
   if(importVar.Open(m, shots , image_filenames, filename.c_str(), filename_images.c_str()))
      std::cout<<"Error reading the bundler file!"<<std::endl;
 
+  std::cout<<"Done."<<std::endl;
 }
 
 
