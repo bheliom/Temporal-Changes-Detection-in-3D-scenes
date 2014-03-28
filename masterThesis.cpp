@@ -95,15 +95,18 @@ void testNN(map<int,string> inputStrings){
 	  
 	  for(int j = 0; j< named_hv[i].size(); j++)
 	    {
-	      cv::Mat image = getImg(image_filenames[named_hv[i].at(j).id_img]);
+	      int idImg = named_hv[i].at(j).id_img;
+	      cv::Mat image = getImg(image_filenames[idImg]);
 	      cv::Size s = image.size();
-	  
+
+
 	      vcg::Point2i tmpDisp(named_hv[i].at(j).x+s.width/2,named_hv[i].at(j).y+s.height/2);
 	      vcg::Point3f tmpDisp2 = pmvsMesh.vert[i].P();
 	      
-	      vcg::Point2i tmpDisp3 = getPtImgCoord(shots[i].Project(tmpDisp2), shots[i]);
+	      vcg::Point2i tmpDisp3 = getPtImgCoord(shots[idImg].Project(tmpDisp2), shots[i]);
 	      
 	      std::cout<<"Dimensions:"<< s.width << " " << s.height << std::endl;
+	      std::cout<<"SIFT:"<< tmpDisp.X()<<" "<<tmpDisp.Y()<<std::endl;
 	      std::cout<<"Point X Y:" << tmpDisp3.X()<< " " <<tmpDisp3.Y() << std::endl;
 	      
 	      dispProjPt(tmpDisp3, image);

@@ -16,14 +16,9 @@ pcl::PointXYZ vcg2pclPt(vcg::Point3<float> inPt)
 /*Function calculates image coordinates of the point projected using vcg::Shot class member function*/
 vcg::Point2i getPtImgCoord(const vcg::Point2f &inPoint, const vcg::Shot<float> &inShot){
   
-  vcg::Point2f checkIt = inPoint;
-  //checkIt[0]/=inShot.Intrinsics.PixelSizeMm.X();
-
-  //  checkIt[1]/=inShot.Intrinsics.PixelSizeMm.Y();
-  vcg::Point2i tmpPoint(static_cast<int>(checkIt.X()), static_cast<int>(checkIt.Y()));
+  vcg::Point2i tmpPoint(static_cast<int>(inPoint.X()), static_cast<int>(inPoint.Y()));
 
   return tmpPoint;
-
 }
 
 

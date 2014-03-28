@@ -92,18 +92,19 @@ void visibilityEstimation(MyMesh &m, MyMesh &pmvsMesh, boost::shared_ptr<pcl::Po
 	tmpCorrNum = named_hv[tmpCurrKneighId].size();
 	/*Iterate through corresponding images for given neighbour to find the most often occuring one*/
 	for(int k = 0; k < tmpCorrNum; k++){
+	  
 	  tmpIdImg = named_hv[tmpCurrKneighId].at(k).id_img;
-
-	  	  cv::Mat image = getImg(image_filenames[tmpIdImg]);
-	  	  cv::Size s = image.size();
-
-	  	  vcg::Point2i tmpDisp(named_hv[tmpCurrKneighId].at(k).x+s.width/2,named_hv[tmpCurrKneighId].at(k).y+s.height/2);
-		  vcg::Point3f tmpDisp2 = pmvsMesh.vert[tmpCurrKneighId].P();
-		  
-		  vcg::Point2i tmpDisp3 = getPtImgCoord(shots[tmpIdImg].Project(tmpDisp2), shots[tmpIdImg]);
-		  
-	 	  dispProjPt(tmpDisp3, image);
-	 	  dispProjPt(tmpDisp, image);
+	  
+	  cv::Mat image = getImg(image_filenames[tmpIdImg]);
+	  cv::Size s = image.size();
+	  
+	  vcg::Point2i tmpDisp(named_hv[tmpCurrKneighId].at(k).x+s.width/2,named_hv[tmpCurrKneighId].at(k).y+s.height/2);
+	  vcg::Point3f tmpDisp2 = pmvsMesh.vert[tmpCurrKneighId].P();
+	  
+	  vcg::Point2i tmpDisp3 = getPtImgCoord(shots[tmpIdImg].Project(tmpDisp2), shots[tmpIdImg]);
+	  
+	  dispProjPt(tmpDisp3, image);
+	  dispProjPt(tmpDisp, image);
 
 	  // tmpMap holds the counter for each image index
 	  if(tmpMap.find(tmpIdImg)!=tmpMap.end())
