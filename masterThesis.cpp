@@ -1,5 +1,8 @@
 #include <iostream>
 #include "util/meshProcess.hpp"
+#include "chngDet/chngDet.hpp"
+#include "util/pbaDataInterface.h"
+#include "common/globVariables.hpp"
 
 using namespace std;
 
@@ -10,11 +13,22 @@ void testRemove(string filename);
 void testNN(map<int,string> inputStrings);
 
 int main(int argc, char** argv){
-
+  
   map<int,string> inputStrings;
-  readCmdInput(inputStrings, argc, argv);
 
-  testNN(inputStrings);
+  readCmdInput(inputStrings, argc, argv);
+  
+  vector<CameraT> camera_data;
+  vector<string> names;
+
+  getNVM(inputStrings[MESH], camera_data, names);
+
+  vector<vcg::Shot<float> > shots = nvmCam2vcgShot(camera_data, names);
+  
+  cout<<shots.size()<<endl;
+
+  cout<<shots[0].Intrinsics.ViewportPx[0]<<endl;
+//  testNN(inputStrings);
   return 0;
 
 }
@@ -68,8 +82,6 @@ void testNN(map<int,string> inputStrings){
   pcl::PointCloud<pcl::PointXYZ>::Ptr pmvsCloud(new pcl::PointCloud<pcl::PointXYZ>);
   pcl::PointCloud<pcl::PointXYZ>::Ptr mCloud(new pcl::PointCloud<pcl::PointXYZ>);
 
-
-
   MyMesh m;
   MyMesh pmvsMesh;
 
@@ -107,8 +119,9 @@ void testNN(map<int,string> inputStrings){
 	      tmpDisp4[0] = s.width-tmpDisp4.X();
 	      tmpDisp4[1] = s.height - tmpDisp4.Y();
 
-
-	      pmvsMesh.vert[i].SetS();
+	      
+	      for(int k = 1; k<100; k++)
+		pmvsMesh.vert[i+k].SetS();
       
 	      vcg::tri::UpdateSelection<MyMesh>::FaceFromVertexLoose(m);
 	      vcg::tri::UpdateColor<MyMesh>::PerFaceConstant(pmvsMesh,vcg::Color4b::Red, true);

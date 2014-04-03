@@ -6,7 +6,6 @@
 #include <map>
 
 #include "../common/common.hpp"
-
 #include<wrap/io_trimesh/import_off.h>
 
 #include <pcl/io/pcd_io.h>
@@ -15,6 +14,49 @@
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+
+#include "pbaUtil.h"
+
+
+/*
+To run VisualSFM:
+
+VisualSFM sfm+resume+fixcam <fullPathInput>/input.nvm <fullPathOutput>/output.nvm
+
+It requires an image list called [input].nvm.txt with new images paths
+*/
+
+class chngDetIO{
+
+protected:
+  std::vector<std::string> filenames;
+public:
+  chngDetIO(std::vector<std::string>);
+  chngDetIO(std::string);
+};
+
+class ImgIO : chngDetIO{
+
+protected:
+
+public:
+
+};
+
+class VidIO : chngDetIO{
+
+protected:
+
+public:
+  void saveImgFromVideo(std::string);
+};
+
+
+
+
+std::vector<vcg::Shot<float> > nvmCam2vcgShot(const std::vector<CameraT> &camera_data, const std::vector<std::string> names);
+
+void getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names);
 
 void dispProjPt(const vcg::Point2i &inPt, cv::Mat &inImg);
 
