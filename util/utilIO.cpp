@@ -2,22 +2,31 @@
 #include "pbaDataInterface.h"
 #include "../common/globVariables.hpp"
 #include <fstream>
-
+#include <sstream>
+#include <cstdlib>
 
 chngDetIO::chngDetIO(std::vector<std::string> inVector){
+  filenames.resize(inVector.size());
   filenames = inVector;
 }
 
-chngDetIO::chngDetIO(std::string inImg){
-  filenames[0]=inImg;
+chngDetIO::chngDetIO(std::string inDir){
+  filenames.push_back(inDir);
 }
 
 void VidIO::saveImgFromVideo(std::string outDir){
   
   cv::VideoCapture vidCap(filenames[0]);
   cv::Mat tmpImage;
-  if(vidCap.isOpened())
-    vidCap>>tmpImage;
+
+  if(vidCap.isOpened()){
+    for(int i = 0;;i++){
+      ostringstream ss;
+      ss<<i;
+      vidCap>>tmpImage;
+      cv::imwrite(outDir+ss.str()+".jpg",tmpImage);
+    }
+  }
 }
 
 /*

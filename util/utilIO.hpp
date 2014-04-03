@@ -43,11 +43,11 @@ public:
 
 };
 
-class VidIO : chngDetIO{
-
-protected:
+class VidIO : public chngDetIO{
 
 public:
+  VidIO(std::string inVid) : chngDetIO(inVid){};
+
   void saveImgFromVideo(std::string);
 };
 
