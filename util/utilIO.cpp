@@ -25,7 +25,7 @@ void VidIO::saveImgFromVideo(std::string outDir){
       ostringstream ss;
       ss<<i;
       vidCap>>tmpImage;
-      if(image.empty())
+      if(tmpImage.empty())
 	break;
       cv::imwrite(outDir+ss.str()+".jpg",tmpImage);
     }
