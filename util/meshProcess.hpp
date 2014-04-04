@@ -11,6 +11,27 @@
 #include "../common/common.hpp"
 #include "utilIO.hpp"
 
+
+class DataProcessing{
+protected:
+  MyMesh m;
+public:
+  DataProcessing(MyMesh &inM){vcg::tri::Append<MyMesh,MyMesh>::MeshCopy(m,inM);}
+};
+
+class MeshProcessing : public DataProcessing{
+public:
+  MeshProcessing(MyMesh &inM) : DataProcessing(inM){};
+};
+
+class ImgProcessing : public DataProcessing{
+public:
+  ImgProcessing(MyMesh &inM) : DataProcessing(inM){};
+
+};
+
+
+
 vcg::Point2i getPtImgCoord(const vcg::Point2f &inPoint, const vcg::Shot<float> &inShot);
 double getEdgeAverage(MyMesh &m);
 double getFaceEdgeAverage(MyFace &f);

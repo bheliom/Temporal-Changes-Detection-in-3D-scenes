@@ -5,12 +5,15 @@
 #include <sstream>
 #include <cstdlib>
 
-chngDetIO::chngDetIO(std::vector<std::string> inVector){
+/*
+ *Ta klasa robi to i to
+ */
+ChangeDetectorIO::ChangeDetectorIO(std::vector<std::string> inVector){
   filenames.resize(inVector.size());
   filenames = inVector;
 }
 
-chngDetIO::chngDetIO(std::string inDir){
+ChangeDetectorIO::ChangeDetectorIO(std::string inDir){
   filenames.push_back(inDir);
 }
 
@@ -33,10 +36,19 @@ void VidIO::saveImgFromVideo(std::string outDir){
   std::cout<<"Done!"<<std::endl;
 }
 
+void CmdIO::callVsfm(std::string inCmd){
+  
+  std::string outCommand;
+  std::string vsfmCommand("VisualSFM");
+  outCommand = vsfmCommand+inCmd;
+  
+  system(outCommand.c_str());
+}
+
+
 /*
 Function converts cameras read from NVM file into VCG Shot objects. Part of the function is based on the function Open() in import_out.h in VCG library
 */
-
 std::vector<vcg::Shot<float> > nvmCam2vcgShot(const std::vector<CameraT> &camera_data, const std::vector<std::string> names){
 
   std::vector<vcg::Shot<float> > outputShots;  
@@ -177,15 +189,6 @@ void readCmdInput(std::map<int,std::string> &inStrings, int argc, char** argv){
 
 void inputHandler(std::vector<std::string> inputStrings){
 
-}
-
-void callVsfm(std::string dataPath, std::string outputPath){
-  
-  std::string outCommand;
-  std::string vsfmCommand("VisualSFM sfm+pmvs ");
-  outCommand = vsfmCommand+" "+dataPath+" "+outputPath;
-  
-  system(outCommand.c_str());
 }
 
 void getPlyFileVcg(std::string filename, MyMesh &m){

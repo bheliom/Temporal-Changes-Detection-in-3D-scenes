@@ -24,24 +24,6 @@ class MyEdge    : public vcg::Edge<   MyUsedTypes> {};
   
 class MyMesh    : public vcg::tri::TriMesh< std::vector<MyVertex>, std::vector<MyFace> , std::vector<MyEdge>  > {};
   
-class MyVertex0  : public vcg::Vertex< MyUsedTypes, vcg::vertex::Coord3f, vcg::vertex::BitFlags  >{};
-class MyVertex1  : public vcg::Vertex< MyUsedTypes, vcg::vertex::Coord3f, vcg::vertex::Normal3f, vcg::vertex::BitFlags  >{};
-class MyVertex2  : public vcg::Vertex< MyUsedTypes, vcg::vertex::Coord3f, vcg::vertex::Color4b, vcg::vertex::CurvatureDirf,
-  vcg::vertex::Qualityf, vcg::vertex::Normal3f, vcg::vertex::BitFlags  >{};
-
-class VttMesh : public MyMesh{
-
-public:
-  void removeUnnFaces(int thresVal);
-  
-private:
-  double getEdgeAverage();
-
-  double getFaceEdgeAverage();
-
-};
-
-
 
 
 #endif

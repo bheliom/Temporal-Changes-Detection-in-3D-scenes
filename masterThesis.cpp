@@ -43,7 +43,8 @@ void test2(){
   string dataPath("./");
   string outputPath(".");
 
-  callVsfm(dataPath, outputPath);
+  CmdIO testIt(dataPath);
+  testIt.callVsfm(outputPath);
 }
 
 void test3(string filename){

@@ -1,3 +1,4 @@
+
 #ifndef _CHNGDET_H_
 #define _CHNGDET_H_
 

@@ -26,16 +26,16 @@ VisualSFM sfm+resume+fixcam <fullPathInput>/input.nvm <fullPathOutput>/output.nv
 It requires an image list called [input].nvm.txt with new images paths
 */
 
-class chngDetIO{
+class ChangeDetectorIO{
 
 protected:
   std::vector<std::string> filenames;
 public:
-  chngDetIO(std::vector<std::string>);
-  chngDetIO(std::string);
+  ChangeDetectorIO(std::vector<std::string>);
+  ChangeDetectorIO(std::string);
 };
 
-class ImgIO : chngDetIO{
+class ImgIO : ChangeDetectorIO{
 
 protected:
 
@@ -43,14 +43,20 @@ public:
 
 };
 
-class VidIO : public chngDetIO{
+class VidIO : public ChangeDetectorIO{
 
 public:
-  VidIO(std::string inVid) : chngDetIO(inVid){};
+  VidIO(std::string inVid) : ChangeDetectorIO(inVid){};
 
   void saveImgFromVideo(std::string);
 };
 
+class CmdIO : public ChangeDetectorIO{
+
+public:
+  CmdIO(std::string inDirs) : ChangeDetectorIO(inDirs){};
+  void callVsfm(std::string);
+};
 
 
 
@@ -68,7 +74,7 @@ void readCmdInput(std::map<int,std::string> &inputStrings, int argc, char** argv
 
 void inputHandler(std::vector<std::string> inputStrings);
 
-void callVsfm(std::string dataPath, std::string outputPath);
+
 
 void getPlyFileVcg(std::string filename, MyMesh &m);
 
