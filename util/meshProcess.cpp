@@ -1,7 +1,68 @@
+#include <fstream>
+#include <map>
 #include "meshProcess.hpp"
 
 typedef vcg::tri::UpdateTopology<MyMesh>::PEdge SingleEdge;
 
+/**
+Function splits given string depending on defined delimeter
+ */
+std::vector<std::string> FileProcessing::split(const std::string &inString, char delim){
+
+  std::vector<std::string> outStrings;
+  std::stringstream ss(inString);
+  std::string item;
+
+  while(std::getline(ss, item, delim))
+	outStrings.push_back(item);
+
+  return outStrings;
+
+}
+
+/**
+Function processes NVM file created after calling VisualSfM with new images and old model. It creates new NVM file consisting of camera positions for new images exclusively so that loadNVM function can be used.
+*/
+void FileProcessing::procNewNVMfile(const std::string &nvmFileDir, const std::vector<std::string> &imgFilenames, const std::string &outName){
+
+  std::string tmpString;
+  std::map<std::string, std::string> tmpMap;
+  std::vector<std::string> tmpStrVec;
+
+  std::ofstream outFile;
+  outFile.open(outName.c_str());
+  
+  std::ifstream inFile(nvmFileDir.c_str());  
+
+  //Create map with filenames
+  for(int i = 0 ; i < imgFilenames.size() ; i++)
+    tmpMap[imgFilenames[i]] = "";  
+  
+  //Get the header
+  inFile>>tmpString;
+  outFile<<tmpString+"\n";
+
+  //Number of new cameras
+  outFile<<imgFilenames.size();
+  
+  
+
+  //  while(
+  std::getline(inFile, tmpString);
+  std::getline(inFile, tmpString);
+	//)
+	  //{
+    tmpStrVec = split(tmpString, ' ');
+    std::cout<<tmpStrVec[0].c_str()<<std::endl;
+    if(tmpMap.find(tmpStrVec[0])!=tmpMap.end())
+      outFile << tmpString;
+
+    tmpStrVec.clear();
+    //}
+  
+  outFile.close();
+
+}
 
 pcl::PointXYZ vcg2pclPt(vcg::Point3<float> inPt)
 {

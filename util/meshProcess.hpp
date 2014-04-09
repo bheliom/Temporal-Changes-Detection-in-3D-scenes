@@ -17,6 +17,7 @@ protected:
   MyMesh m;
 public:
   DataProcessing(MyMesh &inM){vcg::tri::Append<MyMesh,MyMesh>::MeshCopy(m,inM);}
+  DataProcessing(){};
 };
 
 class MeshProcessing : public DataProcessing{
@@ -30,7 +31,15 @@ public:
 
 };
 
+class FileProcessing : public DataProcessing{
 
+public:
+  FileProcessing() : DataProcessing(){};
+
+  std::vector<std::string> split(const std::string &inString, char delim);
+  void procNewNVMfile(const std::string &nvmFileDir, const std::vector<std::string> &imgFilenames, const std::string &outName);
+
+};
 
 vcg::Point2i getPtImgCoord(const vcg::Point2f &inPoint, const vcg::Shot<float> &inShot);
 double getEdgeAverage(MyMesh &m);

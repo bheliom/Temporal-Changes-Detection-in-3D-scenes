@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "util/meshProcess.hpp"
 #include "chngDet/chngDet.hpp"
 #include "util/pbaDataInterface.h"
@@ -12,32 +13,52 @@ void test2();
 void test3(string filename);
 void testRemove(string filename);
 void testNN(map<int,string> inputStrings);
+void testVid(map<int,string> inputStrings);
+void testNVM(map<int,string> inputStrings);
+void testNewNVM(map<int,string> inputStrings);
+
 
 int main(int argc, char** argv){
   
   map<int,string> inputStrings;
-
   readCmdInput(inputStrings, argc, argv);
 
+  testNewNVM(inputStrings);
 
-  VidIO procVid(inputStrings[IMAGELIST]);
+  return 0;
 
-  procVid.saveImgFromVideo(inputStrings[OUTDIR]);
+}
 
-/*
+void testNewNVM(map<int,string> inputStrings){
+  
+  FileProcessing fileProc;
+  
+  ifstream inFile(inputStrings[IMAGELIST].c_str());
+  
+  string tmpString;
+  vector<string> imgFilenames;
+
+  while(getline(inFile,tmpString))
+    imgFilenames.push_back(tmpString);
+  
+  fileProc.procNewNVMfile(inputStrings[MESH], imgFilenames, "newNVM.nvm");
+
+}
+
+void testNVM(map<int,string> inputStrings){
+
   vector<CameraT> camera_data;
   vector<string> names;
 
   getNVM(inputStrings[MESH], camera_data, names);
 
   vector<vcg::Shot<float> > shots = nvmCam2vcgShot(camera_data, names);
-*/
-
-//  testNN(inputStrings);
-  return 0;
 
 }
-
+void testVid(map<int,string> inputStrings){
+  VidIO procVid(inputStrings[IMAGELIST]);
+  procVid.saveImgFromVideo(inputStrings[OUTDIR]);
+}
 void test2(){
 
   string dataPath("./");
