@@ -5,8 +5,8 @@
 #include <sstream>
 #include <cstdlib>
 
-/*
- *Ta klasa robi to i to
+/**
+Class responsible for Input/Output operations.
  */
 ChangeDetectorIO::ChangeDetectorIO(std::vector<std::string> inVector){
   filenames.resize(inVector.size());
@@ -46,7 +46,7 @@ void CmdIO::callVsfm(std::string inCmd){
 }
 
 
-/*
+/**
 Function converts cameras read from NVM file into VCG Shot objects. Part of the function is based on the function Open() in import_out.h in VCG library
 */
 std::vector<vcg::Shot<float> > nvmCam2vcgShot(const std::vector<CameraT> &camera_data, const std::vector<std::string> names){

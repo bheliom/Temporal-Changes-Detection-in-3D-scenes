@@ -1,5 +1,6 @@
 #include <fstream>
 #include <map>
+#include <boost/algorithm/string.hpp>
 #include "meshProcess.hpp"
 
 typedef vcg::tri::UpdateTopology<MyMesh>::PEdge SingleEdge;
@@ -40,28 +41,20 @@ void FileProcessing::procNewNVMfile(const std::string &nvmFileDir, const std::ve
   
   //Get the header
   inFile>>tmpString;
-  outFile<<tmpString+"\n";
+  outFile<<tmpString+"\n\n";
 
   //Number of new cameras
-  outFile<<imgFilenames.size();
-  
-  
+  outFile<<imgFilenames.size()<<"\n\n";
 
-  //  while(
-  std::getline(inFile, tmpString);
-  std::getline(inFile, tmpString);
-	//)
-	  //{
-    tmpStrVec = split(tmpString, ' ');
-    std::cout<<tmpStrVec[0].c_str()<<std::endl;
-    if(tmpMap.find(tmpStrVec[0])!=tmpMap.end())
-      outFile << tmpString;
-
-    tmpStrVec.clear();
-    //}
-  
+  while(std::getline(inFile, tmpString))
+    {      
+      boost::split(tmpStrVec, tmpString, boost::is_any_of(" \t"));
+      
+      if(tmpMap.find(tmpStrVec[0])!=tmpMap.end())
+	outFile << tmpString + "\n";      
+      tmpStrVec.clear();
+    }
   outFile.close();
-
 }
 
 pcl::PointXYZ vcg2pclPt(vcg::Point3<float> inPt)
@@ -74,7 +67,7 @@ pcl::PointXYZ vcg2pclPt(vcg::Point3<float> inPt)
   return outPt;
 }
 
-/*Function calculates image coordinates of the point projected using vcg::Shot class member function*/
+/**Function calculates image coordinates of the point projected using vcg::Shot class member function*/
 vcg::Point2i getPtImgCoord(const vcg::Point2f &inPoint, const vcg::Shot<float> &inShot){
   
   vcg::Point2i tmpPoint(static_cast<int>(inPoint.X()), static_cast<int>(inPoint.Y()));
@@ -107,7 +100,7 @@ void findOcc(std::map<int, int> &inMap, std::vector<int> &outVector, int noOfOut
   }
 }
 
-/*Function returns average length of the edge in the whole mesh*/
+      /**Function returns average length of the edge in the whole mesh*/
 double getEdgeAverage(MyMesh &m){
 
   vcg::tri::UpdateTopology<MyMesh>::FaceFace(m);
@@ -136,7 +129,7 @@ double getEdgeAverage(MyMesh &m){
   return tmpSum/edgesSize;
 }
 
-/*Function returns edge average length for given face*/
+    /**Function returns edge average length for given face*/
 double getFaceEdgeAverage(MyFace &f){
   
   vcg::Point3f tmp1,tmp2,tmp3;
@@ -148,7 +141,7 @@ double getFaceEdgeAverage(MyFace &f){
   return (sqrt(tmp1.dot(tmp1))+sqrt(tmp2.dot(tmp2))+sqrt(tmp3.dot(tmp3)))/3;    
 }
 
-/*Function removes faces basing on the face average edge length*/
+/**Function removes faces basing on the face average edge length*/
 void removeUnnFaces(MyMesh &m, int thresVal){
   
   double avgEdge, tmp;

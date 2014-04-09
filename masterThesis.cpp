@@ -16,17 +16,41 @@ void testNN(map<int,string> inputStrings);
 void testVid(map<int,string> inputStrings);
 void testNVM(map<int,string> inputStrings);
 void testNewNVM(map<int,string> inputStrings);
-
+void testPipeline(map<int,string> inputStrings);
 
 int main(int argc, char** argv){
   
   map<int,string> inputStrings;
   readCmdInput(inputStrings, argc, argv);
 
-  testNewNVM(inputStrings);
+  testPipeline(inputStrings);
+  //  testNewNVM(inputStrings);
 
   return 0;
+}
 
+void testPipeline(map<int,string> inputStrings){
+
+  //get the input mesh
+  MyMesh m;
+  getPlyFileVcg(inputStrings[MESH], m); 
+
+  //get initial NVM file
+  vector<vcg::Shot<float> > shots;
+  vector<string> image_filenames;
+  vector<CameraT> camera_data;
+  
+  getNVM(inputStrings[BUNDLER], camera_data, image_filenames);
+  shots = nvmCam2vcgShot(camera_data, image_filenames);
+  
+  //get positions of camers for new images
+  CmdIO vsfmHandler("./");
+  
+  vsfmHandler.callVsfm("sfm+resume+fixcam"+inputStrings[BUNDLER]+" "+inputStrings[OUTDIR]);
+
+  //getBundlerFile(m, inputStrings[BUNDLER], inputStrings[IMAGELIST], shots, image_filenames);
+
+  
 }
 
 void testNewNVM(map<int,string> inputStrings){
@@ -42,7 +66,6 @@ void testNewNVM(map<int,string> inputStrings){
     imgFilenames.push_back(tmpString);
   
   fileProc.procNewNVMfile(inputStrings[MESH], imgFilenames, "newNVM.nvm");
-
 }
 
 void testNVM(map<int,string> inputStrings){
