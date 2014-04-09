@@ -31,27 +31,21 @@
         <h3>
 <a name="project-overview" class="anchor" href="#project-overview"><span class="octicon octicon-link"></span></a>Project overview.</h3>
 
-<p>Project is developed in frame of master thesis project. The main focus of the project is detection of temporal changes in large-scale scenes reconstructed with use of Structure from Motion techniques.</p>
-
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
-
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<p>Project is developed in frame of master thesis project. The main focus of the project is detection of temporal changes in large-scale scenes reconstructed with use of Structure from Motion(SfM) techniques. Given the SfM reconstruction and new images of the scene, system automatically determines position of new cameras and applies image-based change detection algorithms to produce change mask. Change mask is then projected into 3D space using available from SfM process cameras parameters in order to indicate areas in the scene that might change.</p>
 
 <h3>
 <a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h3>
 
-<p>The code is written solely in C++ however it leverages several external libraries and software. In order to run the code one has to make sure first to have installed following components:
--PCL libraries
--VCG libraries
--OpenCV
--boost 
--VisualSFM(command line functionality is required - only CUDA enabled hardware)</p>
+<p>The code is written solely in C++ however it leverages several external libraries and software. In order to run the code one has to make sure first to have installed following components:</p>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<ul>
+<li>PCL libraries</li>
+<li>VCG libraries</li>
+<li>OpenCV</li>
+<li>boost libraries</li>
+<li>VisualSFM(command line functionality is required - only CUDA enabled hardware)</li>
+</ul><h3>
+<a name="get-the-code" class="anchor" href="#get-the-code"><span class="octicon octicon-link"></span></a>Get the code</h3>
 
 <p>In order to get the code you can either use the links above or run in the terminal</p>
 
@@ -59,14 +53,14 @@ $ git checkout gh-pages
 </code></pre>
 
 <h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<a name="author" class="anchor" href="#author"><span class="octicon octicon-link"></span></a>Author</h3>
 
 <p>Waldemar Franczak(<a href="https://github.com/bheliom" class="user-mention">@bheliom</a>).</p>
 
 <h3>
 <a name="contact" class="anchor" href="#contact"><span class="octicon octicon-link"></span></a>Contact</h3>
 
-<p>For any questions please write to <a href="mailto:bhelioom@gmail.com">bhelioom@gmail.com</a></p>
+<p>Please write to <a href="mailto:bhelioom@gmail.com">bhelioom@gmail.com</a></p>
       </section>
     </div>
 
