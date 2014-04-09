@@ -1,37 +1,51 @@
 <!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="5D scene reconstruction from crowdsourcing cameras. : master thesis project" />
 
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <title>5D scene reconstruction from crowdsourcing cameras. by bheliom</title>
+    <title>5D scene reconstruction from crowdsourcing cameras.</title>
   </head>
 
   <body>
 
-    <header>
-      <div class="container">
-        <h1>5D scene reconstruction from crowdsourcing cameras.</h1>
-        <h2>final project</h2>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/bheliom/finalProject">View on GitHub</a>
 
-        <section id="downloads">
-          <a href="https://github.com/bheliom/finalProject/zipball/master" class="btn">Download as .zip</a>
-          <a href="https://github.com/bheliom/finalProject/tarball/master" class="btn">Download as .tar.gz</a>
-          <a href="https://github.com/bheliom/finalProject" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
-        </section>
-      </div>
-    </header>
+          <h1 id="project_title">5D scene reconstruction from crowdsourcing cameras.</h1>
+          <h2 id="project_tagline">master thesis project</h2>
 
-    <div class="container">
-      <section id="main_content">
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/bheliom/finalProject/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/bheliom/finalProject/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
         <h3>
-<a name="project-overview" class="anchor" href="#project-overview"><span class="octicon octicon-link"></span></a>Project overview.</h3>
+<a name="problem-overview" class="anchor" href="#problem-overview"><span class="octicon octicon-link"></span></a>Problem overview.</h3>
 
-<p>Project is developed in frame of master thesis project. The main focus of the project is detection of temporal changes in large-scale scenes reconstructed with use of Structure from Motion(SfM) techniques. Given the SfM reconstruction and new images of the scene, system automatically determines position of new cameras and applies image-based change detection algorithms to produce change mask. Change mask is then projected into 3D space using available from SfM process cameras parameters in order to indicate areas in the scene that might change.</p>
+<p>The system is developed for the purpose of master thesis project. The main focus of the solution is detection of temporal changes in large-scale scenes reconstructed with use of Structure from Motion(SfM) techniques. Given the SfM reconstruction and new images of the scene, system automatically determines position of new cameras and applies image-based change detection algorithms to produce change mask. Change mask is then projected into 3D space using available from SfM process cameras parameters in order to indicate areas in the scene that might change.</p>
+
+<h3>
+<a name="current-status" class="anchor" href="#current-status"><span class="octicon octicon-link"></span></a>Current status</h3>
+
+<p>The project is not yet finished therefore the code available in repository is still a "work in progress".</p>
+
+<h3>
+<a name="main-system-components" class="anchor" href="#main-system-components"><span class="octicon octicon-link"></span></a>Main system components</h3>
+
+<p>System is based on three main classes. Inheritance diagrams are shown below.
+<img src="https://www.dropbox.com/s/lllbausyu8yb891/chD.png" alt="ChangeDetector class"><img src="https://www.dropbox.com/s/k2b0gea0j0zayb0/chIO.png" alt="ChangeDetectorIO class"><img src="https://www.dropbox.com/s/za09e4zr3pgo5my/data.png" alt="DataProcessing class"></p>
 
 <h3>
 <a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h3>
@@ -64,6 +78,15 @@
       </section>
     </div>
 
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">5D scene reconstruction from crowdsourcing cameras. maintained by <a href="https://github.com/bheliom">bheliom</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
     
+
   </body>
 </html>
