@@ -86,9 +86,9 @@ void testPipeline(map<int,string> inputStrings){
   kdtree.setInputCloud (cloud);
   pcl::PointXYZ searchPoint;
 
-  searchPoint.x = newShots[0].Extrinsics.Tra().X();
-  searchPoint.y = newShots[0].Extrinsics.Tra().Y();
-  searchPoint.z = newShots[0].Extrinsics.Tra().Z();
+  searchPoint.x = newShots[10].Extrinsics.Tra().X();
+  searchPoint.y = newShots[10].Extrinsics.Tra().Y();
+  searchPoint.z = newShots[10].Extrinsics.Tra().Z();
 
   // K nearest neighbor search
   int K = 1;
@@ -98,7 +98,7 @@ void testPipeline(map<int,string> inputStrings){
 
   if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
     cout<<"Cos znalazlem"<<endl;
-    cv::Mat newImg = getImg(imgFilenames[0]);
+    cv::Mat newImg = getImg(imgFilenames[10]);
     cv::Mat oldImg = getImg(image_filenames[pointIdxNKNSearch[0]]);
     
     cv::namedWindow( "New image", cv::WINDOW_NORMAL );// Create a window for display.
