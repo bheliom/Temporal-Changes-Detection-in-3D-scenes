@@ -104,13 +104,24 @@ void testPipeline(map<int,string> inputStrings){
 
       cv::Mat newImg = getImg(imgFilenames[i]);
       cv::Mat oldImg = getImg(image_filenames[pointIdxNKNSearch[0]]);
-    
+
+      //cv::cvtColor(colorMat, greyMat, CV_BGR2GRAY);
+
+      cv::Mat diffImg = newImg!=oldImg;
       cv::namedWindow( "New image", cv::WINDOW_NORMAL );// Create a window for display.
-      cv::namedWindow( "Old image", cv::WINDOW_NORMAL );// Create a window for display.
-      cv::moveWindow("Old image", 200, 0);
       cv::imshow( "New image", newImg);                   // Show our image inside it.
-      cv::waitKey(0);                        
+      cv::waitKey(0);                     
+   
+      cv::namedWindow( "Old image", cv::WINDOW_NORMAL );// Create a window for display.
+      cv::moveWindow("Old image", 500, 0);
+
       cv::imshow( "Old image", oldImg);
+      cv::waitKey(0);                        
+
+      cv::namedWindow( "Difference image", cv::WINDOW_NORMAL );// Create a window for display.
+      cv::moveWindow("Difference image", 1000, 0);
+
+      cv::imshow( "Difference image", diffImg);
       cv::waitKey(0);                        
     }
   }
