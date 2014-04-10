@@ -28,7 +28,7 @@ public:
 class ImgProcessing : public DataProcessing{
 public:
   ImgProcessing(MyMesh &inM) : DataProcessing(inM){};
-
+  static cv::Mat getImgFundMat(cv::Mat, cv::Mat);
 };
 
 class FileProcessing : public DataProcessing{

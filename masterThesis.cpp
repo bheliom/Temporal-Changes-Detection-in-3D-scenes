@@ -116,13 +116,17 @@ void testPipeline(map<int,string> inputStrings){
       cv::cvtColor(newImg, newImgG, CV_BGR2GRAY);
       cv::Mat oldImgG;
       cv::cvtColor(oldImg, oldImgG, CV_BGR2GRAY);
+      
+      cv::Mat F = ImgProcessing::getImgFundMat(newImg, oldImg);
+      cv::Mat outImg;
+      warpPerspective(newImg, outImg, F, newImg.size());
       //cv::cvtColor(colorMat, greyMat, CV_BGR2GRAY);
 
       cv::Mat diffImg = newImgG!=oldImgG;
 
       cv::imshow( "New image", newImg);                   // Show our image inside it.
       cv::imshow( "Old image", oldImg);
-      cv::imshow( "Difference image", diffImg);
+      cv::imshow( "Difference image", outImg);
       cv::waitKey(0);                        
     }
   }

@@ -3,7 +3,76 @@
 #include <boost/algorithm/string.hpp>
 #include "meshProcess.hpp"
 
+#include "opencv2/core/core.hpp"
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/calib3d/calib3d.hpp"
+#include "opencv2/nonfree/nonfree.hpp"
+
 typedef vcg::tri::UpdateTopology<MyMesh>::PEdge SingleEdge;
+
+cv::Mat ImgProcessing::getImgFundMat(cv::Mat img_object, cv::Mat img_scene){
+
+//-- Step 1: Detect the keypoints using SURF Detector
+int minHessian = 400;
+
+cv::SurfFeatureDetector detector( minHessian );
+
+std::vector<cv::KeyPoint> keypoints_object, keypoints_scene;
+
+detector.detect( img_object, keypoints_object );
+detector.detect( img_scene, keypoints_scene );
+
+//-- Step 2: Calculate descriptors (feature vectors)
+cv::SurfDescriptorExtractor extractor;
+
+cv::Mat descriptors_object, descriptors_scene;
+
+extractor.compute( img_object, keypoints_object, descriptors_object );
+extractor.compute( img_scene, keypoints_scene, descriptors_scene );
+
+//-- Step 3: Matching descriptor vectors using FLANN matcher
+cv::FlannBasedMatcher matcher;
+std::vector< cv::DMatch > matches;
+matcher.match( descriptors_object, descriptors_scene, matches );
+
+double max_dist = 0; double min_dist = 100;
+
+//-- Quick calculation of max and min distances between keypoints
+for( int i = 0; i < descriptors_object.rows; i++ )
+  { double dist = matches[i].distance;
+if( dist < min_dist ) min_dist = dist;
+if( dist > max_dist ) max_dist = dist;
+}
+
+printf("-- Max dist : %f \n", max_dist );
+printf("-- Min dist : %f \n", min_dist );
+
+//-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
+std::vector< cv::DMatch > good_matches;
+
+for( int i = 0; i < descriptors_object.rows; i++ )
+  { if( matches[i].distance < 3*min_dist )
+      { good_matches.push_back( matches[i]); }
+}
+cv::Mat img_matches;
+ 
+//-- Localize the object
+std::vector<cv::Point2f> obj;
+std::vector<cv::Point2f> scene;
+
+for( int i = 0; i < good_matches.size(); i++ )
+  {
+//-- Get the keypoints from the good matches
+obj.push_back( keypoints_object[ good_matches[i].queryIdx ].pt );
+scene.push_back( keypoints_scene[ good_matches[i].trainIdx ].pt );
+}
+
+cv::Mat H = cv::findHomography( obj, scene, CV_RANSAC );
+
+return H;
+}
+
 
 /**
 Function splits given string depending on defined delimeter
