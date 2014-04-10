@@ -25,10 +25,11 @@ void VidIO::saveImgFromVideo(std::string outDir,int frameRate){
   std::cout<<"Saving frames from video file..."<<std::endl;
   if(vidCap.isOpened()){
     for(int i = 0;;i++){
+      ostringstream ss;
+      ss<<i;
+      vidCap>>tmpImage;
+
       if(i%frameRate==0){
-	ostringstream ss;
-	ss<<i;
-	vidCap>>tmpImage;
 	if(tmpImage.empty())
 	  break;
 	cv::imwrite(outDir+ss.str()+".jpg",tmpImage);
