@@ -76,16 +76,9 @@ void testPipeline(map<int,string> inputStrings){
 
   for (size_t i = 0; i < cloud->points.size (); ++i)
     {
-
-      cloud->points[i].x = shots[i].GetViewPoint().X();
-      cloud->points[i].y = shots[i].GetViewPoint().Y();
-      cloud->points[i].z = shots[i].GetViewPoint().Z();
-
-
-      // cloud->points[i].x = shots[i].Extrinsics.Tra().X();
-      // cloud->points[i].y = shots[i].Extrinsics.Tra().Y();
-      // cloud->points[i].z = shots[i].Extrinsics.Tra().Z();
-
+      cloud->points[i].x = shots[i].Extrinsics.Tra().X();
+      cloud->points[i].y = shots[i].Extrinsics.Tra().Y();
+      cloud->points[i].z = shots[i].Extrinsics.Tra().Z();
     }
 
   pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
@@ -94,16 +87,9 @@ void testPipeline(map<int,string> inputStrings){
   pcl::PointXYZ searchPoint;
 
   for(int i = 0 ; i < newShots.size(); i++){
-    
-    vcg::Point3f tmpPoint = newShots[i].GetViewPoint();
-    // searchPoint.x = newShots[i].Extrinsics.Tra().X();
-    // searchPoint.y = newShots[i].Extrinsics.Tra().Y();
-    // searchPoint.z = newShots[i].Extrinsics.Tra().Z();
-
-    searchPoint.x = tmpPoint[0];
-    searchPoint.y = tmpPoint[1];
-    searchPoint.z = tmpPoint[2];
-
+    searchPoint.x = newShots[i].Extrinsics.Tra().X();
+    searchPoint.y = newShots[i].Extrinsics.Tra().Y();
+    searchPoint.z = newShots[i].Extrinsics.Tra().Z();
 
     // K nearest neighbor search
     int K = 1;
@@ -126,19 +112,20 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat diffImg = newImgG!=oldImgG;
       cv::namedWindow( "New image", cv::WINDOW_NORMAL );// Create a window for display.
       cv::imshow( "New image", newImg);                   // Show our image inside it.
-      cv::moveWindow("Old image", 100, 100);
+      cv::moveWindow("Old image", 100, 0);
+
       cv::waitKey(0);                     
    
       cv::namedWindow( "Old image", cv::WINDOW_NORMAL );// Create a window for display.
-      cv::moveWindow("Old image", 500, 100);
-
       cv::imshow( "Old image", oldImg);
+      cv::moveWindow("Old image", 500, 0);
+
       cv::waitKey(0);                        
 
       cv::namedWindow( "Difference image", cv::WINDOW_NORMAL );// Create a window for display.
-      cv::moveWindow("Difference image", 1000, 100);
-
       cv::imshow( "Difference image", diffImg);
+      cv::moveWindow("Difference image", 1000, 0);
+
       cv::waitKey(0);                        
     }
   }
