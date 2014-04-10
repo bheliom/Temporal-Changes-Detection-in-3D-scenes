@@ -104,8 +104,9 @@ void testPipeline(map<int,string> inputStrings){
     cv::namedWindow( "New image", cv::WINDOW_NORMAL );// Create a window for display.
     cv::namedWindow( "Old image", cv::WINDOW_NORMAL );// Create a window for display.
     cv::imshow( "New image", newImg);                   // Show our image inside it.
+    cv::waitKey(10);                        
     cv::imshow( "Old image", oldImg);
-    cv::waitKey(0);                        
+    cv::waitKey(10);                        
   }
 }
 
