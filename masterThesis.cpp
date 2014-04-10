@@ -23,9 +23,10 @@ int main(int argc, char** argv){
   map<int,string> inputStrings;
   readCmdInput(inputStrings, argc, argv);
 
-  //  testPipeline(inputStrings);
+   testPipeline(inputStrings);
   //  testNewNVM(inputStrings);
-  testVid(inputStrings);
+
+  //  testVid(inputStrings);
   return 0;
 }
 
