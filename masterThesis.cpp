@@ -23,9 +23,9 @@ int main(int argc, char** argv){
   map<int,string> inputStrings;
   readCmdInput(inputStrings, argc, argv);
 
-  testPipeline(inputStrings);
+  //  testPipeline(inputStrings);
   //  testNewNVM(inputStrings);
-
+  testVid(inputStrings);
   return 0;
 }
 
@@ -37,20 +37,67 @@ void testPipeline(map<int,string> inputStrings){
 
   //get initial NVM file
   vector<vcg::Shot<float> > shots;
+  vector<vcg::Shot<float> > newShots;
   vector<string> image_filenames;
   vector<CameraT> camera_data;
+  vector<CameraT> newCameraData;
   
   getNVM(inputStrings[BUNDLER], camera_data, image_filenames);
   shots = nvmCam2vcgShot(camera_data, image_filenames);
   
-  //get positions of camers for new images
+  //Call VisualSfM
   CmdIO vsfmHandler("./");
-  
-  vsfmHandler.callVsfm("sfm+resume+fixcam"+inputStrings[BUNDLER]+" "+inputStrings[OUTDIR]);
+  vsfmHandler.callVsfm(" sfm+resume+fixcam "+inputStrings[BUNDLER]+" "+inputStrings[OUTDIR]);
 
-  //getBundlerFile(m, inputStrings[BUNDLER], inputStrings[IMAGELIST], shots, image_filenames);
+  //Process the output file to get new cameras positions
+  FileProcessing fileProc;
 
-  
+  //Read list of new files
+  ifstream inFile(inputStrings[PMVS].c_str());
+  string tmpString;
+  vector<string> imgFilenames;
+
+  while(getline(inFile,tmpString))
+    imgFilenames.push_back(tmpString);
+
+  tmpString = "newNVM.nvm";
+
+  //Get positions of new cameras
+  fileProc.procNewNVMfile(inputStrings[OUTDIR],imgFilenames, tmpString);
+  getNVM(tmpString, newCameraData, imgFilenames);
+  newShots = nvmCam2vcgShot(newCameraData, imgFilenames);
+
+  //Find nearest neighbor
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
+
+  // Generate pointcloud data
+  cloud->points.resize (shots.size());
+
+  for (size_t i = 0; i < cloud->points.size (); ++i)
+    {
+      cloud->points[i].x = shots[i].Extrinsics.Tra().X();
+      cloud->points[i].y = shots[i].Extrinsics.Tra().Y();
+      cloud->points[i].z = shots[i].Extrinsics.Tra().Z();
+    }
+
+  pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+
+  kdtree.setInputCloud (cloud);
+  pcl::PointXYZ searchPoint;
+
+  searchPoint.x = newShots[0].Extrinsics.Tra().X();
+  searchPoint.y = newShots[0].Extrinsics.Tra().Y();
+  searchPoint.z = newShots[0].Extrinsics.Tra().Z();
+
+  // K nearest neighbor search
+  int K = 1;
+
+  std::vector<int> pointIdxNKNSearch(K);
+  std::vector<float> pointNKNSquaredDistance(K);
+
+  if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0)
+    cout<<"Cos znalazlem";
+
 }
 
 void testNewNVM(map<int,string> inputStrings){
@@ -80,7 +127,7 @@ void testNVM(map<int,string> inputStrings){
 }
 void testVid(map<int,string> inputStrings){
   VidIO procVid(inputStrings[IMAGELIST]);
-  procVid.saveImgFromVideo(inputStrings[OUTDIR]);
+  procVid.saveImgFromVideo(inputStrings[OUTDIR], atoi(inputStrings[BUNDLER].c_str()));
 }
 void test2(){
 

@@ -48,7 +48,7 @@ class VidIO : public ChangeDetectorIO{
 public:
   VidIO(std::string inVid) : ChangeDetectorIO(inVid){};
 
-  void saveImgFromVideo(std::string);
+  void saveImgFromVideo(std::string,int);
 };
 
 class CmdIO : public ChangeDetectorIO{

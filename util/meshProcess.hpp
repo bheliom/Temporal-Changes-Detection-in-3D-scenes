@@ -41,6 +41,14 @@ public:
 
 };
 
+class PclProcessing : public DataProcessing{
+
+public:
+  PclProcessing() : DataProcessing(){};
+
+  
+};
+
 vcg::Point2i getPtImgCoord(const vcg::Point2f &inPoint, const vcg::Shot<float> &inShot);
 double getEdgeAverage(MyMesh &m);
 double getFaceEdgeAverage(MyFace &f);

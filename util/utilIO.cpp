@@ -6,8 +6,8 @@
 #include <cstdlib>
 
 /**
-Class responsible for Input/Output operations.
- */
+   Class responsible for Input/Output operations.
+*/
 ChangeDetectorIO::ChangeDetectorIO(std::vector<std::string> inVector){
   filenames.resize(inVector.size());
   filenames = inVector;
@@ -17,7 +17,7 @@ ChangeDetectorIO::ChangeDetectorIO(std::string inDir){
   filenames.push_back(inDir);
 }
 
-void VidIO::saveImgFromVideo(std::string outDir){
+void VidIO::saveImgFromVideo(std::string outDir,int frameRate){
   
   cv::VideoCapture vidCap(filenames[0]);
   cv::Mat tmpImage;
@@ -25,12 +25,14 @@ void VidIO::saveImgFromVideo(std::string outDir){
   std::cout<<"Saving frames from video file..."<<std::endl;
   if(vidCap.isOpened()){
     for(int i = 0;;i++){
-      ostringstream ss;
-      ss<<i;
-      vidCap>>tmpImage;
-      if(tmpImage.empty())
-	break;
-      cv::imwrite(outDir+ss.str()+".jpg",tmpImage);
+      if(i%frameRate==0){
+	ostringstream ss;
+	ss<<i;
+	vidCap>>tmpImage;
+	if(tmpImage.empty())
+	  break;
+	cv::imwrite(outDir+ss.str()+".jpg",tmpImage);
+      }
     }
   }
   std::cout<<"Done!"<<std::endl;
@@ -47,9 +49,11 @@ void CmdIO::callVsfm(std::string inCmd){
 
 
 /**
-Function converts cameras read from NVM file into VCG Shot objects. Part of the function is based on the function Open() in import_out.h in VCG library
+   Function converts cameras read from NVM file into VCG Shot objects. Part of the function is based on the function Open() in import_out.h in VCG library
 */
 std::vector<vcg::Shot<float> > nvmCam2vcgShot(const std::vector<CameraT> &camera_data, const std::vector<std::string> names){
+  
+  std::cout<<"Converting NVM Cam structure to VCG shot structure..."<<std::endl;
 
   std::vector<vcg::Shot<float> > outputShots;  
   std::size_t inSize = camera_data.size();
@@ -101,7 +105,8 @@ std::vector<vcg::Shot<float> > nvmCam2vcgShot(const std::vector<CameraT> &camera
     outputShots[i].Intrinsics.CenterPx[0] = (int)((double)outputShots[i].Intrinsics.ViewportPx[0]/2.0f);
     outputShots[i].Intrinsics.CenterPx[1] = (int)((double)outputShots[i].Intrinsics.ViewportPx[1]/2.0f);
   }
-
+  
+  std::cout<<"Done."<<std::endl;
   return outputShots;
 }
 
@@ -181,10 +186,10 @@ void readCmdInput(std::map<int,std::string> &inStrings, int argc, char** argv){
       break;
 	
     default: /* '?' */
-	fprintf(stderr, "Usage: %s [-m input mesh] [-p input PMVS] [-b input bundler file] [-i input image list]\n",
-		argv[0]);
-      }
+      fprintf(stderr, "Usage: %s [-m input mesh] [-p input PMVS] [-b input bundler file] [-i input image list]\n",
+	      argv[0]);
     }
+  }
 }
 
 void inputHandler(std::vector<std::string> inputStrings){
@@ -218,7 +223,7 @@ void getBundlerFile(MyMesh &m, std::string filename, std::string filename_images
   vcg::tri::io::ImporterOUT<MyMesh> importVar;
 
   if(importVar.Open(m, shots , image_filenames, filename.c_str(), filename_images.c_str()))
-     std::cout<<"Error reading the bundler file!"<<std::endl;
+    std::cout<<"Error reading the bundler file!"<<std::endl;
 
   std::cout<<"Done."<<std::endl;
 }

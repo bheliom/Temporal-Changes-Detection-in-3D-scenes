@@ -25,7 +25,8 @@ std::vector<std::string> FileProcessing::split(const std::string &inString, char
 Function processes NVM file created after calling VisualSfM with new images and old model. It creates new NVM file consisting of camera positions for new images exclusively so that loadNVM function can be used.
 */
 void FileProcessing::procNewNVMfile(const std::string &nvmFileDir, const std::vector<std::string> &imgFilenames, const std::string &outName){
-
+  
+  std::cout<<"Processing new NVM file..."<<std::endl;
   std::string tmpString;
   std::map<std::string, std::string> tmpMap;
   std::vector<std::string> tmpStrVec;
@@ -55,6 +56,9 @@ void FileProcessing::procNewNVMfile(const std::string &nvmFileDir, const std::ve
       tmpStrVec.clear();
     }
   outFile.close();
+
+ std::cout<<"Done."<<std::endl;
+
 }
 
 pcl::PointXYZ vcg2pclPt(vcg::Point3<float> inPt)

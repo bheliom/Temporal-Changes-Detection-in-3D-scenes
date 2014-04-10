@@ -8,65 +8,67 @@
 class ChangeDetector{
 
 protected:
-MyMesh m;
+  MyMesh m;
 
 public:
-void setInMesh(MyMesh inMesh)
-{vcg::tri::Append<MyMesh,MyMesh>::MeshCopy(m,inMesh);}
+  void setInMesh(MyMesh inMesh)
+  {vcg::tri::Append<MyMesh,MyMesh>::MeshCopy(m,inMesh);}
 
-virtual std::vector<float> getPofChange()=0;
-virtual std::vector<vcg::Point3f> getChangeMap()=0;
+  virtual std::vector<float> getPofChange()=0;
+  virtual std::vector<vcg::Point3f> getChangeMap()=0;
 
 };
 
 class ImgChangeDetector : public ChangeDetector{
 
 protected:
-std::vector<std::string> newImgFilenames;
-/*
--nvm workspace directory
--IO for calling VisualSfM to get new bundler.out
--function to process new bundler.out just to get camera positions
- */
+  std::vector<std::string> newImgFilenames;
+  /*
+    -nvm workspace directory
+    -IO for calling VisualSfM to get new bundler.out
+    -function to process new bundler.out just to get camera positions
+  */
 public:
-void setNewImgFilenames(std::vector<std::string> filenames)
-{newImgFilenames = filenames;}
-
-std::vector<float> getPofChange(){
-}
-std::vector<vcg::Point3f> getChangeMap(){
-}
-
+  void setNewImgFilenames(std::vector<std::string> filenames)
+  {newImgFilenames = filenames;}
+  cv::Mat getImageDifference(cv::Mat img1, cv::Mat img2);
+  
+  std::vector<vcg::Point3f> projChngMask(cv::Mat chngMask, vcg::Shot<float> inShot);
+  std::vector<float> getPofChange(){
+  }
+  std::vector<vcg::Point3f> getChangeMap(){
+  }
+  
 };
 
 class MeshChangeDetector : public ChangeDetector{
 
 public:
-std::vector<float> getPofChange(){
-}
-std::vector<vcg::Point3f> getChangeMap(){
-}
-
+  std::vector<float> getPofChange(){
+  }
+  std::vector<vcg::Point3f> getChangeMap(){
+  }
+  
 };
 
 class LaserChangeDetector : public ChangeDetector{
 
 public:
 
-std::vector<float> getPofChange(){
-}
-std::vector<vcg::Point3f> getChangeMap(){
-}
+  std::vector<float> getPofChange(){
+  }
+  std::vector<vcg::Point3f> getChangeMap(){
+  }
 
 };
 
 class MpImgChangeDetector : public ImgChangeDetector{
 
 public:
-std::vector<float> getPofChange(){
-}
-std::vector<vcg::Point3f> getChangeMap(){
-}
+  std::vector<float> getPofChange(){
+  }
+  std::vector<vcg::Point3f> getChangeMap(){
+  }
 
 };
 
