@@ -86,29 +86,33 @@ void testPipeline(map<int,string> inputStrings){
   kdtree.setInputCloud (cloud);
   pcl::PointXYZ searchPoint;
 
-  searchPoint.x = newShots[10].Extrinsics.Tra().X();
-  searchPoint.y = newShots[10].Extrinsics.Tra().Y();
-  searchPoint.z = newShots[10].Extrinsics.Tra().Z();
+  for(int i = 0 ; i < newShots.size(); i++){
 
-  // K nearest neighbor search
-  int K = 1;
+    searchPoint.x = newShots[i].Extrinsics.Tra().X();
+    searchPoint.y = newShots[i].Extrinsics.Tra().Y();
+    searchPoint.z = newShots[i].Extrinsics.Tra().Z();
 
-  std::vector<int> pointIdxNKNSearch(K);
-  std::vector<float> pointNKNSquaredDistance(K);
+    // K nearest neighbor search
+    int K = 1;
 
-  if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
-    cout<<"Cos znalazlem"<<endl;
-    cout<< pointNKNSquaredDistance[0]<<endl;
+    std::vector<int> pointIdxNKNSearch(K);
+    std::vector<float> pointNKNSquaredDistance(K);
 
-    cv::Mat newImg = getImg(imgFilenames[10]);
-    cv::Mat oldImg = getImg(image_filenames[pointIdxNKNSearch[0]]);
+    if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
+      cout<<"Cos znalazlem"<<endl;
+      cout<< pointNKNSquaredDistance[0]<<endl;
+
+      cv::Mat newImg = getImg(imgFilenames[i]);
+      cv::Mat oldImg = getImg(image_filenames[pointIdxNKNSearch[0]]);
     
-    cv::namedWindow( "New image", cv::WINDOW_NORMAL );// Create a window for display.
-    cv::namedWindow( "Old image", cv::WINDOW_NORMAL );// Create a window for display.
-    cv::imshow( "New image", newImg);                   // Show our image inside it.
-    cv::waitKey(0);                        
-    cv::imshow( "Old image", oldImg);
-    cv::waitKey(0);                        
+      cv::namedWindow( "New image", cv::WINDOW_NORMAL );// Create a window for display.
+      cv::namedWindow( "Old image", cv::WINDOW_NORMAL );// Create a window for display.
+      cv::moveWindow("Old image", 200, 0);
+      cv::imshow( "New image", newImg);                   // Show our image inside it.
+      cv::waitKey(0);                        
+      cv::imshow( "Old image", oldImg);
+      cv::waitKey(0);                        
+    }
   }
 }
 
