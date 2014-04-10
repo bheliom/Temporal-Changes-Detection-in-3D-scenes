@@ -23,7 +23,7 @@ int main(int argc, char** argv){
   map<int,string> inputStrings;
   readCmdInput(inputStrings, argc, argv);
 
-   testPipeline(inputStrings);
+  testPipeline(inputStrings);
   //  testNewNVM(inputStrings);
 
   //  testVid(inputStrings);
@@ -33,8 +33,8 @@ int main(int argc, char** argv){
 void testPipeline(map<int,string> inputStrings){
 
   //get the input mesh
-  MyMesh m;
-  getPlyFileVcg(inputStrings[MESH], m); 
+  //MyMesh m;
+  //getPlyFileVcg(inputStrings[MESH], m); 
 
   //get initial NVM file
   vector<vcg::Shot<float> > shots;
