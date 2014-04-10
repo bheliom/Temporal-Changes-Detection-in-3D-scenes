@@ -96,9 +96,17 @@ void testPipeline(map<int,string> inputStrings){
   std::vector<int> pointIdxNKNSearch(K);
   std::vector<float> pointNKNSquaredDistance(K);
 
-  if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0)
-    cout<<"Cos znalazlem";
-
+  if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
+    cout<<"Cos znalazlem"<<endl;
+    cv::Mat newImg = getImg(imgFilenames[0]);
+    cv::Mat oldImg = getImg(image_filenames[pointIdxNKNSearch[0]]);
+    
+      
+    cv::namedWindow( "New image", cv::WINDOW_NORMAL );// Create a window for display.
+    cv::namedWindow( "Old image", cv::WINDOW_NORMAL );// Create a window for display.
+    cv::imshow( "New image", newImg);                   // Show our image inside it.
+    cv::imshow( "Old image", oldImg);
+  }
 }
 
 void testNewNVM(map<int,string> inputStrings){
