@@ -101,11 +101,11 @@ void testPipeline(map<int,string> inputStrings){
     cv::Mat newImg = getImg(imgFilenames[0]);
     cv::Mat oldImg = getImg(image_filenames[pointIdxNKNSearch[0]]);
     
-      
     cv::namedWindow( "New image", cv::WINDOW_NORMAL );// Create a window for display.
     cv::namedWindow( "Old image", cv::WINDOW_NORMAL );// Create a window for display.
     cv::imshow( "New image", newImg);                   // Show our image inside it.
     cv::imshow( "Old image", oldImg);
+    cv::waitKey(0);                        
   }
 }
 
