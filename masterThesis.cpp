@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <opencv2/imgproc/imgproc.hpp>
 #include "util/meshProcess.hpp"
 #include "chngDet/chngDet.hpp"
 #include "util/pbaDataInterface.h"
@@ -25,7 +26,6 @@ int main(int argc, char** argv){
 
   testPipeline(inputStrings);
   //  testNewNVM(inputStrings);
-
   //  testVid(inputStrings);
   return 0;
 }
@@ -99,27 +99,31 @@ void testPipeline(map<int,string> inputStrings){
     std::vector<float> pointNKNSquaredDistance(K);
 
     if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
-      cout<<"Cos znalazlem"<<endl;
       cout<< pointNKNSquaredDistance[0]<<endl;
 
       cv::Mat newImg = getImg(imgFilenames[i]);
       cv::Mat oldImg = getImg(image_filenames[pointIdxNKNSearch[0]]);
-
+      
+      cv::Mat newImgG;
+      cv::cvtColor(newImg, newImgG, CV_BGR2GRAY);
+      cv::Mat oldImgG;
+      cv::cvtColor(oldImg, oldImgG, CV_BGR2GRAY);
       //cv::cvtColor(colorMat, greyMat, CV_BGR2GRAY);
 
-      cv::Mat diffImg = newImg!=oldImg;
+      cv::Mat diffImg = newImgG!=oldImgG;
       cv::namedWindow( "New image", cv::WINDOW_NORMAL );// Create a window for display.
       cv::imshow( "New image", newImg);                   // Show our image inside it.
+      cv::moveWindow("Old image", 100, 100);
       cv::waitKey(0);                     
    
       cv::namedWindow( "Old image", cv::WINDOW_NORMAL );// Create a window for display.
-      cv::moveWindow("Old image", 500, 0);
+      cv::moveWindow("Old image", 500, 100);
 
       cv::imshow( "Old image", oldImg);
       cv::waitKey(0);                        
 
       cv::namedWindow( "Difference image", cv::WINDOW_NORMAL );// Create a window for display.
-      cv::moveWindow("Difference image", 1000, 0);
+      cv::moveWindow("Difference image", 1000, 100);
 
       cv::imshow( "Difference image", diffImg);
       cv::waitKey(0);                        
