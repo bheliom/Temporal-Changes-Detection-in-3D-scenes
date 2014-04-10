@@ -97,6 +97,15 @@ void testPipeline(map<int,string> inputStrings){
     std::vector<int> pointIdxNKNSearch(K);
     std::vector<float> pointNKNSquaredDistance(K);
 
+    cv::namedWindow( "New image", cv::WINDOW_NORMAL );// Create a window for display.
+    cv::moveWindow("New image", 100, 0);
+
+    cv::namedWindow( "Old image", cv::WINDOW_NORMAL );// Create a window for display.
+    cv::moveWindow("Old image", 500, 0);
+
+    cv::namedWindow( "Difference image", cv::WINDOW_NORMAL );// Create a window for display.
+    cv::moveWindow("Difference image", 1000, 0);
+
     if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
       cout<< pointNKNSquaredDistance[0]<<endl;
 
@@ -110,22 +119,10 @@ void testPipeline(map<int,string> inputStrings){
       //cv::cvtColor(colorMat, greyMat, CV_BGR2GRAY);
 
       cv::Mat diffImg = newImgG!=oldImgG;
-      cv::namedWindow( "New image", cv::WINDOW_NORMAL );// Create a window for display.
+
       cv::imshow( "New image", newImg);                   // Show our image inside it.
-      cv::moveWindow("Old image", 100, 0);
-
-      cv::waitKey(0);                     
-   
-      cv::namedWindow( "Old image", cv::WINDOW_NORMAL );// Create a window for display.
       cv::imshow( "Old image", oldImg);
-      cv::moveWindow("Old image", 500, 0);
-
-      cv::waitKey(0);                        
-
-      cv::namedWindow( "Difference image", cv::WINDOW_NORMAL );// Create a window for display.
       cv::imshow( "Difference image", diffImg);
-      cv::moveWindow("Difference image", 1000, 0);
-
       cv::waitKey(0);                        
     }
   }
