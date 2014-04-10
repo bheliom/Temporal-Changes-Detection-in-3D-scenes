@@ -98,6 +98,8 @@ void testPipeline(map<int,string> inputStrings){
 
   if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
     cout<<"Cos znalazlem"<<endl;
+    cout<< pointNKNSquaredDistance[0]<<endl;
+
     cv::Mat newImg = getImg(imgFilenames[10]);
     cv::Mat oldImg = getImg(image_filenames[pointIdxNKNSearch[0]]);
     
