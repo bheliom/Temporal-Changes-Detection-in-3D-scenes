@@ -11,72 +11,67 @@
 
 typedef vcg::tri::UpdateTopology<MyMesh>::PEdge SingleEdge;
 
-cv::Mat ImgProcessing::getImgFundMat(cv::Mat img_object, cv::Mat img_scene){
+/**
+Function finds fundamental matrix F for two input images. Function mostly based on OpenCV documentation tutorials.
+ */
+cv::Mat ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2){
 
-//-- Step 1: Detect the keypoints using SURF Detector
-int minHessian = 400;
+  //-- Step 1: Detect the keypoints using SURF Detector
+  int minHessian = 400;
+  cv::SurfFeatureDetector detector( minHessian );
+  std::vector<cv::KeyPoint> keyPtsImg1, keyPtsImg2;
 
-cv::SurfFeatureDetector detector( minHessian );
+  detector.detect( img1, keyPtsImg1 );
+  detector.detect( img2, keyPtsImg2 );
 
-std::vector<cv::KeyPoint> keypoints_object, keypoints_scene;
+  //-- Step 2: Calculate descriptors (feature vectors)
+  cv::SurfDescriptorExtractor extractor;
+  cv::Mat descriptors_object, descriptors_scene;
 
-detector.detect( img_object, keypoints_object );
-detector.detect( img_scene, keypoints_scene );
+  extractor.compute( img1, keyPtsImg1, descriptors_object );
+  extractor.compute( img2, keyPtsImg2, descriptors_scene );
 
-//-- Step 2: Calculate descriptors (feature vectors)
-cv::SurfDescriptorExtractor extractor;
+  //-- Step 3: Matching descriptor vectors using FLANN matcher
+  cv::FlannBasedMatcher matcher;
+  std::vector< cv::DMatch > matches;
+  matcher.match( descriptors_object, descriptors_scene, matches );
 
-cv::Mat descriptors_object, descriptors_scene;
+  double max_dist = 0; double min_dist = 100;
 
-extractor.compute( img_object, keypoints_object, descriptors_object );
-extractor.compute( img_scene, keypoints_scene, descriptors_scene );
+  //-- Quick calculation of max and min distances between keypoints
+  for( int i = 0; i < descriptors_object.rows; i++ )
+    { double dist = matches[i].distance;
+      if( dist < min_dist ) min_dist = dist;
+      if( dist > max_dist ) max_dist = dist;
+    }
+  //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
+  std::vector< cv::DMatch > good_matches;
 
-//-- Step 3: Matching descriptor vectors using FLANN matcher
-cv::FlannBasedMatcher matcher;
-std::vector< cv::DMatch > matches;
-matcher.match( descriptors_object, descriptors_scene, matches );
-
-double max_dist = 0; double min_dist = 100;
-
-//-- Quick calculation of max and min distances between keypoints
-for( int i = 0; i < descriptors_object.rows; i++ )
-  { double dist = matches[i].distance;
-if( dist < min_dist ) min_dist = dist;
-if( dist > max_dist ) max_dist = dist;
-}
-
-printf("-- Max dist : %f \n", max_dist );
-printf("-- Min dist : %f \n", min_dist );
-
-//-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
-std::vector< cv::DMatch > good_matches;
-
-for( int i = 0; i < descriptors_object.rows; i++ )
-  { if( matches[i].distance < 3*min_dist )
-      { good_matches.push_back( matches[i]); }
-}
-cv::Mat img_matches;
+  for( int i = 0; i < descriptors_object.rows; i++ )
+    { if( matches[i].distance < 3*min_dist )
+	{ good_matches.push_back( matches[i]); }
+    }
  
-//-- Localize the object
-std::vector<cv::Point2f> obj;
-std::vector<cv::Point2f> scene;
+  //-- Localize the object
+  std::vector<cv::Point2f> obj;
+  std::vector<cv::Point2f> scene;
 
-for( int i = 0; i < good_matches.size(); i++ )
-  {
-//-- Get the keypoints from the good matches
-obj.push_back( keypoints_object[ good_matches[i].queryIdx ].pt );
-scene.push_back( keypoints_scene[ good_matches[i].trainIdx ].pt );
-}
+  for( int i = 0; i < good_matches.size(); i++ )
+    {
+      //-- Get the keypoints from the good matches
+      obj.push_back( keyPtsImg1[ good_matches[i].queryIdx ].pt );
+      scene.push_back( keyPtsImg2[ good_matches[i].trainIdx ].pt );
+    }
 
-cv::Mat H = cv::findHomography( obj, scene, CV_RANSAC );
+  cv::Mat H = cv::findHomography( obj, scene, CV_RANSAC );
 
-return H;
+  return H;
 }
 
 
 /**
-Function splits given string depending on defined delimeter
- */
+   Function splits given string depending on defined delimeter
+*/
 std::vector<std::string> FileProcessing::split(const std::string &inString, char delim){
 
   std::vector<std::string> outStrings;
@@ -84,14 +79,13 @@ std::vector<std::string> FileProcessing::split(const std::string &inString, char
   std::string item;
 
   while(std::getline(ss, item, delim))
-	outStrings.push_back(item);
+    outStrings.push_back(item);
 
   return outStrings;
-
 }
 
 /**
-Function processes NVM file created after calling VisualSfM with new images and old model. It creates new NVM file consisting of camera positions for new images exclusively so that loadNVM function can be used.
+   Function processes NVM file created after calling VisualSfM with new images and old model. It creates new NVM file consisting of camera positions for new images exclusively so that loadNVM function can be used.
 */
 void FileProcessing::procNewNVMfile(const std::string &nvmFileDir, const std::vector<std::string> &imgFilenames, const std::string &outName){
   
@@ -126,7 +120,7 @@ void FileProcessing::procNewNVMfile(const std::string &nvmFileDir, const std::ve
     }
   outFile.close();
 
- std::cout<<"Done."<<std::endl;
+  std::cout<<"Done."<<std::endl;
 
 }
 
@@ -173,7 +167,7 @@ void findOcc(std::map<int, int> &inMap, std::vector<int> &outVector, int noOfOut
   }
 }
 
-      /**Function returns average length of the edge in the whole mesh*/
+/**Function returns average length of the edge in the whole mesh*/
 double getEdgeAverage(MyMesh &m){
 
   vcg::tri::UpdateTopology<MyMesh>::FaceFace(m);
@@ -202,7 +196,7 @@ double getEdgeAverage(MyMesh &m){
   return tmpSum/edgesSize;
 }
 
-    /**Function returns edge average length for given face*/
+/**Function returns edge average length for given face*/
 double getFaceEdgeAverage(MyFace &f){
   
   vcg::Point3f tmp1,tmp2,tmp3;

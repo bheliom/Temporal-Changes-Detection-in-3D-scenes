@@ -32,10 +32,6 @@ int main(int argc, char** argv){
 
 void testPipeline(map<int,string> inputStrings){
 
-  //get the input mesh
-  //MyMesh m;
-  //getPlyFileVcg(inputStrings[MESH], m); 
-
   //get initial NVM file
   vector<vcg::Shot<float> > shots;
   vector<vcg::Shot<float> > newShots;
@@ -45,7 +41,6 @@ void testPipeline(map<int,string> inputStrings){
   
   getNVM(inputStrings[BUNDLER], camera_data, image_filenames);
   shots = nvmCam2vcgShot(camera_data, image_filenames);
-
   
   CmdIO::callCmd("cp "+inputStrings[PMVS]+" "+inputStrings[BUNDLER]+".txt");
 
@@ -77,12 +72,11 @@ void testPipeline(map<int,string> inputStrings){
   // Generate pointcloud data
   cloud->points.resize (shots.size());
 
-  for (size_t i = 0; i < cloud->points.size (); ++i)
-    {
-      cloud->points[i].x = shots[i].Extrinsics.Tra().X();
-      cloud->points[i].y = shots[i].Extrinsics.Tra().Y();
-      cloud->points[i].z = shots[i].Extrinsics.Tra().Z();
-    }
+  for (size_t i = 0; i < cloud->points.size (); ++i){
+    cloud->points[i].x = shots[i].Extrinsics.Tra().X();
+    cloud->points[i].y = shots[i].Extrinsics.Tra().Y();
+    cloud->points[i].z = shots[i].Extrinsics.Tra().Z();
+  }
 
   pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
 
@@ -100,16 +94,16 @@ void testPipeline(map<int,string> inputStrings){
     std::vector<int> pointIdxNKNSearch(K);
     std::vector<float> pointNKNSquaredDistance(K);
 
-    cv::namedWindow( "New image", cv::WINDOW_NORMAL );// Create a window for display.
+    cv::namedWindow( "New image", cv::WINDOW_NORMAL );
     cv::moveWindow("New image", 100, 0);
 
-    cv::namedWindow( "Old image", cv::WINDOW_NORMAL );// Create a window for display.
+    cv::namedWindow( "Old image", cv::WINDOW_NORMAL );
     cv::moveWindow("Old image", 500, 0);
 
-    cv::namedWindow( "Difference image", cv::WINDOW_NORMAL );// Create a window for display.
+    cv::namedWindow( "Difference image", cv::WINDOW_NORMAL );
     cv::moveWindow("Difference image", 1000, 0);
 
-    cv::namedWindow( "Out image", cv::WINDOW_NORMAL );// Create a window for display.
+    cv::namedWindow( "Out image", cv::WINDOW_NORMAL );
     cv::moveWindow("Out image", 1000, 500);
 
     if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
@@ -125,30 +119,27 @@ void testPipeline(map<int,string> inputStrings){
       cv::Size newSize(oldImg.cols/resFac , oldImg.rows/resFac);
 
       cv::Mat oldImgG;
-      cv::cvtColor(oldImg, oldImgG, CV_BGR2HSV);
       //      cv::resize(oldImgG,  oldImgG, newSize);
 
       cv::Mat F = ImgProcessing::getImgFundMat(newImg, oldImg);
       cv::Mat outImg;
       warpPerspective(newImg, outImg, F, newImg.size());
       
-
-      cv::imwrite("imgOld.jpg", oldImg);
-      cv::imwrite("imgNew.jpg", outImg);
+      // cv::imwrite("imgOld.jpg", oldImg);
+      // cv::imwrite("imgNew.jpg", outImg);
 
       cv::Mat outImgG;
       
       cv::cvtColor(outImg, outImgG, CV_BGR2HSV);
-      //cv::resize(outImgG, outImgG, newSize);      
-      //GaussianBlur(InputArray src, OutputArray dst, Size ksize, double sigmaX,
-      cv::blur(outImgG, outImgG, cv::Size(resFac,resFac));
-      cv::blur(oldImgG, oldImgG, cv::Size(resFac,resFac));
-      cv::Mat diffImg = (oldImgG!=outImgG);
-      //      cv::cvtColor(diffImg, diffImg, CV_BGR2GRAY);
+      cv::cvtColor(oldImg, oldImgG, CV_BGR2HSV);
 
-      //      cv::adaptiveThreshold(diffImg, diffImg, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 3, 5);
+      cv::Mat diffImg = oldImgG-outImgG;
+      cv::Mat diffChan[3];
+      cv::split(diffImg, diffChan);
+      cv::Mat finMask;
+      cv::adaptiveThreshold(diffChan[2], finMask, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 3, 5);
 
-      cv::imshow( "New image", newImg);                   // Show our image inside it.
+      cv::imshow( "New image", newImg);       
       cv::imshow( "Old image", oldImg);
       cv::imshow( "Difference image", diffImg);
       cv::imshow( "Out image", outImg);
