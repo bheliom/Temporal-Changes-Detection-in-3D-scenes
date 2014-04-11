@@ -136,12 +136,11 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat outImgG;
       
       cv::cvtColor(outImg, outImgG, CV_BGR2GRAY);
-      cv::resize(outImgG, outImgG, newSize);
+      cv::resize(outImgG, outImgG, newSize);      
       
-      
-      oldImgG/=20;
-      outImgG/=20;
       cv::Mat diffImg = cv::abs(oldImgG-outImgG);
+
+      cv::adaptiveThreshold(diffImg, diffImg, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 3, 5);
 
       cv::imshow( "New image", newImg);                   // Show our image inside it.
       cv::imshow( "Old image", oldImg);
