@@ -128,12 +128,16 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat F = ImgProcessing::getImgFundMat(newImg, oldImg);
       cv::Mat outImg;
       warpPerspective(newImg, outImg, F, newImg.size());
+      
+
+      cv::imwrite("imgOld.jpg", oldImg);
+      cv::imwrite("imgNew.jpg", outImg);
+
       cv::Mat outImgG;
+      
       cv::cvtColor(outImg, outImgG, CV_BGR2GRAY);
       cv::resize(outImgG, outImgG, newSize);
       
-      cv::imwrite("imgOld.jpg", oldImg);
-      cv::imwrite("imgNew.jpg", newImg);
       
       oldImgG/=20;
       outImgG/=20;
