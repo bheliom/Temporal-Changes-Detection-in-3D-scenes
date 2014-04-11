@@ -122,7 +122,7 @@ void testPipeline(map<int,string> inputStrings){
       warpPerspective(newImg, outImg, F, newImg.size());
       //cv::cvtColor(colorMat, greyMat, CV_BGR2GRAY);
 
-      cv::Mat diffImg = newImg!=outImg;
+      cv::Mat diffImg = (oldImg!=outImg);
 
       cv::imshow( "New image", newImg);                   // Show our image inside it.
       cv::imshow( "Old image", oldImg);
