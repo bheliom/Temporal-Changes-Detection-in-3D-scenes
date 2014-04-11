@@ -106,6 +106,9 @@ void testPipeline(map<int,string> inputStrings){
     cv::namedWindow( "Difference image", cv::WINDOW_NORMAL );// Create a window for display.
     cv::moveWindow("Difference image", 1000, 0);
 
+    cv::namedWindow( "Out image", cv::WINDOW_NORMAL );// Create a window for display.
+    cv::moveWindow("Out image", 1000, 1000);
+
     if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
       cout<< pointNKNSquaredDistance[0]<<endl;
 
@@ -120,13 +123,15 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat F = ImgProcessing::getImgFundMat(newImg, oldImg);
       cv::Mat outImg;
       warpPerspective(newImg, outImg, F, newImg.size());
-      //cv::cvtColor(colorMat, greyMat, CV_BGR2GRAY);
+      cv::Mat outImgG;
+      cv::cvtColor(outImg, outImgG, CV_BGR2GRAY);
 
-      cv::Mat diffImg = (oldImg!=outImg);
+      cv::Mat diffImg = (oldImgG!=outImgG);
 
       cv::imshow( "New image", newImg);                   // Show our image inside it.
       cv::imshow( "Old image", oldImg);
       cv::imshow( "Difference image", diffImg);
+      cv::imshow( "Out image", outImg);
       cv::waitKey(0);                        
     }
   }
