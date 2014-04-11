@@ -59,7 +59,7 @@ void testPipeline(map<int,string> inputStrings){
   while(getline(inFile,tmpString))
     imgFilenames.push_back(tmpString);
 
-  infile.close();
+  inFile.close();
 
   tmpString = "newNVM.nvm";
 
