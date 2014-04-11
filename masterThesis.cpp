@@ -122,8 +122,8 @@ void testPipeline(map<int,string> inputStrings){
       cv::Size newSize(oldImg.cols/resFac , oldImg.rows/resFac);
 
       cv::Mat oldImgG;
-      cv::cvtColor(oldImg, oldImgG, CV_BGR2GRAY);
-      cv::resize(oldImgG,  oldImgG, newSize);
+      cv::cvtColor(oldImg, oldImgG, CV_BGR2HSV);
+      //      cv::resize(oldImgG,  oldImgG, newSize);
 
       cv::Mat F = ImgProcessing::getImgFundMat(newImg, oldImg);
       cv::Mat outImg;
@@ -135,10 +135,11 @@ void testPipeline(map<int,string> inputStrings){
 
       cv::Mat outImgG;
       
-      cv::cvtColor(outImg, outImgG, CV_BGR2GRAY);
-      cv::resize(outImgG, outImgG, newSize);      
+      cv::cvtColor(outImg, outImgG, CV_BGR2HSV);
+      //cv::resize(outImgG, outImgG, newSize);      
       
-      cv::Mat diffImg = cv::abs(oldImg-outImg);
+      cv::Mat diffImg = oldImgG-outImgG;
+      cv::cvtColor(diffImg, diffImg, CV_BGR2GRAY);
 
       cv::adaptiveThreshold(diffImg, diffImg, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 3, 5);
 
