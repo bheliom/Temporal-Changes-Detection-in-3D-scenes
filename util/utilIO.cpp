@@ -48,6 +48,9 @@ void CmdIO::callVsfm(std::string inCmd){
   system(outCommand.c_str());
 }
 
+void CmdIO::callCmd(std::string inCmd){
+  system(inCmd.c_str());
+}
 
 /**
    Function converts cameras read from NVM file into VCG Shot objects. Part of the function is based on the function Open() in import_out.h in VCG library

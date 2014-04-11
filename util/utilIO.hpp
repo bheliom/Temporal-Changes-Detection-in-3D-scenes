@@ -55,7 +55,8 @@ class CmdIO : public ChangeDetectorIO{
 
 public:
   CmdIO(std::string inDirs) : ChangeDetectorIO(inDirs){};
-  void callVsfm(std::string);
+  static void callVsfm(std::string);
+  static void callCmd(std::string);
 };
 
 

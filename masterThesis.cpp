@@ -45,7 +45,10 @@ void testPipeline(map<int,string> inputStrings){
   
   getNVM(inputStrings[BUNDLER], camera_data, image_filenames);
   shots = nvmCam2vcgShot(camera_data, image_filenames);
+
   
+  CmdIO::callCmd("cp "+inputStrings[PMVS]+" "+inputStrings[BUNDLER]+".txt");
+
   //Call VisualSfM
   CmdIO vsfmHandler("./");
   vsfmHandler.callVsfm(" sfm+resume+fixcam "+inputStrings[BUNDLER]+" "+inputStrings[OUTDIR]);
