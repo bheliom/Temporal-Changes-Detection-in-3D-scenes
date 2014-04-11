@@ -135,7 +135,7 @@ void testPipeline(map<int,string> inputStrings){
       cv::cvtColor(outImg, outImgG, CV_BGR2HSV);
       cv::cvtColor(oldImg, oldImgG, CV_BGR2HSV);
 
-      cv::Mat diffImg = oldImgG-outImgG;
+      cv::Mat diffImg = (oldImgG!=outImgG);
       cv::Mat diffChan[3];
       cv::split(diffImg, diffChan);
       cv::Mat finMask;
