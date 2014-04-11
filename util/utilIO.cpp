@@ -121,6 +121,7 @@ void getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector
   std::cout<<"Loading NVM file... ";
   if(LoadNVM(inFile, camera_data, names))
     std::cout<<"Done!"<<endl;
+  inFile.close();
 }
 
 

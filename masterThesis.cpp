@@ -59,6 +59,8 @@ void testPipeline(map<int,string> inputStrings){
   while(getline(inFile,tmpString))
     imgFilenames.push_back(tmpString);
 
+  infile.close();
+
   tmpString = "newNVM.nvm";
 
   //Get positions of new cameras
@@ -137,12 +139,13 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat diffChan[3];
       cv::split(diffImg, diffChan);
       cv::Mat finMask;
-      cv::adaptiveThreshold(diffChan[1], finMask, 1, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 3, 5);
+      cv::adaptiveThreshold(diffChan[1], finMask, 100, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 3, 5);
       //      cv::threshold(diffChan[1], OutputArray dst, double thresh, double maxval, int type)
       cv::imshow( "New image", newImg);       
       cv::imshow( "Old image", oldImg);
       cv::imshow( "Difference image", finMask);
       cv::imshow( "Out image", outImg);
+   
       cv::waitKey(0);                        
     }
   }
