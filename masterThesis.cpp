@@ -134,7 +134,7 @@ void testPipeline(map<int,string> inputStrings){
       
       oldImgG/=20;
       outImgG/=20;
-      cv::Mat diffImg = (oldImgG!=outImgG);
+      cv::Mat diffImg = cv::abs(oldImgG-outImgG);
 
       cv::imshow( "New image", newImg);                   // Show our image inside it.
       cv::imshow( "Old image", oldImg);
