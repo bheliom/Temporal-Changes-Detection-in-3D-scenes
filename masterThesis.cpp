@@ -132,6 +132,9 @@ void testPipeline(map<int,string> inputStrings){
       cv::cvtColor(outImg, outImgG, CV_BGR2GRAY);
       cv::resize(outImgG, outImgG, newSize);
       
+      cv::imwrite("imgOld.jpg", oldImg);
+      cv::imwrite("imgNew.jpg", newImg);
+      
       oldImgG/=20;
       outImgG/=20;
       cv::Mat diffImg = cv::abs(oldImgG-outImgG);
