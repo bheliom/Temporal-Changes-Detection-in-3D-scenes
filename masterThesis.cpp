@@ -118,7 +118,7 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat newImgG;
       cv::cvtColor(newImg, newImgG, CV_BGR2GRAY);
 
-      int resFac = 15;
+      int resFac = 10;
       cv::Size newSize(oldImg.cols/resFac , oldImg.rows/resFac);
 
       cv::Mat oldImgG;
@@ -137,11 +137,11 @@ void testPipeline(map<int,string> inputStrings){
       
       cv::cvtColor(outImg, outImgG, CV_BGR2HSV);
       //cv::resize(outImgG, outImgG, newSize);      
-      //      GaussianBlur(InputArray src, OutputArray dst, Size ksize, double sigmaX,
+      //GaussianBlur(InputArray src, OutputArray dst, Size ksize, double sigmaX,
       cv::blur(outImgG, outImgG, cv::Size(resFac,resFac));
       cv::blur(oldImgG, oldImgG, cv::Size(resFac,resFac));
       cv::Mat diffImg = (oldImgG!=outImgG);
-      cv::cvtColor(diffImg, diffImg, CV_BGR2GRAY);
+      //      cv::cvtColor(diffImg, diffImg, CV_BGR2GRAY);
 
       //      cv::adaptiveThreshold(diffImg, diffImg, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 3, 5);
 
