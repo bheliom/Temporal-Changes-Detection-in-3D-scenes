@@ -141,7 +141,7 @@ void testPipeline(map<int,string> inputStrings){
 
       cv::imshow( "New image", newImg);       
       cv::imshow( "Old image", oldImg);
-      cv::imshow( "Difference image", diffImg);
+      cv::imshow( "Difference image", finMask);
       cv::imshow( "Out image", outImg);
       cv::waitKey(0);                        
     }
