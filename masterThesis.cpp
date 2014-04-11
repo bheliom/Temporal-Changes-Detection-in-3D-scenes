@@ -139,8 +139,8 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat diffChan[3];
       cv::split(diffImg, diffChan);
       cv::Mat finMask;
-      // cv::adaptiveThreshold(diffChan[1], finMask, 100, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 3, 5);
-      cv::threshold(diffChan[1], finMask, 0.2, 255, CV_THRESH_BINARY);
+      cv::adaptiveThreshold(diffChan[1], finMask, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C ,CV_THRESH_BINARY_INV , 3, 0);
+      //      cv::threshold(diffChan[1], finMask, 0.2, 255, CV_THRESH_BINARY);
       cv::imshow( "New image", newImg);       
       cv::imshow( "Old image", oldImg);
       cv::imshow( "Difference image", finMask);
