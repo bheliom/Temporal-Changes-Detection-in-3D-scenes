@@ -137,7 +137,9 @@ void testPipeline(map<int,string> inputStrings){
       
       cv::cvtColor(outImg, outImgG, CV_BGR2HSV);
       //cv::resize(outImgG, outImgG, newSize);      
-      
+      //      GaussianBlur(InputArray src, OutputArray dst, Size ksize, double sigmaX,
+      cv::blur(outImgG, outImgG, 6);
+      cv::blur(oldImgG, oldImgG, 6);
       cv::Mat diffImg = (oldImgG!=outImgG);
       cv::cvtColor(diffImg, diffImg, CV_BGR2GRAY);
 
