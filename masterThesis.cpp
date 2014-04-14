@@ -95,7 +95,7 @@ void testPipeline(map<int,string> inputStrings){
 
     std::vector<int> pointIdxNKNSearch(K);
     std::vector<float> pointNKNSquaredDistance(K);
-
+    /*
     cv::namedWindow( "New image", cv::WINDOW_NORMAL );
     cv::moveWindow("New image", 100, 0);
 
@@ -107,6 +107,7 @@ void testPipeline(map<int,string> inputStrings){
 
     cv::namedWindow( "Out image", cv::WINDOW_NORMAL );
     cv::moveWindow("Out image", 1000, 500);
+    */
 
     if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
       cout<< pointNKNSquaredDistance[0]<<endl;
@@ -154,13 +155,13 @@ void testPipeline(map<int,string> inputStrings){
       cv::cvtColor(outImgG, finMask, CV_BGR2GRAY);      
       //cv::adaptiveThreshold(diffChan[1], finMask, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C ,CV_THRESH_BINARY_INV , 9, 0);
       cv::threshold(finMask, finMask, 30, 255, CV_THRESH_BINARY_INV);
-
+      /*
       cv::imshow( "New image", newImg);       
       cv::imshow( "Old image", oldImg);
       cv::imshow( "Difference image", finMask);
       cv::imshow( "Out image", diffImg);
    
-      cv::waitKey(0);                        
+      cv::waitKey(0);                        */
     }
   }
 }
