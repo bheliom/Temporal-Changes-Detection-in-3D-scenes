@@ -133,7 +133,7 @@ void testPipeline(map<int,string> inputStrings){
       // cv::imwrite("imgOld.jpg", oldImg);
       // cv::imwrite("imgNew.jpg", outImg);
 
-      cv::Mat outImgG = oldImg;
+      cv::Mat outImgG = oldImg.clone();
       
       //cv::cvtColor(outImg, outImgG, CV_BGR2HSV);
       //cv::cvtColor(oldImg, oldImgG, CV_BGR2HSV);
