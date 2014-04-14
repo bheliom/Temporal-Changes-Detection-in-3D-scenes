@@ -140,7 +140,6 @@ void testPipeline(map<int,string> inputStrings){
       // cv::blur(oldImg, oldImg, cv::Size(resFac,resFac));
 
       cv::Mat diffImg = cv::abs(oldImg-outImg);
-
       
       /*RUN WARP AGAIN TO GET RID OF THE BOUNDING SHIT YO*/
       warpPerspective(outImgG, diffImg, F, diffImg.size(), cv::WARP_INVERSE_MAP);
