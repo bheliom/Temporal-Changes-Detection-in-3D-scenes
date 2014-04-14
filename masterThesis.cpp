@@ -154,7 +154,7 @@ void testPipeline(map<int,string> inputStrings){
       
       //cv::adaptiveThreshold(diffChan[1], finMask, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C ,CV_THRESH_BINARY_INV , 9, 0);
 
-      cv::threshold(finMask, finMask, 255/10, 255, CV_THRESH_BINARY);
+      cv::threshold(finMask, finMask, 10, 255, CV_THRESH_OTSU);
 
       cv::imshow( "New image", newImg);       
       cv::imshow( "Old image", oldImg);
