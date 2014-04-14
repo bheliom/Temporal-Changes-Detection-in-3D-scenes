@@ -118,6 +118,7 @@ void testPipeline(map<int,string> inputStrings){
       cv::cvtColor(newImg, newImgG, CV_BGR2GRAY);
 
       int resFac = 10;
+
       cv::Size newSize(oldImg.cols/resFac , oldImg.rows/resFac);
 
       cv::Mat oldImgG;
@@ -154,12 +155,12 @@ void testPipeline(map<int,string> inputStrings){
       
       //cv::adaptiveThreshold(diffChan[1], finMask, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C ,CV_THRESH_BINARY_INV , 9, 0);
 
-      cv::threshold(finMask, finMask, 30, 255, CV_THRESH_BINARY);
+      cv::threshold(finMask, finMask, 30, 255, CV_THRESH_BINARY_INV);
 
       cv::imshow( "New image", newImg);       
       cv::imshow( "Old image", oldImg);
       cv::imshow( "Difference image", finMask);
-      cv::imshow( "Out image", outImg);
+      cv::imshow( "Out image", outImgG);
    
       cv::waitKey(0);                        
     }
