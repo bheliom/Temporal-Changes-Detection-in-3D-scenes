@@ -32,7 +32,7 @@ int main(int argc, char** argv){
 
 void testPipeline(map<int,string> inputStrings){
 
-  //get initial NVM file
+  //Get initial NVM file
   vector<vcg::Shot<float> > shots;
   vector<vcg::Shot<float> > newShots;
   vector<string> image_filenames;
@@ -96,21 +96,20 @@ void testPipeline(map<int,string> inputStrings){
     std::vector<int> pointIdxNKNSearch(K);
     std::vector<float> pointNKNSquaredDistance(K);
     /*
-    cv::namedWindow( "New image", cv::WINDOW_NORMAL );
-    cv::moveWindow("New image", 100, 0);
+      cv::namedWindow( "New image", cv::WINDOW_NORMAL );
+      cv::moveWindow("New image", 100, 0);
 
-    cv::namedWindow( "Old image", cv::WINDOW_NORMAL );
-    cv::moveWindow("Old image", 500, 0);
+      cv::namedWindow( "Old image", cv::WINDOW_NORMAL );
+      cv::moveWindow("Old image", 500, 0);
 
-    cv::namedWindow( "Difference image", cv::WINDOW_NORMAL );
-    cv::moveWindow("Difference image", 1000, 0);
+      cv::namedWindow( "Difference image", cv::WINDOW_NORMAL );
+      cv::moveWindow("Difference image", 1000, 0);
 
-    cv::namedWindow( "Out image", cv::WINDOW_NORMAL );
-    cv::moveWindow("Out image", 1000, 500);
+      cv::namedWindow( "Out image", cv::WINDOW_NORMAL );
+      cv::moveWindow("Out image", 1000, 500);
     */
 
     if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
-      cout<< pointNKNSquaredDistance[0]<<endl;
 
       cv::Mat newImg = getImg(imgFilenames[i]);
       cv::Mat oldImg = getImg(image_filenames[pointIdxNKNSearch[0]]);
@@ -123,13 +122,12 @@ void testPipeline(map<int,string> inputStrings){
       cv::Size newSize(oldImg.cols/resFac , oldImg.rows/resFac);
 
       cv::Mat oldImgG;
-      //      cv::resize(oldImgG,  oldImgG, newSize);
+      //cv::resize(oldImgG,  oldImgG, newSize);
 
       cv::Mat F = ImgProcessing::getImgFundMat(newImg, oldImg);
       cv::Mat outImg;
 
       warpPerspective(newImg, outImg, F, newImg.size());
-
       
       // cv::imwrite("imgOld.jpg", oldImg);
       // cv::imwrite("imgNew.jpg", outImg);
@@ -147,21 +145,26 @@ void testPipeline(map<int,string> inputStrings){
       /*RUN WARP AGAIN TO GET RID OF THE BOUNDING SHIT YO*/
       warpPerspective(diffImg, outImgG, F, diffImg.size(), cv::WARP_INVERSE_MAP);
 
-      //      cv::Mat diffChan[3];
-      //      cv::split(diffImg, diffChan);
+      //cv::Mat diffChan[3];
+      //cv::split(diffImg, diffChan);
 
       cv::Mat finMask;
 
       cv::cvtColor(outImgG, finMask, CV_BGR2GRAY);      
+
       //cv::adaptiveThreshold(diffChan[1], finMask, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C ,CV_THRESH_BINARY_INV , 9, 0);
-      cv::threshold(finMask, finMask, 30, 255, CV_THRESH_BINARY_INV);
+
+      cv::threshold(finMask, finMask, 30, 255, CV_THRESH_OTSU);
+
       /*
-      cv::imshow( "New image", newImg);       
-      cv::imshow( "Old image", oldImg);
-      cv::imshow( "Difference image", finMask);
-      cv::imshow( "Out image", diffImg);
-   
-      cv::waitKey(0);                        */
+
+	cv::imshow( "New image", newImg);       
+	cv::imshow( "Old image", oldImg);
+	cv::imshow( "Difference image", finMask);
+	cv::imshow( "Out image", diffImg);
+	cv::waitKey(0);                   
+     
+      */
     }
   }
 }
