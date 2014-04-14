@@ -125,6 +125,7 @@ void testPipeline(map<int,string> inputStrings){
 
       cv::Mat F = ImgProcessing::getImgFundMat(newImg, oldImg);
       cv::Mat outImg;
+
       warpPerspective(newImg, outImg, F, newImg.size());
 
       
@@ -142,7 +143,7 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat diffImg = cv::abs(oldImg-outImg);
       
       /*RUN WARP AGAIN TO GET RID OF THE BOUNDING SHIT YO*/
-      warpPerspective(outImgG, diffImg, F, diffImg.size(), cv::WARP_INVERSE_MAP);
+      //      warpPerspective(outImgG, diffImg, F, diffImg.size(), cv::WARP_INVERSE_MAP);
 
       //      cv::Mat diffChan[3];
       //      cv::split(diffImg, diffChan);
