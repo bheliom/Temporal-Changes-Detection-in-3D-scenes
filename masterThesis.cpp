@@ -126,6 +126,10 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat F = ImgProcessing::getImgFundMat(newImg, oldImg);
       cv::Mat outImg;
       warpPerspective(newImg, outImg, F, newImg.size());
+
+
+
+
       
       // cv::imwrite("imgOld.jpg", oldImg);
       // cv::imwrite("imgNew.jpg", outImg);
@@ -135,10 +139,13 @@ void testPipeline(map<int,string> inputStrings){
       cv::cvtColor(outImg, outImgG, CV_BGR2HSV);
       cv::cvtColor(oldImg, oldImgG, CV_BGR2HSV);
       
-      cv::blur(outImg, outImg, cv::Size(resFac,resFac));
-      cv::blur(oldImg, oldImg, cv::Size(resFac,resFac));
+      // cv::blur(outImg, outImg, cv::Size(resFac,resFac));
+      // cv::blur(oldImg, oldImg, cv::Size(resFac,resFac));
 
       cv::Mat diffImg = (oldImgG!=outImgG);
+
+
+      /*RUN WARP AGAIN TO GET RID OF THE BOUNDING SHIT YO*/
       cv::Mat diffChan[3];
       cv::split(diffImg, diffChan);
       cv::Mat finMask;
