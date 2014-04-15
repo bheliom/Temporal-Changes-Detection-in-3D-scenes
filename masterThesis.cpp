@@ -39,8 +39,8 @@ void testPipeline(map<int,string> inputStrings){
   vector<CameraT> camera_data;
   vector<CameraT> newCameraData;
   
-  getNVM(inputStrings[BUNDLER], camera_data, image_filenames);
-  shots = nvmCam2vcgShot(camera_data, image_filenames);
+  FileIO::getNVM(inputStrings[BUNDLER], camera_data, image_filenames);
+  shots = FileIO::nvmCam2vcgShot(camera_data, image_filenames);
   
   CmdIO::callCmd("cp "+inputStrings[PMVS]+" "+inputStrings[BUNDLER]+".txt");
 
@@ -65,8 +65,9 @@ void testPipeline(map<int,string> inputStrings){
 
   //Get positions of new cameras
   fileProc.procNewNVMfile(inputStrings[OUTDIR],imgFilenames, tmpString);
-  getNVM(tmpString, newCameraData, imgFilenames);
-  newShots = nvmCam2vcgShot(newCameraData, imgFilenames);
+
+  FileIO::getNVM(tmpString, newCameraData, imgFilenames);
+  newShots = FileIO::nvmCam2vcgShot(newCameraData, imgFilenames);
 
   //Find nearest neighbor
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
@@ -86,6 +87,7 @@ void testPipeline(map<int,string> inputStrings){
   pcl::PointXYZ searchPoint;
 
   for(int i = 0 ; i < newShots.size(); i++){
+
     searchPoint.x = newShots[i].Extrinsics.Tra().X();
     searchPoint.y = newShots[i].Extrinsics.Tra().Y();
     searchPoint.z = newShots[i].Extrinsics.Tra().Z();
@@ -96,17 +98,17 @@ void testPipeline(map<int,string> inputStrings){
     std::vector<int> pointIdxNKNSearch(K);
     std::vector<float> pointNKNSquaredDistance(K);
     
-      cv::namedWindow( "New image", cv::WINDOW_NORMAL );
-      cv::moveWindow("New image", 100, 0);
+    cv::namedWindow( "New image", cv::WINDOW_NORMAL );
+    cv::moveWindow("New image", 100, 0);
+    
+    cv::namedWindow( "Old image", cv::WINDOW_NORMAL );
+    cv::moveWindow("Old image", 500, 0);
+    
+    cv::namedWindow( "Difference image", cv::WINDOW_NORMAL );
+    cv::moveWindow("Difference image", 1000, 0);
 
-      cv::namedWindow( "Old image", cv::WINDOW_NORMAL );
-      cv::moveWindow("Old image", 500, 0);
-
-      cv::namedWindow( "Difference image", cv::WINDOW_NORMAL );
-      cv::moveWindow("Difference image", 1000, 0);
-
-      cv::namedWindow( "Out image", cv::WINDOW_NORMAL );
-      cv::moveWindow("Out image", 1000, 500);
+    cv::namedWindow( "Out image", cv::WINDOW_NORMAL );
+    cv::moveWindow("Out image", 1000, 500);
     
 
     if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
@@ -114,57 +116,26 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat newImg = getImg(imgFilenames[i]);
       cv::Mat oldImg = getImg(image_filenames[pointIdxNKNSearch[0]]);
       
-      cv::Mat newImgG;
-      cv::cvtColor(newImg, newImgG, CV_BGR2GRAY);
-
-      int resFac = 10;
-
-      cv::Size newSize(oldImg.cols/resFac , oldImg.rows/resFac);
-
-      cv::Mat oldImgG;
-      //cv::resize(oldImgG,  oldImgG, newSize);
-
       cv::Mat F = ImgProcessing::getImgFundMat(newImg, oldImg);
       cv::Mat outImg;
 
       warpPerspective(newImg, outImg, F, newImg.size());
-      
-      // cv::imwrite("imgOld.jpg", oldImg);
-      // cv::imwrite("imgNew.jpg", outImg);
 
       cv::Mat outImgG = oldImg.clone();
-      
-      //cv::cvtColor(outImg, outImgG, CV_BGR2HSV);
-      //cv::cvtColor(oldImg, oldImgG, CV_BGR2HSV);
-      
-      // cv::blur(outImg, outImg, cv::Size(resFac,resFac));
-      // cv::blur(oldImg, oldImg, cv::Size(resFac,resFac));
-
       cv::Mat diffImg = cv::abs(oldImg-outImg);
       
-      /*RUN WARP AGAIN TO GET RID OF THE BOUNDING SHIT YO*/
       warpPerspective(diffImg, outImgG, F, diffImg.size(), cv::WARP_INVERSE_MAP);
-
-      //cv::Mat diffChan[3];
-      //cv::split(diffImg, diffChan);
 
       cv::Mat finMask;
 
       cv::cvtColor(outImgG, finMask, CV_BGR2GRAY);      
-
-      //cv::adaptiveThreshold(diffChan[1], finMask, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C ,CV_THRESH_BINARY_INV , 9, 0);
-
       cv::threshold(finMask, finMask, 30, 255, CV_THRESH_OTSU);
 
-      
-
-	cv::imshow( "New image", newImg);       
-	cv::imshow( "Old image", oldImg);
-	cv::imshow( "Difference image", finMask);
-	cv::imshow( "Out image", diffImg);
-	cv::waitKey(0);                   
-     
-      
+      cv::imshow( "New image", newImg);       
+      cv::imshow( "Old image", oldImg);
+      cv::imshow( "Difference image", finMask);
+      cv::imshow( "Out image", diffImg);
+      cv::waitKey(0);                   
     }
   }
 }
@@ -189,9 +160,9 @@ void testNVM(map<int,string> inputStrings){
   vector<CameraT> camera_data;
   vector<string> names;
 
-  getNVM(inputStrings[MESH], camera_data, names);
+  FileIO::getNVM(inputStrings[MESH], camera_data, names);
 
-  vector<vcg::Shot<float> > shots = nvmCam2vcgShot(camera_data, names);
+  vector<vcg::Shot<float> > shots = FileIO::nvmCam2vcgShot(camera_data, names);
 
 }
 void testVid(map<int,string> inputStrings){

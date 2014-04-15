@@ -8,8 +8,17 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/calib3d/calib3d.hpp"
 #include "opencv2/nonfree/nonfree.hpp"
+#include <opencv2/imgproc/imgproc.hpp>
 
 typedef vcg::tri::UpdateTopology<MyMesh>::PEdge SingleEdge;
+
+cv::Mat ImgProcessing::diffThres(cv::Mat img1, cv::Mat img2){
+  cv::Mat F = getImgFundMat(img1, img2);
+  cv::Mat outImg;  
+  cv::warpPerspective(img1, outImg, F, img2.size());
+  
+  return cv::abs(img2-outImg);
+}
 
 /**
 Function finds fundamental matrix F for two input images. Function mostly based on OpenCV documentation tutorials.
@@ -44,7 +53,7 @@ cv::Mat ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2){
       if( dist < min_dist ) min_dist = dist;
       if( dist > max_dist ) max_dist = dist;
     }
-  //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
+
   std::vector< cv::DMatch > good_matches;
 
   for( int i = 0; i < descriptors_object.rows; i++ )
@@ -62,8 +71,7 @@ cv::Mat ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2){
       obj.push_back( keyPtsImg1[ good_matches[i].queryIdx ].pt );
       scene.push_back( keyPtsImg2[ good_matches[i].trainIdx ].pt );
     }
-
-  cv::Mat H = cv::findHomography( obj, scene, CV_RANSAC );
+  cv::Mat H = cv::findHomography(obj, scene, CV_RANSAC);
 
   return H;
 }

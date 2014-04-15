@@ -51,6 +51,16 @@ public:
   void saveImgFromVideo(std::string,int);
 };
 
+class FileIO : public ChangeDetectorIO{
+
+public:
+
+  FileIO(std::string inFile) : ChangeDetectorIO(inFile){};
+  static void getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names); 
+  static std::vector<vcg::Shot<float> > nvmCam2vcgShot(const std::vector<CameraT> &camera_data, const std::vector<std::string> names);
+
+};
+
 class CmdIO : public ChangeDetectorIO{
 
 public:
@@ -58,12 +68,6 @@ public:
   static void callVsfm(std::string);
   static void callCmd(std::string);
 };
-
-
-
-std::vector<vcg::Shot<float> > nvmCam2vcgShot(const std::vector<CameraT> &camera_data, const std::vector<std::string> names);
-
-void getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names);
 
 void dispProjPt(const vcg::Point2i &inPt, cv::Mat &inImg);
 

@@ -13,22 +13,30 @@
 
 
 class DataProcessing{
+
 protected:
   MyMesh m;
+
 public:
   DataProcessing(MyMesh &inM){vcg::tri::Append<MyMesh,MyMesh>::MeshCopy(m,inM);}
   DataProcessing(){};
 };
 
 class MeshProcessing : public DataProcessing{
+
 public:
   MeshProcessing(MyMesh &inM) : DataProcessing(inM){};
 };
 
 class ImgProcessing : public DataProcessing{
+
 public:
   ImgProcessing(MyMesh &inM) : DataProcessing(inM){};
+  ImgProcessing() : DataProcessing(){};
   static cv::Mat getImgFundMat(cv::Mat, cv::Mat);
+  cv::Mat alignImages(cv::Mat,cv::Mat);
+  cv::Mat diffThres(cv::Mat,cv::Mat);
+    
 };
 
 class FileProcessing : public DataProcessing{
@@ -45,7 +53,6 @@ class PclProcessing : public DataProcessing{
 
 public:
   PclProcessing() : DataProcessing(){};
-
   
 };
 

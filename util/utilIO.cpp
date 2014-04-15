@@ -55,7 +55,7 @@ void CmdIO::callCmd(std::string inCmd){
 /**
    Function converts cameras read from NVM file into VCG Shot objects. Part of the function is based on the function Open() in import_out.h in VCG library
 */
-std::vector<vcg::Shot<float> > nvmCam2vcgShot(const std::vector<CameraT> &camera_data, const std::vector<std::string> names){
+std::vector<vcg::Shot<float> > FileIO::nvmCam2vcgShot(const std::vector<CameraT> &camera_data, const std::vector<std::string> names){
   
   std::cout<<"Converting NVM Cam structure to VCG shot structure..."<<std::endl;
 
@@ -114,7 +114,7 @@ std::vector<vcg::Shot<float> > nvmCam2vcgShot(const std::vector<CameraT> &camera
   return outputShots;
 }
 
-void getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names){
+void FileIO::getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names){
 
   std::ifstream inFile(filename.c_str());
   
