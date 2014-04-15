@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <opencv2/imgproc/imgproc.hpp>
+
 #include "util/meshProcess.hpp"
 #include "chngDet/chngDet.hpp"
 #include "util/pbaDataInterface.h"
@@ -122,6 +123,10 @@ void testPipeline(map<int,string> inputStrings){
       warpPerspective(newImg, outImg, F, newImg.size());
 
       cv::Mat outImgG = oldImg.clone();
+      
+      cv::normalize(oldImg, oldImg);
+      cv::normalize(outImg, outImg);
+
       cv::Mat diffImg = cv::abs(oldImg-outImg);
       
       warpPerspective(diffImg, outImgG, F, diffImg.size(), cv::WARP_INVERSE_MAP);
