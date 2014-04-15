@@ -123,7 +123,6 @@ void testPipeline(map<int,string> inputStrings){
       warpPerspective(newImg, outImg, F, newImg.size());
 
       cv::Mat outImgG = oldImg.clone();
-
       cv::Mat diffImg = cv::abs(oldImg-outImg);
       
       warpPerspective(diffImg, outImgG, F, diffImg.size(), cv::WARP_INVERSE_MAP);
@@ -134,7 +133,7 @@ void testPipeline(map<int,string> inputStrings){
       cv::threshold(finMask, finMask, 30, 255, CV_THRESH_OTSU);
 
       cv::imshow( "New image", newImg);       
-      cv::imshow( "Old image", oldImg+finMask);
+      cv::imshow( "Old image", oldImg);
       cv::imshow( "Difference image", finMask);
       cv::imshow( "Out image", diffImg);
       cv::waitKey(0);                   
