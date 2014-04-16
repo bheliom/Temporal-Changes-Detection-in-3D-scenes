@@ -30,7 +30,8 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
   cv::Mat cam1_intr;
   cv::Mat cam2_intr;
 
-  cam1_intr, cam2_intr = cv::Mat::zeros(3,3, CV_64FC1);
+  cam1_intr = cv::Mat::zeros(3,3, CV_64FC1);
+  cam2_intr = cv::Mat::zeros(3,3, CV_64FC1);
 
   vcg::Matrix44f cam1_rot = cam1.Extrinsics.Rot();
   vcg::Matrix44f cam2_rot = cam1.Extrinsics.Rot();
