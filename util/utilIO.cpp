@@ -4,6 +4,78 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
+#include "opencv2/calib3d/calib3d.hpp"
+
+
+void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<float> cam2, cv::Mat F){
+
+  int num_nonzero_elem = cv::sum(chngMask).val[0];
+  
+  std::vector<cv::Point2f> cam1_points(num_nonzero_elem);
+  std::vector<cv::Point2f> cam2_points(num_nonzero_elem);
+  
+  cv::Mat cam1_fmat;
+  cv::Mat cam2_fmat;
+
+  int count = 0;
+  for(int r = 0; r < chngMask.rows; r++){
+    for(int c = 0; c < chngMask.cols; c++){
+      if(chngMask.at<int>(r,c)>0) cam1_points[count++] = cv::Point2f(c,r);
+    }
+  }
+
+  //cam1/2 has to be Intrinsic*[R|t]
+
+  cv::Mat cam1_Rt(4,4, CV_64FC1);
+  cv::Mat cam2_Rt(4,4, CV_64FC1);
+  
+  cv::Mat cam1_intr;
+  cv::Mat cam2_intr;
+
+  cam1_intr, cam2_intr = cv::Mat::zeros(3,3, CV_64FC1);
+
+  vcg::Matrix44f cam1_rot = cam1.Extrinsics.Rot();
+  vcg::Matrix44f cam2_rot = cam1.Extrinsics.Rot();
+
+  vcg::Point3f cam1_tra = cam1.Extrinsics.Tra();
+  vcg::Point3f cam2_tra = cam2.Extrinsics.Tra();
+
+  for(int i = 0 ; i < 4 ; i++){
+    for(int j = 0 ; j < 4 ; j++){
+      cam1_Rt.at<int>(i,j) = cam1_rot[i][j];
+      cam2_Rt.at<int>(i,j) = cam2_rot[i][j];
+    }
+  }
+  
+  for(int i = 0 ; i < 3 ; i ++){
+    cam1_Rt.at<int>(3,i) = cam1_tra[i];
+    cam2_Rt.at<int>(3,i) = cam2_tra[i];
+  }
+
+
+  cam1_intr.at<int>(0,0) = cam1.Intrinsics.FocalMm;
+  cam1_intr.at<int>(1,1) = cam1.Intrinsics.FocalMm;
+  cam1_intr.at<int>(0,2) = cam1.Intrinsics.CenterPx[0];
+  cam1_intr.at<int>(1,2) = cam1.Intrinsics.CenterPx[1];
+  cam1_intr.at<int>(2,2) = 1;
+
+  cam2_intr.at<int>(0,0) = cam2.Intrinsics.FocalMm;
+  cam2_intr.at<int>(1,1) = cam2.Intrinsics.FocalMm;
+  cam2_intr.at<int>(0,2) = cam2.Intrinsics.CenterPx[0];
+  cam2_intr.at<int>(1,2) = cam2.Intrinsics.CenterPx[1];
+  cam2_intr.at<int>(2,2) = 1;
+
+  cam1_fmat = cam1_intr*cam1_Rt;
+  cam2_fmat = cam2_intr*cam2_Rt;
+  
+  cv::perspectiveTransform(cam1_points,  cam1_points, F);
+   
+  cv::Mat pnts3D(1,num_nonzero_elem,CV_64FC4);
+  //cv::Mat cam0pnts(1,N,CV_64FC2);
+  //cv::Mat cam1pnts(1,N,CV_64FC2);
+  
+  cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D); 
+}
 
 /**
    Class responsible for Input/Output operations.

@@ -71,6 +71,7 @@ cv::Mat ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2){
       obj.push_back( keyPtsImg1[ good_matches[i].queryIdx ].pt );
       scene.push_back( keyPtsImg2[ good_matches[i].trainIdx ].pt );
     }
+
   cv::Mat H = cv::findHomography(obj, scene, CV_RANSAC);
 
   return H;

@@ -33,14 +33,16 @@ protected:
 public:
   ChangeDetectorIO(std::vector<std::string>);
   ChangeDetectorIO(std::string);
+  ChangeDetectorIO();
 };
 
-class ImgIO : ChangeDetectorIO{
+class ImgIO : public ChangeDetectorIO{
 
 protected:
 
 public:
-
+  ImgIO() : ChangeDetectorIO(){};
+  static void projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<float> cam2, cv::Mat F);
 };
 
 class VidIO : public ChangeDetectorIO{
