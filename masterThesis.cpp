@@ -131,14 +131,14 @@ void testPipeline(map<int,string> inputStrings){
 
       cv::cvtColor(outImgG, finMask, CV_BGR2GRAY);      
       cv::threshold(finMask, finMask, 30, 255, CV_THRESH_OTSU);
-      /*
+      
       cv::imshow( "New image", newImg);       
       cv::imshow( "Old image", oldImg);
       cv::imshow( "Difference image", finMask);
       cv::imshow( "Out image", diffImg);
-      */
-      ImgIO::projChngMaskTo3D(outImgG, newShots[i], shots[pointIdxNKNSearch[0]],F);
-      //      cv::waitKey(0);                   
+      
+      //      ImgIO::projChngMaskTo3D(outImgG, newShots[i], shots[pointIdxNKNSearch[0]],F);
+           cv::waitKey(0);                   
     }
   }
 }
