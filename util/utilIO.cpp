@@ -38,7 +38,7 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
   vcg::Point3f cam1_tra = cam1.Extrinsics.Tra();
   vcg::Point3f cam2_tra = cam2.Extrinsics.Tra();
 
-  std::cout<<"czy to tu?"<<std::endl;
+ 
   for(int i = 0 ; i < 4 ; i++){
     for(int j = 0 ; j < 4 ; j++){
       cam1_Rt.at<int>(i,j) = cam1_rot[i][j];
@@ -66,7 +66,8 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
 
   cam1_fmat = cam1_intr*cam1_Rt;
   cam2_fmat = cam2_intr*cam2_Rt;
-  
+  std::cout<<"czy to tu?"<<std::endl;
+ 
   cv::perspectiveTransform(cam1_points,  cam1_points, F);
    
   cv::Mat pnts3D(1,num_nonzero_elem,CV_64FC4);
