@@ -67,7 +67,7 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
   cam2_fmat = cam2_intr*cam2_Rt;
 
 
-  cv::perspectiveTransform(cam1_points,  cam2_points, F);
+  cv::perspectiveTransform(cam1_points, cam2_points, F);
    
   std::cout<<cam1_points[0]<<std::endl;
   std::cout<<cam2_points[0]<<std::endl;
@@ -75,7 +75,7 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
   cv::Mat pnts3D(1,num_nonzero_elem,CV_64FC4);
   //cv::Mat cam0pnts(1,N,CV_64FC2);
   //cv::Mat cam1pnts(1,N,CV_64FC2);
-  //  cv::triangulatePoints(cam1_fmat,cam2_fmat, cam1_points,cam2_points,pnts3D);
+  cv::triangulatePoints(cam1_fmat,cam2_fmat, cam1_points,cam2_points,pnts3D);
 }
 
 /**
