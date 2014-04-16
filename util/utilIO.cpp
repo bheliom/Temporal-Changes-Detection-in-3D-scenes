@@ -24,8 +24,8 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
   }
 
 
-  cv::Mat cam1_Rt(4,4, CV_64FC1);
-  cv::Mat cam2_Rt(4,4, CV_64FC1);
+  cv::Mat cam1_Rt(3,4, CV_64FC1);
+  cv::Mat cam2_Rt(3,4, CV_64FC1);
   
   cv::Mat cam1_intr;
   cv::Mat cam2_intr;
@@ -40,16 +40,16 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
   vcg::Point3f cam2_tra = cam2.Extrinsics.Tra();
 
  
-  for(int i = 0 ; i < 4 ; i++){
-    for(int j = 0 ; j < 4 ; j++){
+  for(int i = 0 ; i < 3 ; i++){
+    for(int j = 0 ; j < 3 ; j++){
       cam1_Rt.at<int>(i,j) = cam1_rot[i][j];
       cam2_Rt.at<int>(i,j) = cam2_rot[i][j];
     }
+    cam1_Rt.at<int>(i,3) = cam1_tra[i];
+    cam2_Rt.at<int>(i,3) = cam2_tra[i];
   }
   
   for(int i = 0 ; i < 3 ; i ++){
-    cam1_Rt.at<int>(i,3) = cam1_tra[i];
-    cam2_Rt.at<int>(i,3) = cam2_tra[i];
   }
 
   cam1_intr.at<int>(0,0) = cam1.Intrinsics.FocalMm;
