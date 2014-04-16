@@ -75,7 +75,6 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
   //cv::Mat cam0pnts(1,N,CV_64FC2);
   //cv::Mat cam1pnts(1,N,CV_64FC2);
 
-  cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D); 
 }
 
 /**
