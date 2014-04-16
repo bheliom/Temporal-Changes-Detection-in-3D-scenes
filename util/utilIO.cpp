@@ -6,7 +6,6 @@
 #include <cstdlib>
 #include "opencv2/calib3d/calib3d.hpp"
 
-
 void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<float> cam2, cv::Mat F){
 
   int num_nonzero_elem = cv::sum(chngMask).val[0];
@@ -23,8 +22,6 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
       if(chngMask.at<int>(r,c)>0) cam1_points[count++] = cv::Point2f(c,r);
     }
   }
-
-  //cam1/2 has to be Intrinsic*[R|t]
 
   cv::Mat cam1_Rt(4,4, CV_64FC1);
   cv::Mat cam2_Rt(4,4, CV_64FC1);
@@ -73,7 +70,8 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
   cv::Mat pnts3D(1,num_nonzero_elem,CV_64FC4);
   //cv::Mat cam0pnts(1,N,CV_64FC2);
   //cv::Mat cam1pnts(1,N,CV_64FC2);
-  
+
+  std::cout<<"czy to tu?"<<std::endl;
   cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D); 
 }
 
