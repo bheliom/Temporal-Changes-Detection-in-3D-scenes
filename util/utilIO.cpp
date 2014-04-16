@@ -70,11 +70,11 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
 
   cv::perspectiveTransform(cam1_points,  cam1_points, F);
    
-  std::cout<<"czy to tu?"<<std::endl;
+  std::cout<<cam1_points[0]<<std::endl;
+  std::cout<<cam2_points[0]<<std::endl;
   cv::Mat pnts3D(1,num_nonzero_elem,CV_64FC4);
   //cv::Mat cam0pnts(1,N,CV_64FC2);
   //cv::Mat cam1pnts(1,N,CV_64FC2);
-
 }
 
 /**
