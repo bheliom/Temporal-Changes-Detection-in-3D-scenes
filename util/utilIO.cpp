@@ -54,12 +54,8 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
 
   cam1_intr.at<int>(0,0) = 5;
 
-  std::cout<<"czy to tu?"<<std::endl;
-
-  cam1_intr.at<int>(0,0) = static_cast<float>(cam1.Intrinsics.FocalMm);
-  cam1_intr.at<int>(1,1) = static_cast<float>(cam1.Intrinsics.FocalMm);
-
-
+  cam1_intr.at<int>(0,0) = cam1.Intrinsics.FocalMm;
+  cam1_intr.at<int>(1,1) = cam1.Intrinsics.FocalMm;
 
   cam1_intr.at<int>(0,2) = cam1.Intrinsics.CenterPx[0];
   cam1_intr.at<int>(1,2) = cam1.Intrinsics.CenterPx[1];
@@ -75,7 +71,7 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
   cam1_fmat = cam1_intr*cam1_Rt;
   cam2_fmat = cam2_intr*cam2_Rt;
 
- 
+  std::cout<<"czy to tu?"<<std::endl;
   cv::perspectiveTransform(cam1_points,  cam1_points, F);
    
   cv::Mat pnts3D(1,num_nonzero_elem,CV_64FC4);
