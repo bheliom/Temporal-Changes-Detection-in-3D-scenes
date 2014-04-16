@@ -23,7 +23,6 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
     }
   }
 
-
   cv::Mat cam1_Rt(3,4, CV_64FC1);
   cv::Mat cam2_Rt(3,4, CV_64FC1);
   

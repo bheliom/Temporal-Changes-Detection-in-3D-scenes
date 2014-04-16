@@ -137,7 +137,7 @@ void testPipeline(map<int,string> inputStrings){
       cv::imshow( "Difference image", finMask);
       cv::imshow( "Out image", diffImg);
       */
-      ImgIO::projChngMaskTo3D(diffImg, newShots[i], shots[pointIdxNKNSearch[0]],F);
+      ImgIO::projChngMaskTo3D(outImgG, newShots[i], shots[pointIdxNKNSearch[0]],F);
       //      cv::waitKey(0);                   
     }
   }
