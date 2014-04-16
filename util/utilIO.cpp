@@ -51,10 +51,9 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
     cam2_Rt.at<int>(i,3) = cam2_tra[i];
   }
 
-  std::cout<<cam1.Intrinsics.FocalMm<<std::endl;
 
-  cam1_intr.at<int>(0,0) = (float)cam1.Intrinsics.FocalMm;
-  cam1_intr.at<int>(1,1) = (float)cam1.Intrinsics.FocalMm;
+  cam1_intr.at<int>(0,0) = static_cast<float>(cam1.Intrinsics.FocalMm);
+  cam1_intr.at<int>(1,1) = static_cast<float>(cam1.Intrinsics.FocalMm);
 
   std::cout<<"czy to tu?"<<std::endl;
 
