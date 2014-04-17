@@ -133,7 +133,7 @@ void testPipeline(map<int,string> inputStrings){
       cv::cvtColor(outImgG, finMask, CV_BGR2GRAY);      
       cv::threshold(finMask, finMask, 30, 255, CV_THRESH_OTSU);
 
-      if(cv::sum(finMask).val[0]>(finMask.rows*finMask.cols)/2){
+      if(cv::sum(finMask).val[0]<(finMask.rows*finMask.cols)/2){
 	tmpImgs.push_back(finMask);
 
       
