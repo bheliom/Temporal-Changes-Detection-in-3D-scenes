@@ -41,7 +41,7 @@ void testProjections(map<int,string> inputStrings){
 void testPipeline(map<int,string> inputStrings){
 
   //Get initial NVM file
-
+ vector<cv::Mat> tmp_3d_masks;
   vector<vcg::Shot<float> > shots;
   vector<vcg::Shot<float> > newShots;
   vector<string> image_filenames;
@@ -108,7 +108,7 @@ void testPipeline(map<int,string> inputStrings){
     std::vector<float> pointNKNSquaredDistance(K);
    
     vector<cv::Mat> tmpImgs;
-
+   
     if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
 
       cv::Mat newImg = getImg(imgFilenames[i]);
@@ -135,14 +135,8 @@ void testPipeline(map<int,string> inputStrings){
 
       if(no_of_elements < thres_val){
 
-	std::vector<cv::Point2f> cam1_points, cam2_points;
-	
-	ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H, cam1_points, cam2_points);
-	
-	for(int k = cam1_points.size()/2 ; k < cam1_points.size()/2 + 20; k++){
-	  cv::circle(newImg, cam1_points[k], 15, cv::Scalar(0,0,255),-1);
-	  cv::circle(oldImg, cam2_points[k], 15, cv::Scalar(0,0,255),-1);
-	}
+	cv::Mat mask_3d_pts = ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H);
+	tmp_3d_masks.push_back(mask_3d_pts);
 
 	tmpImgs.push_back(outImg);
 	tmpImgs.push_back(finMask);
@@ -151,9 +145,11 @@ void testPipeline(map<int,string> inputStrings){
 	
 	ImgIO::dispImgs(tmpImgs); 
 	tmpImgs.clear();
+
       }
     }
   }
+  MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask3d.ply");
 }
 
 void testNewNVM(map<int,string> inputStrings){

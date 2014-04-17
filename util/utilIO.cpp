@@ -7,6 +7,19 @@
 #include "opencv2/calib3d/calib3d.hpp"
 #include <ctime>
 
+void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::string &name){
+
+  MyMesh m;
+  cv::Scalar tmp_pt;
+  for(int r = 0 ; r < pts_3d[0].rows; r+10){
+    tmp_pt = pts_3d[0].at<int>(0,r);
+    vcg::tri::Allocator<MyMesh>::AddVertex(m,MyMesh::CoordType (tmp_pt.val[0], tmp_pt.val[1], tmp_pt.val[2]));
+  }
+
+  savePlyFileVcg(name,m);
+}
+
+
 void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
   
   std::ostringstream tmpString;
@@ -65,12 +78,11 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
   return intr_mat;
 }
 
-void ImgIO::projChngMaskTo3D(const cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<float> cam2, cv::Mat F, std::vector<cv::Point2f> &cam1_points, std::vector<cv::Point2f> &cam2_points){
+cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> &cam1, const vcg::Shot<float> &cam2, const cv::Mat &H){
 
-  //  std::vector<cv::Point2f> cam1_points;
-  //  std::vector<cv::Point2f> cam2_points;
   const clock_t begin_time = clock();
 
+  std::vector<cv::Point2f> cam1_points, cam2_points;
   getPtsFromMask(chngMask, cam1_points);
 
   cv::Mat cam1_fmat;
@@ -84,10 +96,9 @@ void ImgIO::projChngMaskTo3D(const cv::Mat chngMask, vcg::Shot<float> cam1, vcg:
 
   cam1_fmat = cam1_intr*cam1_Rt;
   cam2_fmat = cam2_intr*cam2_Rt;
-  cv::perspectiveTransform(cam1_points, cam2_points, F);
+  cv::perspectiveTransform(cam1_points, cam2_points, H);
   
-
-  cv::Mat pnts3D(1,cam1_points.size(),CV_64FC4);
+  cv::Mat pnts3D(1,cam1_points.size(), CV_64FC4);
   cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D);
 
   std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC<<std::endl;
