@@ -139,7 +139,7 @@ void testPipeline(map<int,string> inputStrings){
       ImgIO::projChngMaskTo3D(outImgG, newShots[i], shots[pointIdxNKNSearch[0]],F, cam1_points, cam2_points);
       std::cout<<"Jestem tutaj"<<std::endl;
 
-      for(int k = 0 ; k < 20; k++){
+      for(int k = cam1_points.size()/2 ; k < cam1_points.size()/2+20; k++){
 	cv::circle(newImg, cam1_points[k], 5, cv::Scalar(0,0,255),-1);
 	cv::circle(oldImg, cam2_points[k], 5, cv::Scalar(0,0,255),-1);
       }
