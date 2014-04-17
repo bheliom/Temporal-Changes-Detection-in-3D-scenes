@@ -41,8 +41,6 @@ void testProjections(map<int,string> inputStrings){
 void testPipeline(map<int,string> inputStrings){
 
   //Get initial NVM file
-  MyMesh m;
-  getPlyFileVcg(inputStrings[MESH],m);
 
   vector<vcg::Shot<float> > shots;
   vector<vcg::Shot<float> > newShots;
@@ -119,7 +117,6 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat outImg;
       cv::Mat finMask;
       
-      
       cv::Mat H = ImgProcessing::getImgFundMat(newImg, oldImg);
 
       warpPerspective(newImg, outImg, H, newImg.size());
@@ -142,10 +139,9 @@ void testPipeline(map<int,string> inputStrings){
 	std::cout<<"Jestem tutaj"<<std::endl;
 
 	tmpImgs.push_back(finMask);      
-	std::vector<cv::Point2f> cam1_points(no_of_elements), cam2_points(no_of_elements);
+	std::vector<cv::Point2f> cam1_points, cam2_points;
 
 	std::cout<<"Jestem tutaj"<<std::endl;
-
 	ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H, cam1_points, cam2_points);
 	std::cout<<"Jestem tutaj"<<std::endl;
 

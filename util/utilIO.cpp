@@ -24,15 +24,12 @@ void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
 }
 
 void ImgIO::getPtsFromMask(const cv::Mat &mask, std::vector<cv::Point2f> &pts_vector){
-
-  std::cout<<"Jestem tutaj w pts mask"<<std::endl;
   
   int count = 0;
   
   for(int r = 0; r < mask.rows; r++){
     for(int c = 0; c < mask.cols; c++){
-      if(mask.at<int>(r,c)>0) pts_vector[count++] = cv::Point2f(c,r);
-      std::cout<<"Jestem tutaj w pts mask"<<std::endl;
+      if(mask.at<int>(r,c)>0) pts_vector.push_back(cv::Point2f(c,r));
     }
   }
 }
