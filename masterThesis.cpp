@@ -131,9 +131,9 @@ void testPipeline(map<int,string> inputStrings){
       warpPerspective(diffImg, outImgG, H, diffImg.size(), cv::WARP_INVERSE_MAP);
       
       cv::cvtColor(outImgG, finMask, CV_BGR2GRAY);      
-      cv::threshold(finMask, finMask, 30, 255, CV_THRESH_OTSU);
+      cv::threshold(finMask, finMask, 30, 1, CV_THRESH_OTSU);
 
-      if(cv::sum(finMask).val[0]<(finMask.rows*finMask.cols)/2){
+      if(cv::sum(finMask).val[0]/255<(finMask.rows*finMask.cols)/2){
 	tmpImgs.push_back(finMask);
 
       
