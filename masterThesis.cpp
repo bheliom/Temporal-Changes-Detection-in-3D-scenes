@@ -142,7 +142,9 @@ void testPipeline(map<int,string> inputStrings){
       for(int k = 0 ; k < cam1_points.size(); k+20){
 	cv::circle(newImg, cam1_points[k], 10, cv::Scalar(0,0,255),-1);
 	cv::circle(oldImg, cam2_points[k], 10, cv::Scalar(0,0,255),-1);
+	std::cout<<"teraz tutaj"<<std::endl;
       }
+
       tmpImgs.push_back(newImg);
       tmpImgs.push_back(oldImg);
 
