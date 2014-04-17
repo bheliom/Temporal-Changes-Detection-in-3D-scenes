@@ -6,81 +6,91 @@
 #include <cstdlib>
 #include "opencv2/calib3d/calib3d.hpp"
 
-void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<float> cam2, cv::Mat F){
+void ImgIO::getPtsFromMask(const cv::Mat &mask, std::vector<cv::Point2f> &pts_vector){
 
-  int num_nonzero_elem = cv::sum(chngMask).val[0];
+int num_nonzero_elem = cv::sum(mask).val[0];
+ pts_vector.resize(num_nonzero_elem);
   
-  std::vector<cv::Point2f> cam1_points(num_nonzero_elem);
-  std::vector<cv::Point2f> cam2_points(num_nonzero_elem);
+ int count = 0;
   
-  cv::Mat cam1_fmat;
-  cv::Mat cam2_fmat;
+ for(int r = 0; r < mask.rows; r++){
+   for(int c = 0; c < mask.cols; c++){
+     if(mask.at<int>(r,c)>0) pts_vector[count++] = cv::Point2f(c,r);
+   }
+ }
+}
 
-  int count = 0;
-  for(int r = 0; r < chngMask.rows; r++){
-    for(int c = 0; c < chngMask.cols; c++){
-      if(chngMask.at<int>(r,c)>0) cam1_points[count++] = cv::Point2f(c,r);
-    }
-  }
+cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
 
-  cv::Mat cam1_Rt(3,4, CV_64FC1);
-  cv::Mat cam2_Rt(3,4, CV_64FC1);
+  cv::Mat mat_Rt(3,4, CV_64FC1);
+  mat_Rt = cv::Mat::zeros(3,4, CV_64FC1);
+
+  vcg::Matrix44f mat_rot = shot.Extrinsics.Rot();
+  vcg::Point3f mat_tra = shot.Extrinsics.Tra();
   
-  cv::Mat cam1_intr;
-  cv::Mat cam2_intr;
-
-  cam1_intr = cv::Mat::zeros(3,3, CV_64FC1);
-  cam2_intr = cv::Mat::zeros(3,3, CV_64FC1);
-
-  vcg::Matrix44f cam1_rot = cam1.Extrinsics.Rot();
-  vcg::Matrix44f cam2_rot = cam1.Extrinsics.Rot();
-
-  vcg::Point3f cam1_tra = cam1.Extrinsics.Tra();
-  vcg::Point3f cam2_tra = cam2.Extrinsics.Tra();
-
- 
   for(int i = 0 ; i < 3 ; i++){
     for(int j = 0 ; j < 3 ; j++){
-      cam1_Rt.at<int>(i,j) = cam1_rot[i][j];
-      cam2_Rt.at<int>(i,j) = cam2_rot[i][j];
+      mat_Rt.at<int>(i,j) = mat_rot[i][j];
     }
-    cam1_Rt.at<int>(i,3) = cam1_tra[i];
-    cam2_Rt.at<int>(i,3) = cam2_tra[i];
+    mat_Rt.at<int>(i,3) = mat_tra[i];
   }
+  return mat_Rt;
+}
+
+cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
+
+  cv::Mat intr_mat;
+  intr_mat = cv::Mat::zeros(3,3, CV_64FC1);
+
+  intr_mat.at<int>(0,0) = shot.Intrinsics.FocalMm;
+  intr_mat.at<int>(1,1) = shot.Intrinsics.FocalMm;
+  intr_mat.at<int>(0,2) = shot.Intrinsics.CenterPx[0];
+  intr_mat.at<int>(1,2) = shot.Intrinsics.CenterPx[1];
+  intr_mat.at<int>(2,2) = 1;
+
+  return intr_mat;
+}
+
+void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<float> cam2, cv::Mat F){
+
+  std::vector<cv::Point2f> cam1_points;
+  std::vector<cv::Point2f> cam2_points;
   
-  for(int i = 0 ; i < 3 ; i ++){
-  }
+  getPtsFromMask(chngMask, cam1_points);
+  cam2_points.resize(cam1_points.size());
 
-  cam1_intr.at<int>(0,0) = cam1.Intrinsics.FocalMm;
-  cam1_intr.at<int>(1,1) = cam1.Intrinsics.FocalMm;
+  cv::Mat cam1_fmat;
+  cv::Mat cam2_fmat;
+ 
+  cv::Mat cam1_Rt = getRtMatrix(cam1);
+  cv::Mat cam2_Rt = getRtMatrix(cam2);
+  
+  cv::Mat cam1_intr = getIntrMatrix(cam1);
+  cv::Mat cam2_intr = getIntrMatrix(cam2);
 
-  cam1_intr.at<int>(0,2) = cam1.Intrinsics.CenterPx[0];
-  cam1_intr.at<int>(1,2) = cam1.Intrinsics.CenterPx[1];
-  cam1_intr.at<int>(2,2) = 1;
-
-  cam2_intr.at<int>(0,0) = cam2.Intrinsics.FocalMm;
-  cam2_intr.at<int>(1,1) = cam2.Intrinsics.FocalMm;
-  cam2_intr.at<int>(0,2) = cam2.Intrinsics.CenterPx[0];
-  cam2_intr.at<int>(1,2) = cam2.Intrinsics.CenterPx[1];
-  cam2_intr.at<int>(2,2) = 1;
   cam1_fmat = cam1_intr*cam1_Rt;
   cam2_fmat = cam2_intr*cam2_Rt;
 
   cv::perspectiveTransform(cam1_points, cam2_points, F);
-  cv::Point2f tmpPoint;
+
+  /*
+    cv::Point2f tmpPoint;
   
-  for(int i = 0; i < cam1_points.size(); i++){
+    //In case if we need to remove negative values
+
+    for(int i = 0; i < cam1_points.size(); i++){
     tmpPoint = cam2_points.at(i);
     if(tmpPoint.x<0 || tmpPoint.y<0){
-      cam1_points.erase(cam1_points.begin()+i);
-      cam2_points.erase(cam2_points.begin()+i);
+    cam1_points.erase(cam1_points.begin()+i);
+    cam2_points.erase(cam2_points.begin()+i);
     }
-  }
+    }
+  */
 
   std::cout<<cam1_points[0]<<std::endl;
   std::cout<<cam2_points[0]<<std::endl;
 
-  cv::Mat pnts3D(1,num_nonzero_elem,CV_64FC4);
+  cv::Mat pnts3D(1,cam1_points.size(),CV_64FC4);
 
   cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D);
 }
@@ -312,10 +322,3 @@ void getBundlerFile(MyMesh &m, std::string filename, std::string filename_images
 
   std::cout<<"Done."<<std::endl;
 }
-
-
-
-
-
-
-

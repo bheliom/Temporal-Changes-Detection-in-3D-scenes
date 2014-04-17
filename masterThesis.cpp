@@ -34,6 +34,10 @@ int main(int argc, char** argv){
 void testPipeline(map<int,string> inputStrings){
 
   //Get initial NVM file
+  MyMesh m;
+
+  getPlyFileVcg(inputStrings[MESH],m);
+
   vector<vcg::Shot<float> > shots;
   vector<vcg::Shot<float> > newShots;
   vector<string> image_filenames;
@@ -111,7 +115,6 @@ void testPipeline(map<int,string> inputStrings){
     cv::namedWindow( "Out image", cv::WINDOW_NORMAL );
     cv::moveWindow("Out image", 1000, 500);
     
-
     if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
 
       cv::Mat newImg = getImg(imgFilenames[i]);
@@ -137,7 +140,7 @@ void testPipeline(map<int,string> inputStrings){
       cv::imshow( "Difference image", finMask);
       cv::imshow( "Out image", diffImg);
       
-      //      ImgIO::projChngMaskTo3D(outImgG, newShots[i], shots[pointIdxNKNSearch[0]],F);
+           ImgIO::projChngMaskTo3D(outImgG, newShots[i], shots[pointIdxNKNSearch[0]],F);
            cv::waitKey(0);                   
     }
   }
@@ -282,7 +285,5 @@ void testNN(map<int,string> inputStrings){
 	    }
 	}
     }
-
-  
   //  visibilityEstimation(m, pmvsMesh, pmvsCloud, 30, mCloud, shots, image_filenames);
 }
