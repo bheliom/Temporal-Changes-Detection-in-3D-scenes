@@ -100,11 +100,14 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
   for(int i = 0; i < cam1_points.size(); i++){
     tmpPoint = cam2_points.at(i);
     if(tmpPoint.x<0 || tmpPoint.y<0){
-      cam1_points.erase(cam1_points.begin()+i+1);
+  std::cout<<"teraz jestem tutaj"<<std::endl;      
+cam1_points.erase(cam1_points.begin()+i+1);
       cam2_points.erase(cam2_points.begin()+i+1);
+      std::cout<<"teraz jestem tutaj"<<std::endl;
     }
+    
   }
-  std::cout<<"teraz jestem tutaj"<<std::endl;
+
   
   // cv::Mat pnts3D(1,cam1_points.size(),CV_64FC4);
   // cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D);
