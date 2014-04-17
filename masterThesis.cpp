@@ -83,7 +83,7 @@ void testPipeline(map<int,string> inputStrings){
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
 
   // Generate pointcloud data
-  cloud->points.resize (shots.size());
+  cloud->points.resize(shots.size());
 
   for (size_t i = 0; i < cloud->points.size (); ++i){
     cloud->points[i].x = shots[i].Extrinsics.Tra().X();
@@ -93,7 +93,7 @@ void testPipeline(map<int,string> inputStrings){
 
   pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
 
-  kdtree.setInputCloud (cloud);
+  kdtree.setInputCloud(cloud);
   pcl::PointXYZ searchPoint;
 
   for(int i = 0 ; i < newShots.size(); i++){
@@ -107,8 +107,6 @@ void testPipeline(map<int,string> inputStrings){
 
     std::vector<int> pointIdxNKNSearch(K);
     std::vector<float> pointNKNSquaredDistance(K);
-   
-    vector<cv::Mat> tmpImgs;
    
     if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
 
@@ -130,13 +128,14 @@ void testPipeline(map<int,string> inputStrings){
 
       int no_of_elements = cv::sum(finMask).val[0]/255;
       int thres_val = (finMask.rows*finMask.cols)/4;
-
+      
       if(no_of_elements < thres_val){
 	cv::Mat mask_3d_pts = ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H);
 	tmp_3d_masks.push_back(mask_3d_pts);
       }
     }
   }
+
   MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask3d.ply");
 }
 
