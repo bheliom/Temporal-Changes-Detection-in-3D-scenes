@@ -136,7 +136,7 @@ void testPipeline(map<int,string> inputStrings){
       tmpImgs.push_back(finMask);
 
       std::vector<cv::Point2f> cam1_points, cam2_points;
-      ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]],F, cam1_points, cam2_points);
+      ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H, cam1_points, cam2_points);
       std::cout<<"Jestem tutaj"<<std::endl;
       
 
