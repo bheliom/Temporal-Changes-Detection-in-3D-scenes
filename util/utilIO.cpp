@@ -14,9 +14,9 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
   MyMesh::VertexIterator vi;
   std::cout<<"Number of rows:"<< pts_3d[0].cols << std::endl;
 
-  for(int r = 0 ; r < pts_3d[0].rows; r+=100){
-    tmp_pt = pts_3d[0].at<int>(0,r);   
-    vi = vcg::tri::Allocator<MyMesh>::AddVertex(m,MyMesh::CoordType (tmp_pt.val[0], tmp_pt.val[1], tmp_pt.val[2]));
+  for(int c = 0 ; c < pts_3d[0].cols; c+=10){
+    if(c%100==0) DrawProgressBar(40, (double)c/(double)pts_3d[0].cols);
+    vcg::tri::Allocator<MyMesh>::AddVertex(m,MyMesh::CoordType(pts_3d[0].at<int>(0,c), pts_3d[0].at<int>(1,c), pts_3d[0].at<int>(2,c)));
   }
   savePlyFileVcg(name,m);
 }
