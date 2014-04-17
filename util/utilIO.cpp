@@ -65,7 +65,7 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
   return intr_mat;
 }
 
-void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<float> cam2, cv::Mat F, std::vector<cv::Point2f> &cam1_points, std::vector<cv::Point2f> &cam2_points){
+void ImgIO::projChngMaskTo3D(const cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<float> cam2, cv::Mat F, std::vector<cv::Point2f> &cam1_points, std::vector<cv::Point2f> &cam2_points){
 
   //  std::vector<cv::Point2f> cam1_points;
   //  std::vector<cv::Point2f> cam2_points;
