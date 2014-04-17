@@ -12,8 +12,9 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
   MyMesh m;
   cv::Scalar tmp_pt;
   MyMesh::VertexIterator vi;
-  std::cout<<"Number of rows:"<<pts_3d[0].rows << std::endl;
-  for(int r = 0 ; r < pts_3d[0].rows; r+1000){
+  std::cout<<"Number of rows:"<< pts_3d[0].cols << std::endl;
+
+  for(int r = 0 ; r < pts_3d[0].rows; r+=100){
     tmp_pt = pts_3d[0].at<int>(0,r);   
     vi = vcg::tri::Allocator<MyMesh>::AddVertex(m,MyMesh::CoordType (tmp_pt.val[0], tmp_pt.val[1], tmp_pt.val[2]));
   }
