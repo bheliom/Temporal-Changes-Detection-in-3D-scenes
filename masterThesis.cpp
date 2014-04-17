@@ -128,12 +128,8 @@ void testPipeline(map<int,string> inputStrings){
       cv::cvtColor(outImgG, finThres, CV_BGR2GRAY);      
       cv::threshold(finThres, finMask, 30, 255, CV_THRESH_OTSU);
 
-      tmpImgs.push_back(finMask);      
-      tmpImgs.push_back(finThres);
-      ImgIO::dispImgs(tmpImgs); 
-
       int no_of_elements = cv::sum(finMask).val[0]/255;
-      int thres_val = (finMask.rows*finMask.cols)/2;
+      int thres_val = (finMask.rows*finMask.cols)/4;
 
       cout<<"Thres:"<<thres_val<<" No of elem:"<<no_of_elements<<endl;
 
@@ -143,7 +139,7 @@ void testPipeline(map<int,string> inputStrings){
 	
 	ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H, cam1_points, cam2_points);
 	
-	for(int k = cam1_points.size()-20 ; k < cam1_points.size(); k++){
+	for(int k = cam1_points.size()/2 ; k < cam1_points.size()/2 + 20; k++){
 	  cv::circle(newImg, cam1_points[k], 15, cv::Scalar(0,0,255),-1);
 	  cv::circle(oldImg, cam2_points[k], 15, cv::Scalar(0,0,255),-1);
 	}

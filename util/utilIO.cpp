@@ -16,8 +16,7 @@ void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
     cv::namedWindow(tmpString.str(), cv::WINDOW_NORMAL);
     cv::moveWindow(tmpString.str(), moveFactor, 0);
     cv::imshow(tmpString.str(), inImgs[i]);
-
-    tmpString.clear();
+    tmpString.flush();
     moveFactor+=moveFactor;
   }
   cv::waitKey(0);                   
