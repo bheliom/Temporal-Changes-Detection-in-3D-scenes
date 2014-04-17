@@ -132,11 +132,13 @@ void testPipeline(map<int,string> inputStrings){
       
       cv::cvtColor(outImgG, finMask, CV_BGR2GRAY);      
       cv::threshold(finMask, finMask, 30, 1, CV_THRESH_OTSU);
-
-      if(cv::sum(finMask).val[0]/255<(finMask.rows*finMask.cols)/2){
-	tmpImgs.push_back(finMask);
-
       
+      int no_of_elements = cv::sum(finMask).val[0]/255;
+      int thres_val = (finMask.rows*finMask.cols)/2;
+      cout<<"Thres:"<<thres_val<<" No of elem:"<<no_of_elements<<endl;
+      if(no_of_elements<thres_val){
+
+	tmpImgs.push_back(finMask);      
 	std::vector<cv::Point2f> cam1_points, cam2_points;
 	ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H, cam1_points, cam2_points);
 	std::cout<<"Jestem tutaj"<<std::endl;
