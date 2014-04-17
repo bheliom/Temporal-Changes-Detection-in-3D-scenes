@@ -5,6 +5,7 @@
 #include <sstream>
 #include <cstdlib>
 #include "opencv2/calib3d/calib3d.hpp"
+#include <ctime>
 
 void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
   
@@ -68,6 +69,7 @@ void ImgIO::projChngMaskTo3D(const cv::Mat chngMask, vcg::Shot<float> cam1, vcg:
 
   //  std::vector<cv::Point2f> cam1_points;
   //  std::vector<cv::Point2f> cam2_points;
+  const clock_t begin_time = clock();
 
   getPtsFromMask(chngMask, cam1_points);
 
@@ -84,9 +86,11 @@ void ImgIO::projChngMaskTo3D(const cv::Mat chngMask, vcg::Shot<float> cam1, vcg:
   cam2_fmat = cam2_intr*cam2_Rt;
   cv::perspectiveTransform(cam1_points, cam2_points, F);
   
-  
-  // cv::Mat pnts3D(1,cam1_points.size(),CV_64FC4);
-  // cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D);
+
+  cv::Mat pnts3D(1,cam1_points.size(),CV_64FC4);
+  std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC;
+
+  cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D);
 }
 
 /**

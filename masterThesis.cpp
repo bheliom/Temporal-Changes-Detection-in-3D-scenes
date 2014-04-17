@@ -145,7 +145,7 @@ void testPipeline(map<int,string> inputStrings){
 	}
 
 	tmpImgs.push_back(outImg);
-		
+	tmpImgs.push_back(finMask);
 	tmpImgs.push_back(newImg);
 	tmpImgs.push_back(oldImg);
 	
