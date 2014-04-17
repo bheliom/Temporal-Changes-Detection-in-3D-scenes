@@ -95,7 +95,6 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
   
   //In case if we need to remove negative values
   
-  std::cout<<"Jestem tutaj"<<std::endl;
   /*
   for(int i = 0; i < cam1_points.size(); i++){
     tmpPoint = cam2_points.at(i);
