@@ -133,25 +133,29 @@ void testPipeline(map<int,string> inputStrings){
       cv::cvtColor(outImgG, finMask, CV_BGR2GRAY);      
       cv::threshold(finMask, finMask, 30, 255, CV_THRESH_OTSU);
 
-      tmpImgs.push_back(finMask);
+      if(cv::sum(finMask).val[0]>(finMask.rows*finMask.cols)/2){
+	tmpImgs.push_back(finMask);
 
-      std::vector<cv::Point2f> cam1_points, cam2_points;
-      ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H, cam1_points, cam2_points);
-      std::cout<<"Jestem tutaj"<<std::endl;
       
-
-      for(int k = 0 ; k < 20; k++){
-	cv::circle(newImg, cam1_points[k], 15, cv::Scalar(0,0,255),-1);
-	cv::circle(oldImg, cam2_points[k], 15, cv::Scalar(0,0,255),-1);
+	std::vector<cv::Point2f> cam1_points, cam2_points;
+	ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H, cam1_points, cam2_points);
+	std::cout<<"Jestem tutaj"<<std::endl;
+	
+	
+	for(int k = 20 ; k < 40; k++){
+	  cv::circle(newImg, cam1_points[k], 15, cv::Scalar(0,0,255),-1);
+	  cv::circle(oldImg, cam2_points[k], 15, cv::Scalar(0,0,255),-1);
+	}
+	
+	std::cout<<"teraz tutaj"<<std::endl;
+	
+	tmpImgs.push_back(newImg);
+	tmpImgs.push_back(oldImg);
+	
+	std::cout<<"teraz tutaj"<<std::endl;
+	ImgIO::dispImgs(tmpImgs); 
+	
       }
-
-      std::cout<<"teraz tutaj"<<std::endl;
-
-      tmpImgs.push_back(newImg);
-      tmpImgs.push_back(oldImg);
-
-      std::cout<<"teraz tutaj"<<std::endl;
-      ImgIO::dispImgs(tmpImgs); 
 
       tmpImgs.clear();
     }
