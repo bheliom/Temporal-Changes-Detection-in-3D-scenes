@@ -14,10 +14,12 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
   MyMesh::VertexIterator vi;
   std::cout<<"Number of rows:"<< pts_3d[0].cols << std::endl;
 
-  for(int c = 0 ; c < pts_3d[0].cols; c+=10){
+  for(int c = 0 ; c < pts_3d[0].cols; c++){
     if(c%100==0) DrawProgressBar(40, (double)c/(double)pts_3d[0].cols);
-    vcg::tri::Allocator<MyMesh>::AddVertex(m,MyMesh::CoordType(pts_3d[0].at<int>(0,c), pts_3d[0].at<int>(1,c), pts_3d[0].at<int>(2,c)));
+    vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(pts_3d[0].at<int>(0,c), pts_3d[0].at<int>(1,c), pts_3d[0].at<int>(2,c)));
+    m.vert[c].SetS();
   }
+  vcg::tri::UpdateColor<MyMesh>::PerVertexConstant(m, vcg::Color4b::Red, true);
   savePlyFileVcg(name,m);
 }
 
