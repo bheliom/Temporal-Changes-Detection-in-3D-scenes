@@ -25,16 +25,17 @@ void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
 
 void ImgIO::getPtsFromMask(const cv::Mat &mask, std::vector<cv::Point2f> &pts_vector){
 
-int num_nonzero_elem = cv::sum(mask).val[0];
- pts_vector.resize(num_nonzero_elem);
+  std::cout<<"Jestem tutaj w pts mask"<<std::endl;
+  int num_nonzero_elem = cv::sum(mask).val[0]/255;
+  pts_vector.resize(num_nonzero_elem);
   
- int count = 0;
+  int count = 0;
   
- for(int r = 0; r < mask.rows; r++){
-   for(int c = 0; c < mask.cols; c++){
-     if(mask.at<int>(r,c)>0) pts_vector[count++] = cv::Point2f(c,r);
-   }
- }
+  for(int r = 0; r < mask.rows; r++){
+    for(int c = 0; c < mask.cols; c++){
+      if(mask.at<int>(r,c)>0) pts_vector[count++] = cv::Point2f(c,r);
+    }
+  }
 }
 
 cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
@@ -72,10 +73,12 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
 
   //  std::vector<cv::Point2f> cam1_points;
   //  std::vector<cv::Point2f> cam2_points;
-  
+  std::cout<<"Jestem tutaj"<<std::endl;
   getPtsFromMask(chngMask, cam1_points);
+
   cam2_points.resize(cam1_points.size());
-	std::cout<<"Jestem tutaj"<<std::endl;
+  
+
   cv::Mat cam1_fmat;
   cv::Mat cam2_fmat;
  
