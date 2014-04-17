@@ -18,7 +18,6 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
     if(c%100==0) DrawProgressBar(40, (double)c/(double)pts_3d[0].cols);
     vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(pts_3d[0].at<int>(0,c), pts_3d[0].at<int>(1,c), pts_3d[0].at<int>(2,c)));
     m.vert[c].SetS();
-    std::cout<<pts_3d[0].at<int>(0,c)<<std::endl;
   }
 
   vcg::tri::UpdateColor<MyMesh>::PerVertexConstant(m, vcg::Color4b::Red, true);
@@ -110,6 +109,7 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC<<std::endl;
   std::cout<< "No of 3D points:"<<pnts3D.size()<<std::endl;
 
+  std::cout<< cv::sum(pnts3D).val[0]<<std::endl;
   return pnts3D;
 }
 
