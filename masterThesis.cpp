@@ -41,7 +41,8 @@ void testProjections(map<int,string> inputStrings){
 void testPipeline(map<int,string> inputStrings){
 
   //Get initial NVM file
- vector<cv::Mat> tmp_3d_masks;
+  vector<cv::Mat> tmp_3d_masks;
+
   vector<vcg::Shot<float> > shots;
   vector<vcg::Shot<float> > newShots;
   vector<string> image_filenames;
@@ -136,8 +137,10 @@ void testPipeline(map<int,string> inputStrings){
       if(no_of_elements < thres_val){
 
 	cv::Mat mask_3d_pts = ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H);
+	
 	tmp_3d_masks.push_back(mask_3d_pts);
-
+	std::cout<<"tutaj"<<std::endl;
+	/*
 	tmpImgs.push_back(outImg);
 	tmpImgs.push_back(finMask);
 	tmpImgs.push_back(newImg);
@@ -145,7 +148,7 @@ void testPipeline(map<int,string> inputStrings){
 	
 	ImgIO::dispImgs(tmpImgs); 
 	tmpImgs.clear();
-
+	*/
       }
     }
   }
