@@ -116,7 +116,7 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat outImgG = oldImg.clone();
       cv::Mat outImg;
       cv::Mat finMask;
-      
+      cv::Mat finThres;
       cv::Mat H = ImgProcessing::getImgFundMat(newImg, oldImg);
 
       warpPerspective(newImg, outImg, H, newImg.size());
@@ -125,10 +125,11 @@ void testPipeline(map<int,string> inputStrings){
 
       warpPerspective(diffImg, outImgG, H, diffImg.size(), cv::WARP_INVERSE_MAP);
       
-      cv::cvtColor(outImgG, finMask, CV_BGR2GRAY);      
-      cv::threshold(finMask, finMask, 30, 1, CV_THRESH_OTSU);
+      cv::cvtColor(outImgG, finThres, CV_BGR2GRAY);      
+      cv::threshold(finThres, finMask, 30, 255, CV_THRESH_OTSU);
+
       tmpImgs.push_back(finMask);      
-      tmpImgs.push_back(diffImg);
+      tmpImgs.push_back(finThres);
       ImgIO::dispImgs(tmpImgs); 
 
       int no_of_elements = cv::sum(finMask).val[0]/255;
