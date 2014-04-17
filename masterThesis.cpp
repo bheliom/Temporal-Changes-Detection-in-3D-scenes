@@ -119,8 +119,6 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat outImg;
       cv::Mat finMask;
       
-      tmpImgs.push_back(newImg);
-      tmpImgs.push_back(oldImg);
       
       cv::Mat F = ImgProcessing::getImgFundMat(newImg, oldImg);
 
@@ -136,10 +134,20 @@ void testPipeline(map<int,string> inputStrings){
       cv::threshold(finMask, finMask, 30, 255, CV_THRESH_OTSU);
 
       tmpImgs.push_back(finMask);
-      ImgIO::dispImgs(tmpImgs);
+
       std::vector<cv::Point2f> cam1_points, cam2_points;
       ImgIO::projChngMaskTo3D(outImgG, newShots[i], shots[pointIdxNKNSearch[0]],F, cam1_points, cam2_points);
- 
+
+      for(int k = 0 ; k < cam1_points.size(); k++){
+	cv::circle(newImg, cam1_points[k], 10, cv::Scalar(0,0,255),-1);
+	cv::circle(oldImg, cam2_points[k], 10, cv::Scalar(0,0,255),-1);
+      }
+      tmpImgs.push_back(newImg);
+      tmpImgs.push_back(oldImg);
+
+      ImgIO::dispImgs(tmpImgs); 
+
+      tmpImgs.clear();
     }
   }
 }
