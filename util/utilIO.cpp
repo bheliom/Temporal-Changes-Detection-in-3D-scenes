@@ -109,7 +109,7 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC<<std::endl;
   std::cout<< "No of 3D points:"<<pnts3D.size()<<std::endl;
 
-  std::cout<< pnts3D.at<int>(0,0) <<std::endl;
+  std::cout<< pnts3D.at<int>(0,0) <<pnts3D.at<int>(0,1)<<pnts3D.at<int>(0,2)<std::endl;
   return pnts3D;
 }
 
