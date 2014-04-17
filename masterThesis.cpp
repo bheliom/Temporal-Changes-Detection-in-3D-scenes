@@ -137,7 +137,7 @@ void testPipeline(map<int,string> inputStrings){
 
       std::vector<cv::Point2f> cam1_points, cam2_points;
       ImgIO::projChngMaskTo3D(outImgG, newShots[i], shots[pointIdxNKNSearch[0]],F, cam1_points, cam2_points);
-
+      std::cout<<"Jestem tutaj"<<std::endl;
       for(int k = 0 ; k < cam1_points.size(); k++){
 	cv::circle(newImg, cam1_points[k], 10, cv::Scalar(0,0,255),-1);
 	cv::circle(oldImg, cam2_points[k], 10, cv::Scalar(0,0,255),-1);
@@ -145,6 +145,7 @@ void testPipeline(map<int,string> inputStrings){
       tmpImgs.push_back(newImg);
       tmpImgs.push_back(oldImg);
 
+      std::cout<<"teraz tutaj"<<std::endl;
       ImgIO::dispImgs(tmpImgs); 
 
       tmpImgs.clear();
