@@ -115,45 +115,30 @@ void testPipeline(map<int,string> inputStrings){
 
       cv::Mat newImg = getImg(imgFilenames[i]);
       cv::Mat oldImg = getImg(image_filenames[pointIdxNKNSearch[0]]);
-
-      cv::Point2f tmpPoint;
-      cv::Point2f tmpPoint2;
-      
-      vcg::Point2f vcgTmpPoint = shots[pointIdxNKNSearch[0]].Project(m.vert[100].P());
-      tmpPoint.x = vcgTmpPoint[0];
-      tmpPoint.y = vcgTmpPoint[1];
-      
-      vcgTmpPoint = newShots[i].Project(m.vert[100].P());
-      tmpPoint2.x = vcgTmpPoint[0];
-      tmpPoint2.y = vcgTmpPoint[1];
-       
-      cv::circle(newImg, tmpPoint, 3, cv::Scalar( 0, 0, 255 ), -1, 0);
-      cv::circle(oldImg, tmpPoint2, 3, cv::Scalar( 0, 0, 255 ), -1, 0);
+      cv::Mat outImgG = oldImg.clone();
+      cv::Mat outImg;
+      cv::Mat finMask;
       
       tmpImgs.push_back(newImg);
       tmpImgs.push_back(oldImg);
       
       cv::Mat F = ImgProcessing::getImgFundMat(newImg, oldImg);
-      cv::Mat outImg;
 
       warpPerspective(newImg, outImg, F, newImg.size());
 
       tmpImgs.push_back(outImg);
-      cv::Mat outImgG = oldImg.clone();
+
       cv::Mat diffImg = cv::abs(oldImg-outImg);
-      tmpImgs.push_back(diffImg);
 
       warpPerspective(diffImg, outImgG, F, diffImg.size(), cv::WARP_INVERSE_MAP);
-
-      cv::Mat finMask;
       
       cv::cvtColor(outImgG, finMask, CV_BGR2GRAY);      
       cv::threshold(finMask, finMask, 30, 255, CV_THRESH_OTSU);
 
       tmpImgs.push_back(finMask);
       ImgIO::dispImgs(tmpImgs);
-
-      //      ImgIO::projChngMaskTo3D(outImgG, newShots[i], shots[pointIdxNKNSearch[0]],F);
+      std::vector<cv::Point2f> cam1_points, cam2_points;
+      ImgIO::projChngMaskTo3D(outImgG, newShots[i], shots[pointIdxNKNSearch[0]],F, cam1_points, cam2_points);
  
     }
   }

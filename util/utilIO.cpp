@@ -9,12 +9,15 @@
 void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
   
   std::ostringstream tmpString;
-  int moveFactor = 300;
+  int moveFactor = 200;
+
   for(int i = 0 ; i < inImgs.size(); i++){
     tmpString<<i;
     cv::namedWindow(tmpString.str(), cv::WINDOW_NORMAL);
-    cv::moveWindow(tmpString.str(), moveFactor, moveFactor);
+    cv::moveWindow(tmpString.str(), moveFactor, 0);
     cv::imshow(tmpString.str(), inImgs[i]);
+
+    tmpString.clear();
     moveFactor+=moveFactor;
   }
   cv::waitKey(0);                   
@@ -65,10 +68,10 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
   return intr_mat;
 }
 
-void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<float> cam2, cv::Mat F){
+void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<float> cam2, cv::Mat F, std::vector<cv::Point2f> &cam1_points, std::vector<cv::Point2f> &cam2_points){
 
-  std::vector<cv::Point2f> cam1_points;
-  std::vector<cv::Point2f> cam2_points;
+  //  std::vector<cv::Point2f> cam1_points;
+  //  std::vector<cv::Point2f> cam2_points;
   
   getPtsFromMask(chngMask, cam1_points);
   cam2_points.resize(cam1_points.size());
@@ -84,29 +87,25 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
 
   cam1_fmat = cam1_intr*cam1_Rt;
   cam2_fmat = cam2_intr*cam2_Rt;
-
+  
   cv::perspectiveTransform(cam1_points, cam2_points, F);
-
-  /*
-    cv::Point2f tmpPoint;
-    
-    //In case if we need to remove negative values
-    
-    for(int i = 0; i < cam1_points.size(); i++){
+  
+  
+  cv::Point2f tmpPoint;
+  
+  //In case if we need to remove negative values
+  
+  for(int i = 0; i < cam1_points.size(); i++){
     tmpPoint = cam2_points.at(i);
     if(tmpPoint.x<0 || tmpPoint.y<0){
-    cam1_points.erase(cam1_points.begin()+i);
-    cam2_points.erase(cam2_points.begin()+i);
+      cam1_points.erase(cam1_points.begin()+i);
+      cam2_points.erase(cam2_points.begin()+i);
     }
-    }
-  */
+  }
+  
+  // cv::Mat pnts3D(1,cam1_points.size(),CV_64FC4);
 
-  std::cout<<cam1_points[0]<<std::endl;
-  std::cout<<cam2_points[0]<<std::endl;
-
-  cv::Mat pnts3D(1,cam1_points.size(),CV_64FC4);
-
-  cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D);
+  //  cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D);
 }
 
 /**
