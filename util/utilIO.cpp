@@ -26,8 +26,6 @@ void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
 void ImgIO::getPtsFromMask(const cv::Mat &mask, std::vector<cv::Point2f> &pts_vector){
 
   std::cout<<"Jestem tutaj w pts mask"<<std::endl;
-  int num_nonzero_elem = cv::sum(mask).val[0]/255;
-  pts_vector.resize(num_nonzero_elem);
   
   int count = 0;
   
@@ -78,7 +76,6 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
 
   cam2_points.resize(cam1_points.size());
   
-
   cv::Mat cam1_fmat;
   cv::Mat cam2_fmat;
  
