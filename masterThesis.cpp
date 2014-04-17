@@ -120,6 +120,7 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat H = ImgProcessing::getImgFundMat(newImg, oldImg);
 
       warpPerspective(newImg, outImg, H, newImg.size());
+     
       cv::Mat diffImg = cv::abs(oldImg-outImg);
 
       warpPerspective(diffImg, outImgG, H, diffImg.size(), cv::WARP_INVERSE_MAP);
@@ -127,10 +128,11 @@ void testPipeline(map<int,string> inputStrings){
       cv::cvtColor(outImgG, finMask, CV_BGR2GRAY);      
       cv::threshold(finMask, finMask, 30, 1, CV_THRESH_OTSU);
       tmpImgs.push_back(finMask);      
+      tmpImgs.push_back(diffImg);
       ImgIO::dispImgs(tmpImgs); 
 
       int no_of_elements = cv::sum(finMask).val[0]/255;
-      int thres_val = (finMask.rows*finMask.cols)/3;
+      int thres_val = (finMask.rows*finMask.cols)/2;
 
       cout<<"Thres:"<<thres_val<<" No of elem:"<<no_of_elements<<endl;
 

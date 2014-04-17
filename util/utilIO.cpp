@@ -69,11 +69,8 @@ void ImgIO::projChngMaskTo3D(const cv::Mat chngMask, vcg::Shot<float> cam1, vcg:
 
   //  std::vector<cv::Point2f> cam1_points;
   //  std::vector<cv::Point2f> cam2_points;
-  std::cout<<"Jestem tutaj"<<std::endl;
-  getPtsFromMask(chngMask, cam1_points);
 
-  cam2_points.resize(cam1_points.size());
-  
+  getPtsFromMask(chngMask, cam1_points);
 
   cv::Mat cam1_fmat;
   cv::Mat cam2_fmat;
@@ -86,22 +83,8 @@ void ImgIO::projChngMaskTo3D(const cv::Mat chngMask, vcg::Shot<float> cam1, vcg:
 
   cam1_fmat = cam1_intr*cam1_Rt;
   cam2_fmat = cam2_intr*cam2_Rt;
-  	std::cout<<"Jestem tutaj"<<std::endl;
   cv::perspectiveTransform(cam1_points, cam2_points, F);
-    
-  cv::Point2f tmpPoint;
   
-  //In case if we need to remove negative values
-  
-  /*
-  for(int i = 0; i < cam1_points.size(); i++){
-    tmpPoint = cam2_points.at(i);
-    if(tmpPoint.x<0 || tmpPoint.y<0){
-      cam1_points.erase(cam1_points.begin()+i+1);
-      cam2_points.erase(cam2_points.begin()+i+1);
-    }
-  }
-*/
   
   // cv::Mat pnts3D(1,cam1_points.size(),CV_64FC4);
   // cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D);
