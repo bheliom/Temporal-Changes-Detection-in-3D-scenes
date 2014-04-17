@@ -62,17 +62,17 @@ cv::Mat ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2){
     }
  
   //-- Localize the object
-  std::vector<cv::Point2f> obj;
-  std::vector<cv::Point2f> scene;
+  std::vector<cv::Point2f> img1_pts;
+  std::vector<cv::Point2f> img2_pts;
 
   for( int i = 0; i < good_matches.size(); i++ )
     {
       //-- Get the keypoints from the good matches
-      obj.push_back( keyPtsImg1[ good_matches[i].queryIdx ].pt );
-      scene.push_back( keyPtsImg2[ good_matches[i].trainIdx ].pt );
+      img1_pts.push_back( keyPtsImg1[ good_matches[i].queryIdx ].pt );
+      img2_pts.push_back( keyPtsImg2[ good_matches[i].trainIdx ].pt );
     }
 
-  cv::Mat H = cv::findHomography(obj, scene, CV_RANSAC);
+  cv::Mat H = cv::findHomography(img1_pts, img2_pts, CV_RANSAC);
 
   return H;
 }

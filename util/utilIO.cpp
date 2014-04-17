@@ -89,8 +89,7 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
   cam2_fmat = cam2_intr*cam2_Rt;
   
   cv::perspectiveTransform(cam1_points, cam2_points, F);
-  
-  
+    
   cv::Point2f tmpPoint;
   
   //In case if we need to remove negative values

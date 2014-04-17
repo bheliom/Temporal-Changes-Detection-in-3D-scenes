@@ -120,15 +120,15 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat finMask;
       
       
-      cv::Mat F = ImgProcessing::getImgFundMat(newImg, oldImg);
+      cv::Mat H = ImgProcessing::getImgFundMat(newImg, oldImg);
 
-      warpPerspective(newImg, outImg, F, newImg.size());
+      warpPerspective(newImg, outImg, H, newImg.size());
 
       tmpImgs.push_back(outImg);
 
       cv::Mat diffImg = cv::abs(oldImg-outImg);
 
-      warpPerspective(diffImg, outImgG, F, diffImg.size(), cv::WARP_INVERSE_MAP);
+      warpPerspective(diffImg, outImgG, H, diffImg.size(), cv::WARP_INVERSE_MAP);
       
       cv::cvtColor(outImgG, finMask, CV_BGR2GRAY);      
       cv::threshold(finMask, finMask, 30, 255, CV_THRESH_OTSU);
@@ -136,13 +136,15 @@ void testPipeline(map<int,string> inputStrings){
       tmpImgs.push_back(finMask);
 
       std::vector<cv::Point2f> cam1_points, cam2_points;
-      ImgIO::projChngMaskTo3D(outImgG, newShots[i], shots[pointIdxNKNSearch[0]],F, cam1_points, cam2_points);
+      ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]],F, cam1_points, cam2_points);
       std::cout<<"Jestem tutaj"<<std::endl;
+      
 
-      for(int k = cam1_points.size()/2 ; k < cam1_points.size()/2+20; k++){
-	cv::circle(newImg, cam1_points[k], 5, cv::Scalar(0,0,255),-1);
-	cv::circle(oldImg, cam2_points[k], 5, cv::Scalar(0,0,255),-1);
+      for(int k = 0 ; k < 20; k++){
+	cv::circle(newImg, cam1_points[k], 15, cv::Scalar(0,0,255),-1);
+	cv::circle(oldImg, cam2_points[k], 15, cv::Scalar(0,0,255),-1);
       }
+
       std::cout<<"teraz tutaj"<<std::endl;
 
       tmpImgs.push_back(newImg);
