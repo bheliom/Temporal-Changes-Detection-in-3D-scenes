@@ -88,9 +88,10 @@ void ImgIO::projChngMaskTo3D(const cv::Mat chngMask, vcg::Shot<float> cam1, vcg:
   
 
   cv::Mat pnts3D(1,cam1_points.size(),CV_64FC4);
-  std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC;
-
   cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D);
+
+  std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC<<std::endl;
+  std::cout<< "No of 3D points:"<<pnts3D.size()<<std::endl;
 }
 
 /**
