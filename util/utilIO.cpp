@@ -75,7 +75,7 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
   
   getPtsFromMask(chngMask, cam1_points);
   cam2_points.resize(cam1_points.size());
-
+	std::cout<<"Jestem tutaj"<<std::endl;
   cv::Mat cam1_fmat;
   cv::Mat cam2_fmat;
  
@@ -87,7 +87,7 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
 
   cam1_fmat = cam1_intr*cam1_Rt;
   cam2_fmat = cam2_intr*cam2_Rt;
-  
+  	std::cout<<"Jestem tutaj"<<std::endl;
   cv::perspectiveTransform(cam1_points, cam2_points, F);
     
   cv::Point2f tmpPoint;
