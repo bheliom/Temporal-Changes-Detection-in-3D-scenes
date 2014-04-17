@@ -19,7 +19,7 @@ void testVid(map<int,string> inputStrings);
 void testNVM(map<int,string> inputStrings);
 void testNewNVM(map<int,string> inputStrings);
 void testPipeline(map<int,string> inputStrings);
-
+void testProjections(map<int,string> inputStrings);
 int main(int argc, char** argv){
   
   map<int,string> inputStrings;
@@ -31,11 +31,17 @@ int main(int argc, char** argv){
   return 0;
 }
 
+void testProjections(map<int,string> inputStrings){
+
+  MyMesh m;
+  getPlyFileVcg(inputStrings[MESH],m);
+
+}
+
 void testPipeline(map<int,string> inputStrings){
 
   //Get initial NVM file
   MyMesh m;
-
   getPlyFileVcg(inputStrings[MESH],m);
 
   vector<vcg::Shot<float> > shots;
@@ -102,28 +108,31 @@ void testPipeline(map<int,string> inputStrings){
 
     std::vector<int> pointIdxNKNSearch(K);
     std::vector<float> pointNKNSquaredDistance(K);
-    /*
-    cv::namedWindow( "New image", cv::WINDOW_NORMAL );
-    cv::moveWindow("New image", 100, 0);
-    
-    cv::namedWindow( "Old image", cv::WINDOW_NORMAL );
-    cv::moveWindow("Old image", 500, 0);
-    
-    cv::namedWindow( "Difference image", cv::WINDOW_NORMAL );
-    cv::moveWindow("Difference image", 1000, 0);
-
-    cv::namedWindow( "Out image", cv::WINDOW_NORMAL );
-    cv::moveWindow("Out image", 1000, 500);
-    */
+   
     vector<cv::Mat> tmpImgs;
 
     if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
 
       cv::Mat newImg = getImg(imgFilenames[i]);
       cv::Mat oldImg = getImg(image_filenames[pointIdxNKNSearch[0]]);
+
+      cv::Point2f tmpPoint;
+      cv::Point2f tmpPoint2;
+      
+      vcg::Point2f vcgTmpPoint = shots[pointIdxNKNSearch[0]].Project(m.vert[100].P());
+      tmpPoint.x = vcgTmpPoint[0];
+      tmpPoint.y = vcgTmpPoint[1];
+      
+      vcgTmpPoint = newShots[i].Project(m.vert[100].P());
+      tmpPoint2.x = vcgTmpPoint[0];
+      tmpPoint2.y = vcgTmpPoint[1];
+       
+      cv::circle(newImg, tmpPoint, 3, cv::Scalar( 0, 0, 255 ), -1, 0);
+      cv::circle(oldImg, tmpPoint2, 3, cv::Scalar( 0, 0, 255 ), -1, 0);
+      
       tmpImgs.push_back(newImg);
       tmpImgs.push_back(oldImg);
-
+      
       cv::Mat F = ImgProcessing::getImgFundMat(newImg, oldImg);
       cv::Mat outImg;
 
@@ -142,15 +151,7 @@ void testPipeline(map<int,string> inputStrings){
       cv::threshold(finMask, finMask, 30, 255, CV_THRESH_OTSU);
 
       tmpImgs.push_back(finMask);
-
       ImgIO::dispImgs(tmpImgs);
-
-      /*
-      cv::imshow( "New image", newImg);       
-      cv::imshow( "Old image", oldImg);
-      cv::imshow( "Difference image", finMask);
-      cv::imshow( "Out image", diffImg);
-      */
 
       //      ImgIO::projChngMaskTo3D(outImgG, newShots[i], shots[pointIdxNKNSearch[0]],F);
  

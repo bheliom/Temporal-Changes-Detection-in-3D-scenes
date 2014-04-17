@@ -9,11 +9,13 @@
 void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
   
   std::ostringstream tmpString;
-  
+  int moveFactor = 300;
   for(int i = 0 ; i < inImgs.size(); i++){
     tmpString<<i;
     cv::namedWindow(tmpString.str(), cv::WINDOW_NORMAL);
+    cv::moveWindow(tmpString.str(), moveFactor, moveFactor);
     cv::imshow(tmpString.str(), inImgs[i]);
+    moveFactor+=moveFactor;
   }
   cv::waitKey(0);                   
 }
