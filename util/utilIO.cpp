@@ -6,6 +6,18 @@
 #include <cstdlib>
 #include "opencv2/calib3d/calib3d.hpp"
 
+void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
+  
+  std::ostringstream tmpString;
+  
+  for(int i = 0 ; i < inImgs.size(); i++){
+    tmpString<<i;
+    cv::namedWindow(tmpString.str(), cv::WINDOW_NORMAL);
+    cv::imshow(tmpString.str(), inImgs[i]);
+  }
+  cv::waitKey(0);                   
+}
+
 void ImgIO::getPtsFromMask(const cv::Mat &mask, std::vector<cv::Point2f> &pts_vector){
 
 int num_nonzero_elem = cv::sum(mask).val[0];
@@ -75,9 +87,9 @@ void ImgIO::projChngMaskTo3D(cv::Mat chngMask, vcg::Shot<float> cam1, vcg::Shot<
 
   /*
     cv::Point2f tmpPoint;
-  
+    
     //In case if we need to remove negative values
-
+    
     for(int i = 0; i < cam1_points.size(); i++){
     tmpPoint = cam2_points.at(i);
     if(tmpPoint.x<0 || tmpPoint.y<0){

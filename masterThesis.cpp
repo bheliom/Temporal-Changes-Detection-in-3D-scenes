@@ -102,7 +102,7 @@ void testPipeline(map<int,string> inputStrings){
 
     std::vector<int> pointIdxNKNSearch(K);
     std::vector<float> pointNKNSquaredDistance(K);
-    
+    /*
     cv::namedWindow( "New image", cv::WINDOW_NORMAL );
     cv::moveWindow("New image", 100, 0);
     
@@ -114,34 +114,46 @@ void testPipeline(map<int,string> inputStrings){
 
     cv::namedWindow( "Out image", cv::WINDOW_NORMAL );
     cv::moveWindow("Out image", 1000, 500);
-    
+    */
+    vector<cv::Mat> tmpImgs;
+
     if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
 
       cv::Mat newImg = getImg(imgFilenames[i]);
       cv::Mat oldImg = getImg(image_filenames[pointIdxNKNSearch[0]]);
-      
+      tmpImgs.push_back(newImg);
+      tmpImgs.push_back(oldImg);
+
       cv::Mat F = ImgProcessing::getImgFundMat(newImg, oldImg);
       cv::Mat outImg;
 
       warpPerspective(newImg, outImg, F, newImg.size());
 
+      tmpImgs.push_back(outImg);
       cv::Mat outImgG = oldImg.clone();
       cv::Mat diffImg = cv::abs(oldImg-outImg);
-      
+      tmpImgs.push_back(diffImg);
+
       warpPerspective(diffImg, outImgG, F, diffImg.size(), cv::WARP_INVERSE_MAP);
 
       cv::Mat finMask;
-
+      
       cv::cvtColor(outImgG, finMask, CV_BGR2GRAY);      
       cv::threshold(finMask, finMask, 30, 255, CV_THRESH_OTSU);
-      
+
+      tmpImgs.push_back(finMask);
+
+      ImgIO::dispImgs(tmpImgs);
+
+      /*
       cv::imshow( "New image", newImg);       
       cv::imshow( "Old image", oldImg);
       cv::imshow( "Difference image", finMask);
       cv::imshow( "Out image", diffImg);
-      
-           ImgIO::projChngMaskTo3D(outImgG, newShots[i], shots[pointIdxNKNSearch[0]],F);
-           cv::waitKey(0);                   
+      */
+
+      //      ImgIO::projChngMaskTo3D(outImgG, newShots[i], shots[pointIdxNKNSearch[0]],F);
+ 
     }
   }
 }
