@@ -77,7 +77,7 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
   intr_mat.at<float>(1,1) = shot.Intrinsics.FocalMm;
   intr_mat.at<float>(0,2) = shot.Intrinsics.CenterPx[0];
   intr_mat.at<float>(1,2) = shot.Intrinsics.CenterPx[1];
-  intr_mat.at<float>(2,2) = 1;
+  intr_mat.at<float>(2,2) = 1.0;
 
   return intr_mat;
 }
@@ -102,7 +102,7 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   cam2_fmat = cam2_intr*cam2_Rt;
 
   std::cout<<"Rt 1"<<cam1_Rt<<"\n intr 1:"<<cam1_intr<<std::endl;
-  std::cout<<"P matrix 1:"<<cam1_fmat<<"\nP matrix 2:"<<cam2_fmat<<std::endl;
+  //  std::cout<<"P matrix 1:"<<cam1_fmat<<"\nP matrix 2:"<<cam2_fmat<<std::endl;
 
   cv::perspectiveTransform(cam1_points, cam2_points, H);
   
@@ -110,7 +110,7 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
 
   cv::triangulatePoints(cam1_fmat, cam2_fmat, cv::Mat(cam1_points).reshape(1,2), cv::Mat(cam2_points).reshape(1,2), pnts3D);
 
-  std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC<<std::endl;
+  std::cout << "Time:"<<float( clock () - begin_time ) /  CLOCKS_PER_SEC<<std::endl;
   std::cout<< "No of 3D points:"<<pnts3D.size()<<std::endl;
   
   cv::Mat tmpMat;
