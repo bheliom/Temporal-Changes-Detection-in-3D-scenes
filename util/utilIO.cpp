@@ -112,14 +112,16 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   std::cout<<"Rt 1:\n"<<cam1_Rt<<"\n intr 1:\n"<<cam1_intr<<std::endl;
   
   cv::perspectiveTransform(cam1_points, cam2_points, H);  
-  cv::Mat pnts3D(4, cam1_points.size(), CV_32FC4);
+  cv::Mat pnts3D(4, cam1_points.size(), CV_64FC4);
+  cv::Mat pnts3D_final(4, cam1_points.size(), CV_64FC4);
 
   cv::triangulatePoints(cam1_fmat, cam2_fmat, cv::Mat(cam1_points).reshape(1,2), cv::Mat(cam2_points).reshape(1,2), pnts3D);
 
+  cv::convertPointsFromHomogeneous(pnts3D, pnts3D_final);
   std::cout << "Time:"<<float( clock () - begin_time ) /  CLOCKS_PER_SEC<<std::endl;
   std::cout<< "No of 3D points:"<<pnts3D.size()<<std::endl;
   
-  return pnts3D;
+  return pnts3D_final;
 }
 
 /**
