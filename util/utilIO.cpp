@@ -11,12 +11,19 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
 
   MyMesh m;
   cv::Scalar tmp_pt;
+  cv::Mat tmpMat;
+  float w;
+
   MyMesh::VertexIterator vi;
   std::cout<<"Number of rows:"<< pts_3d[0].cols << std::endl;
 
   for(int c = 0 ; c < pts_3d[0].cols; c++){
     if(c%100==0) DrawProgressBar(40, (double)c/(double)pts_3d[0].cols);
-    vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(pts_3d[0].at<float>(0,c), pts_3d[0].at<float>(1,c), pts_3d[0].at<float>(2,c)));
+
+    tmpMat  = pts_3d[0].col(c);
+    w = tmpMat.at<float>(3,0);
+    
+    vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(tmpMat.at<float>(0,0)/w,tmpMat.at<float>(1,0)/w,tmpMat.at<float>(2,0)/w));
     m.vert[c].SetS();
   }
 
@@ -113,13 +120,6 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   std::cout << "Time:"<<float( clock () - begin_time ) /  CLOCKS_PER_SEC<<std::endl;
   std::cout<< "No of 3D points:"<<pnts3D.size()<<std::endl;
   
-  cv::Mat tmpMat;
-
-  tmpMat  = pnts3D.col(1000);
-  float w = tmpMat.at<float>(3,0);
-  
-  std::cout<<tmpMat<<std::endl;
-
   return pnts3D;
 }
 
