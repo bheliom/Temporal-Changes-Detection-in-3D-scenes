@@ -132,6 +132,7 @@ void testPipeline(map<int,string> inputStrings){
       tmpImgs.push_back(newImg);
       tmpImgs.push_back(oldImg);
       tmpImgs.push_back(finMask);
+
       ImgIO::dispImgs(tmpImgs);
       
       if(no_of_elements < thres_val){

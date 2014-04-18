@@ -96,17 +96,17 @@ void ImgIO::getPtsFromMask(const cv::Mat &mask, std::vector<cv::Point2f> &pts_ve
 
 cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
 
-  cv::Mat mat_Rt(3,4, CV_32FC1);
-  mat_Rt = cv::Mat::zeros(3,4, CV_32FC1);
+  cv::Mat mat_Rt(3,4, CV_64FC1);
+  mat_Rt = cv::Mat::zeros(3,4, CV_64FC1);
 
   vcg::Matrix44f mat_rot = shot.Extrinsics.Rot();
   vcg::Point3f mat_tra = shot.Extrinsics.Tra();
   
   for(int i = 0 ; i < 3 ; i++){
     for(int j = 0 ; j < 3 ; j++){
-      mat_Rt.at<float>(i,j) = mat_rot[i][j];
+      mat_Rt.at<double>(i,j) = mat_rot[i][j];
     }
-    mat_Rt.at<float>(i,3) = mat_tra[i];
+    mat_Rt.at<double>(i,3) = mat_tra[i];
   }
   return mat_Rt;
 }
@@ -114,13 +114,13 @@ cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
 cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
 
   cv::Mat intr_mat;
-  intr_mat = cv::Mat::zeros(3,3, CV_32FC1);
+  intr_mat = cv::Mat::zeros(3,3, CV_64FC1);
 
-  intr_mat.at<float>(0,0) = shot.Intrinsics.FocalMm;
-  intr_mat.at<float>(1,1) = shot.Intrinsics.FocalMm;
-  intr_mat.at<float>(0,2) = shot.Intrinsics.CenterPx[0];
-  intr_mat.at<float>(1,2) = shot.Intrinsics.CenterPx[1];
-  intr_mat.at<float>(2,2) = 1;
+  intr_mat.at<double>(0,0) = shot.Intrinsics.FocalMm;
+  intr_mat.at<double>(1,1) = shot.Intrinsics.FocalMm;
+  intr_mat.at<double>(0,2) = shot.Intrinsics.CenterPx[0];
+  intr_mat.at<double>(1,2) = shot.Intrinsics.CenterPx[1];
+  intr_mat.at<double>(2,2) = 1;
 
   return intr_mat;
 }
@@ -147,9 +147,9 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   std::cout<<"Rt 1:\n"<<cam1_Rt<<"\n intr 1:\n"<<cam1_intr<<std::endl;
   
   cv::perspectiveTransform(cam1_points, cam2_points, H);  
-  cv::Mat pnts3D(4, cam1_points.size(), CV_32FC4);
+  cv::Mat pnts3D(4, cam1_points.size(), CV_64FC4);
 
-  cv::triangulatePoints(cam1_fmat, cam2_fmat, cv::Mat(cam1_points).reshape(1,2), cv::Mat(cam2_points).reshape(1,2), pnts3D);
+  cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D);
 
   std::cout << "Time:"<<float( clock () - begin_time ) /  CLOCKS_PER_SEC<<std::endl;
   std::cout<< "No of 3D points:"<<pnts3D.size()<<std::endl;
