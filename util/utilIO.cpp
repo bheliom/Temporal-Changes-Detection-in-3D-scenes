@@ -104,7 +104,7 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   std::cout<<"Rt 1:\n"<<cam1_Rt<<"\n intr 1:\n"<<cam1_intr<<std::endl;
   //  std::cout<<"P matrix 1:"<<cam1_fmat<<"\nP matrix 2:"<<cam2_fmat<<std::endl;
   int sz[3] = {2,2,2};
-  Mat L(3,sz, CV_8UC(1), Scalar::all(0));
+  cv::Mat L(3, sz, CV_8UC(1), cv::Scalar::all(0) );
   
   std::cout<<L<<std::endl;
   cv::perspectiveTransform(cam1_points, cam2_points, H);
