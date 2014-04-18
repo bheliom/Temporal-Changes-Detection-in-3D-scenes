@@ -100,6 +100,8 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
 
   cam1_fmat = cam1_intr*cam1_Rt;
   cam2_fmat = cam2_intr*cam2_Rt;
+  std::cout<<"P matrix 1:"<<cam1_fmat<<" P matrix 2:"<<cam2_mat<<std::endl;
+
   cv::perspectiveTransform(cam1_points, cam2_points, H);
   
   cv::Mat pnts3D(4, cam1_points.size(), CV_64FC4);
