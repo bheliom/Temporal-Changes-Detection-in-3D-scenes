@@ -18,7 +18,7 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
   std::cout<<"Number of rows:"<< pts_3d[0].cols << std::endl;
 
   for(int i = 0 ; i < pts_3d.size() ; i++)
-    for(int c = 0 ; c < pts_3d[0].cols; c++){
+    for(int c = 0 ; c < pts_3d[i].cols; c++){
       if(c%100==0) DrawProgressBar(40, (double)c/(double)pts_3d[i].cols);
       
       tmpMat  = pts_3d[i].col(c);
