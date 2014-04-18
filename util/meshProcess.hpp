@@ -62,7 +62,7 @@ double getFaceEdgeAverage(MyFace &f);
 void removeUnnFaces(MyMesh &m, int thresVal);
 void findOcc(std::map<int,int> &inMap, std::vector<int> &outVector, int noOfOut);
 pcl::PointXYZ vcg2pclPt(vcg::Point3<float> inPt);
-
+/*
 template <typename T>
 void visibilityEstimation(MyMesh &m, MyMesh &pmvsMesh, boost::shared_ptr<pcl::PointCloud<T> > pmvsCloud, int K, boost::shared_ptr<pcl::PointCloud<T> > mCloud, std::vector<vcg::Shot<float> > shots, std::vector<std::string> image_filenames){
 
@@ -89,15 +89,15 @@ void visibilityEstimation(MyMesh &m, MyMesh &pmvsMesh, boost::shared_ptr<pcl::Po
   int tmpCount = 0;
   int tmpCurrKneighId = 0;
   
-  /*Instead of using 7 ring neighborhood we use 7 times the average length of an edge as a search radius for the neighbouring vertices*/
+  /*Instead of using 7 ring neighborhood we use 7 times the average length of an edge as a search radius for the neighbouring vertices
   float tmpRadius = 7*getEdgeAverage(m);
 
-  /*Get the handler for pmvsMesh that gives access to correspondences attribute for each point*/
+  /*Get the handler for pmvsMesh that gives access to correspondences attribute for each point
   MyMesh::PerVertexAttributeHandle<vcg::tri::io::CorrVec> named_hv = vcg::tri::Allocator<MyMesh>:: GetPerVertexAttribute<vcg::tri::io::CorrVec> (pmvsMesh ,std::string("correspondences"));
   
   vertNumber = m.VN();
 
-  /*Iterate through each vertex in the input mesh(one reconstructed with Poisson)*/
+  /*Iterate through each vertex in the input mesh(one reconstructed with Poisson)
   std::cout<<"Start visibility estimation."<<std::endl;
   for(int i = 0; i < vertNumber; i++){    
     if(i%1000==0) DrawProgressBar(40, (double)i/(double)vertNumber);
@@ -122,7 +122,7 @@ void visibilityEstimation(MyMesh &m, MyMesh &pmvsMesh, boost::shared_ptr<pcl::Po
       
       dispProjPt(tmpDisp, image);
     }
-    */    
+    
  
     // The vertex becomes a pcl point to find K nearest neighbours in PMVS cloud
     searchPoint = vcg2pclPt(m.vert[i].P());
@@ -130,12 +130,12 @@ void visibilityEstimation(MyMesh &m, MyMesh &pmvsMesh, boost::shared_ptr<pcl::Po
 
     if(!pointIdxNKNSearch.empty()){
       tmpCount = pointIdxNKNSearch.size();
-      /*Iterate through neighbors. We iterate through PMVS cloud points here*/
+      /*Iterate through neighbors. We iterate through PMVS cloud points here
       for (int j = 0; j < tmpCount; j++){
 	tmpCurrKneighId = pointIdxNKNSearch[j];
 	//Get number of correspondences for this particular point
 	tmpCorrNum = named_hv[tmpCurrKneighId].size();
-	/*Iterate through corresponding images for given neighbour to find the most often occuring one*/
+	/*Iterate through corresponding images for given neighbour to find the most often occuring one
 	for(int k = 0; k < tmpCorrNum; k++){
 	  
 	  tmpIdImg = named_hv[tmpCurrKneighId].at(k).id_img;
@@ -167,7 +167,7 @@ void visibilityEstimation(MyMesh &m, MyMesh &pmvsMesh, boost::shared_ptr<pcl::Po
 
     if(!tmpSetImgs.empty()){
       kdtreeNeigh.radiusSearch(searchPoint, tmpRadius, pointIdxRadiusSearch, pointRadiusSquaredDistance);
-      /*here tmpSetImgs has 9 most often occuring images on which we have to project neighboring vertices of vertex V in 7 ring neighborhood*/
+      /*here tmpSetImgs has 9 most often occuring images on which we have to project neighboring vertices of vertex V in 7 ring neighborhood
       if(!pointIdxRadiusSearch.empty()){
 	for(std::vector<int>::iterator it = tmpSetImgs.begin(); it!=tmpSetImgs.end(); ++it){
 	  cv::Mat image = getImg(image_filenames[*it]);
@@ -175,7 +175,7 @@ void visibilityEstimation(MyMesh &m, MyMesh &pmvsMesh, boost::shared_ptr<pcl::Po
 	    vcg::Point3f tmpPoint(mCloud->points[pointIdxRadiusSearch[t]].x, mCloud->points[pointIdxRadiusSearch[t]].y, mCloud->points[pointIdxRadiusSearch[t]].z);	    
 	    tmpProjPoints.push_back(shots[*it].Project(tmpPoint));
 	  }	
-	  /*Here tmpProjPoints stores all projections of neighbor points on given image*/
+	  /*Here tmpProjPoints stores all projections of neighbor points on given image
 	  
 	    for(int t = 0 ; t < tmpProjPoints.size(); t++){
 	      vcg::Point2i tmpDisp = getPtImgCoord(tmpProjPoints[t], shots[*it]);
@@ -198,10 +198,10 @@ void visibilityEstimation(MyMesh &m, MyMesh &pmvsMesh, boost::shared_ptr<pcl::Po
       -function to get intensity value
       -function to determine cloudy images 
       -function to check occlusions
-    */
+    
   }
   DrawProgressBar(40, 1);
   std::cout<<"\n";
 }
-  
+*/
 #endif

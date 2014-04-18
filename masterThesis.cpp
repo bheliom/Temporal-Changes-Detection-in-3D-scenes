@@ -218,7 +218,7 @@ void testBundler(string filename, string filename2, string filename3){
   cout<<named_hv[2].at(0).id_img<<endl;
 
 }
-
+/*
 void testNN(map<int,string> inputStrings){
 
   pcl::PointCloud<pcl::PointXYZ>::Ptr pmvsCloud(new pcl::PointCloud<pcl::PointXYZ>);
@@ -286,3 +286,4 @@ void testNN(map<int,string> inputStrings){
     }
   //  visibilityEstimation(m, pmvsMesh, pmvsCloud, 30, mCloud, shots, image_filenames);
 }
+*/

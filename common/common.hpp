@@ -27,3 +27,12 @@ class MyMesh    : public vcg::tri::TriMesh< std::vector<MyVertex>, std::vector<M
 
 
 #endif
+
+
+
+
+
+
+
+
+
