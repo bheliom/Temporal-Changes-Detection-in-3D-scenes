@@ -129,8 +129,6 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   std::vector<cv::Point2f> cam1_points, cam2_points;
   getPtsFromMask(chngMask, cam1_points);
 
-  std::cout<<"P1 size:"<<cam1_points.size()<<" P2 size:"<<cam2_points.size()<<std::endl;
-  std::cout<<"Sum of chng"<<cv::sum(chngMask).val[0]/255<<std::endl;
   cv::Mat cam1_fmat;
   cv::Mat cam2_fmat;
  
@@ -145,6 +143,10 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
 
   std::cout<<"Rt 1:\n"<<cam1_Rt<<"\n intr 1:\n"<<cam1_intr<<std::endl;
   cv::perspectiveTransform(cam1_points, cam2_points, H);  
+
+  std::cout<<"P1 size:"<<cam1_points.size()<<" P2 size:"<<cam2_points.size()<<std::endl;
+  std::cout<<"Sum of chng:"<<cv::sum(chngMask).val[0]/255<<std::endl;
+
   cv::Mat pnts3D(1, cam1_points.size(), CV_64FC4);
 
   cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D);
