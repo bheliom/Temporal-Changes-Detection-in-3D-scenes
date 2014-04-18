@@ -114,8 +114,8 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
   cv::Mat intr_mat;
   intr_mat = cv::Mat::zeros(3,3, CV_64FC1);
 
-  intr_mat.at<double>(0,0) = shot.Intrinsics.FocalMm;
-  intr_mat.at<double>(1,1) = shot.Intrinsics.FocalMm;
+  intr_mat.at<double>(0,0) = shot.Intrinsics.FocalMm/shot.Intrinsics.PixelSizeMm[0];
+  intr_mat.at<double>(1,1) = shot.Intrinsics.FocalMm/shot.Intrinsics.PixelSizeMm[1];
   intr_mat.at<double>(0,2) = shot.Intrinsics.CenterPx[0];
   intr_mat.at<double>(1,2) = shot.Intrinsics.CenterPx[1];
   intr_mat.at<double>(2,2) = 1;
