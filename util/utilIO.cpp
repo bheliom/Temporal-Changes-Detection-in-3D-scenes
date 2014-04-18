@@ -24,7 +24,6 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
   savePlyFileVcg(name,m);
 }
 
-
 void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
   
   std::ostringstream tmpString;
@@ -108,8 +107,12 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
 
   std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC<<std::endl;
   std::cout<< "No of 3D points:"<<pnts3D.size()<<std::endl;
+  
+  cv::Mat4f tmpMat;
+  tmpMat = pnts3D.col(1000);
+  float w = tmpMat.at<int>(3);
+  std::cout<<tmpMat.at<int>(0)/w <<tmpMat.at<int>(1)/w <<tmpMat.at<int>(2)/w <<std::endl;
 
-  std::cout<< pnts3D.at<int>(1000,0)<<pnts3D.at<int>(1000,1)<<pnts3D.at<int>(1000,2)<<std::endl;
   return pnts3D;
 }
 
