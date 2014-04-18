@@ -79,7 +79,7 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
   intr_mat.at<float>(1,2) = shot.Intrinsics.CenterPx[1];
   intr_mat.at<float>(2,2,0) = 1.0f;
 
-  std::cout<< intr_mat.at<float>(2,2,0)<<std::endl;
+  std::cout<< intr_mat <<std::endl;
 
   return intr_mat;
 }
