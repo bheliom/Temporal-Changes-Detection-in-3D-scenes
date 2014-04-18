@@ -39,23 +39,28 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
   MyMesh m;
   cv::Scalar tmp_pt;
   cv::Mat tmpMat;
-  float w;
-
+  float w, x, y, z;
+  
   MyMesh::VertexIterator vi;
   std::cout<<"Number of rows:"<< pts_3d[0].cols << std::endl;
 
-  for(int i = 0 ; i < pts_3d.size() ; i++)
+  for(int i = 0 ; i < pts_3d.size() ; i++){
+    DrawProgressBar(40, (double)i/(double)pts_3d.size());
+
     for(int c = 0 ; c < pts_3d[i].cols; c++){
-      if(c%100==0) DrawProgressBar(40, (double)c/(double)pts_3d[i].cols);
       
       tmpMat  = pts_3d[i].col(c);
       w = tmpMat.at<float>(3,0);
-      
-      vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(tmpMat.at<float>(0,0),tmpMat.at<float>(1,0),tmpMat.at<float>(2,0)));
+
+      x = tmpMat.at<float>(0,0);
+      y = tmpMat.at<float>(1,0);
+      z = tmpMat.at<float>(2,0);
+
+      vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(x,y,z));
 
       m.vert[c].SetS();
     }
-
+  }
   vcg::tri::UpdateColor<MyMesh>::PerVertexConstant(m, vcg::Color4b::Red, true);
   savePlyFileVcg(name,m);
 }
@@ -147,10 +152,6 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   std::cout << "Time:"<<float( clock () - begin_time ) /  CLOCKS_PER_SEC<<std::endl;
   std::cout<< "No of 3D points:"<<pnts3D.size()<<std::endl;
   
-  std::cout << "Double:"<< pnts3D.at<double>(0,0) / pnts3D.at<double>(3,0)<<std::endl;
-  std::cout << "Values:"<<  pnts3D.at<float>(0,0) << " " <<  pnts3D.at<float>(3,0)<<std::endl;
-  std::cout << "Float:"<< pnts3D.at<float>(0,0) / pnts3D.at<float>(3,0)<<std::endl;
-
   return pnts3D;
 }
 
