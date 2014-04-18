@@ -77,7 +77,7 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
   intr_mat.at<float>(1,1) = shot.Intrinsics.FocalMm;
   intr_mat.at<float>(0,2) = shot.Intrinsics.CenterPx[0];
   intr_mat.at<float>(1,2) = shot.Intrinsics.CenterPx[1];
-  intr_mat.at<float>(2,2) = 1.0;
+  intr_mat.at<float>(2,2) = 1.0f;
 
   return intr_mat;
 }
@@ -101,9 +101,12 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   cam1_fmat = cam1_intr*cam1_Rt;
   cam2_fmat = cam2_intr*cam2_Rt;
 
-  std::cout<<"Rt 1"<<cam1_Rt<<"\n intr 1:"<<cam1_intr<<std::endl;
+  std::cout<<"Rt 1:\n"<<cam1_Rt<<"\n intr 1:\n"<<cam1_intr<<std::endl;
   //  std::cout<<"P matrix 1:"<<cam1_fmat<<"\nP matrix 2:"<<cam2_fmat<<std::endl;
-
+  int sz[3] = {2,2,2};
+  Mat L(3,sz, CV_8UC(1), Scalar::all(0));
+  
+  std::cout<<L<<std::endl;
   cv::perspectiveTransform(cam1_points, cam2_points, H);
   
   cv::Mat pnts3D(4, cam1_points.size(), CV_64FC4);
