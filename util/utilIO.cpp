@@ -100,7 +100,9 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
 
   cam1_fmat = cam1_intr*cam1_Rt;
   cam2_fmat = cam2_intr*cam2_Rt;
-  std::cout<<"P matrix 1:"<<cam1_fmat<<" P matrix 2:"<<cam2_fmat<<std::endl;
+
+  std::cout<<"Rt 1"<<cam1_Rt<<"\n intr 1:"<<cam1_intr<<std::endl;
+  std::cout<<"P matrix 1:"<<cam1_fmat<<"\nP matrix 2:"<<cam2_fmat<<std::endl;
 
   cv::perspectiveTransform(cam1_points, cam2_points, H);
   
@@ -113,10 +115,7 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   
   cv::Mat tmpMat;
 
-  for(int i = 2000; i < 2010; i++){
-    tmpMat  = pnts3D.col(i);
-    std::cout<<tmpMat<<std::endl;
-  }
+  tmpMat  = pnts3D.col(1000);
   float w = tmpMat.at<float>(3,0);
   
   std::cout<<tmpMat.at<float>(0,0)/w <<tmpMat.at<int>(0,1)/w <<tmpMat.at<int>(0,2)/w <<std::endl;
