@@ -77,9 +77,7 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
   intr_mat.at<float>(1,1) = shot.Intrinsics.FocalMm;
   intr_mat.at<float>(0,2) = shot.Intrinsics.CenterPx[0];
   intr_mat.at<float>(1,2) = shot.Intrinsics.CenterPx[1];
-  intr_mat.at<float>(2,2,0) = 1;
-
-  std::cout<< intr_mat <<std::endl;
+  intr_mat.at<float>(2,2) = 1;
 
   return intr_mat;
 }
@@ -120,7 +118,7 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   tmpMat  = pnts3D.col(1000);
   float w = tmpMat.at<float>(3,0);
   
-  std::cout<<tmpMat.at<float>(0,0)/w <<tmpMat.at<int>(0,1)/w <<tmpMat.at<int>(0,2)/w <<std::endl;
+  std::cout<<tmpMat<<std::endl;
 
   return pnts3D;
 }
