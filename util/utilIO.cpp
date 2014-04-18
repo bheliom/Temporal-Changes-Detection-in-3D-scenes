@@ -7,6 +7,32 @@
 #include "opencv2/calib3d/calib3d.hpp"
 #include <ctime>
 
+/*
+cv::Mat LinearLSTriangulation(cv::Point3d u,       //homogenous image point (u,v,1)
+			      cv::Mat P,       //camera 1 matrix
+			      cv::Point3d u1,      //homogenous image point in 2nd camera
+			      cv::Mat P1       //camera 2 matrix
+			      )
+{
+    //build matrix A for homogenous equation system Ax = 0
+    //assume X = (x,y,z,1), for Linear-LS method
+    //which turns it into a AX = B system, where A is 4x3, X is 3x1 and B is 4x1
+  cv::Mat A =(cv::Mat_<double>(4,3)<<(u.x*P.at<float>(2,0)-P.at<float>(0,0),u.x*P.at<float>(2,1)-P.at<float>(0,1),      u.x*P.at<float>(2,2)-P.at<float>(0,2),
+          u.y*P.at<float>(2,0)-P.at<float>(1,0),    u.y*P.at<float>(2,1)-P.at<float>(1,1),      u.y*P.at<float>(2,2)-P.at<float>(1,2),
+          u1.x*P1.at<float>(2,0)-P1.at<float>(0,0), u1.x*P1.at<float>(2,1)-P1.at<float>(0,1),   u1.x*P1.at<float>(2,2)-P1.at<float>(0,2),
+          u1.y*P1.at<float>(2,0)-P1.at<float>(1,0), u1.y*P1.at<float>(2,1)-P1.at<float>(1,1),   u1.y*P1.at<float>(2,2)-P1.at<float>(1,2)
+				 ));
+  cv::Mat B = (cv::Mat(4,1,CV_64FC1) <<    -(u.x*P.at<float>(2,3)    -P.at<float>(0,3)),
+                      -(u.y*P.at<float>(2,3)  -P.at<float>(1,3)),
+                      -(u1.x*P1.at<float>(2,3)    -P1.at<float>(0,3)),
+                      -(u1.y*P1.at<float>(2,3)    -P1.at<float>(1,3)));
+  
+  cv::Mat X;
+  //solve(A,B,X,DECOMP_SVD);
+ 
+    return X;
+}
+*/
 
 void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::string &name){
 
@@ -121,6 +147,9 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   std::cout << "Time:"<<float( clock () - begin_time ) /  CLOCKS_PER_SEC<<std::endl;
   std::cout<< "No of 3D points:"<<pnts3D.size()<<std::endl;
   
+  std::cout << "Double:"<< pnts3D.at<double>(0,0) / pnts3D.at<double>(3,0)<<std::endl;
+  std::cout << "Float:"<< pnts3D.at<float>(0,0)/pnts3D.at<float>(3,0)<<std::endl;
+
   return pnts3D;
 }
 
