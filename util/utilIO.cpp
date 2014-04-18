@@ -39,7 +39,7 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
   MyMesh m;
   cv::Scalar tmp_pt;
   cv::Mat tmpMat;
-  double w, x, y, z;
+  float w, x, y, z;
   
   MyMesh::VertexIterator vi;
   std::cout<<"Number of rows:"<< pts_3d[0].cols << std::endl;
