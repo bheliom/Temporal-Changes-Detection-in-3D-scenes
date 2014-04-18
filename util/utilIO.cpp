@@ -42,7 +42,7 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
 
   std::cout<<"Number of rows:"<< pts_3d[0].cols << std::endl;
 
-  for(int i = 2 ; i < 3 ; i++){
+  for(int i = 0 ; i < 3 ; i++){
     DrawProgressBar(40, (double)i/(double)pts_3d.size());
 
     for(int c = 0 ; c < pts_3d[i].cols; c++){
@@ -144,7 +144,7 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   std::cout<<"Rt 1:\n"<<cam1_Rt<<"\n intr 1:\n"<<cam1_intr<<std::endl;
   
   cv::perspectiveTransform(cam1_points, cam2_points, H);  
-  cv::Mat pnts3D(4, cam1_points.size(), CV_64FC4);
+  cv::Mat pnts3D(1, cam1_points.size(), CV_64FC4);
 
   cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D);
 
