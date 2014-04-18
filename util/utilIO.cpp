@@ -44,7 +44,7 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
   MyMesh::VertexIterator vi;
   std::cout<<"Number of rows:"<< pts_3d[0].cols << std::endl;
 
-  for(int i = 0 ; i < pts_3d.size() ; i++){
+  for(int i = 1 ; i < 2 ; i++){
     DrawProgressBar(40, (double)i/(double)pts_3d.size());
 
     for(int c = 0 ; c < pts_3d[i].cols; c++){
@@ -53,9 +53,9 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
 
       w = tmpMat.at<float>(3,0);
 
-      x = tmpMat.at<float>(0,0) / w;
-      y = tmpMat.at<float>(1,0) / w;
-      z = tmpMat.at<float>(2,0) / w;
+      x = tmpMat.at<float>(0,0);
+      y = tmpMat.at<float>(1,0);
+      z = tmpMat.at<float>(2,0);
 
       vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(x,y,z));
 
