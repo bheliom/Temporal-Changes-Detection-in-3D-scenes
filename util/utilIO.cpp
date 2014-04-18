@@ -16,7 +16,7 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
 
   for(int c = 0 ; c < pts_3d[0].cols; c++){
     if(c%100==0) DrawProgressBar(40, (double)c/(double)pts_3d[0].cols);
-    vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(pts_3d[0].at<int>(0,c), pts_3d[0].at<int>(1,c), pts_3d[0].at<int>(2,c)));
+    vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(pts_3d[0].at<float>(0,c), pts_3d[0].at<float>(1,c), pts_3d[0].at<float>(2,c)));
     m.vert[c].SetS();
   }
 
@@ -61,9 +61,9 @@ cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
   
   for(int i = 0 ; i < 3 ; i++){
     for(int j = 0 ; j < 3 ; j++){
-      mat_Rt.at<int>(i,j) = mat_rot[i][j];
+      mat_Rt.at<float>(i,j) = mat_rot[i][j];
     }
-    mat_Rt.at<int>(i,3) = mat_tra[i];
+    mat_Rt.at<float>(i,3) = mat_tra[i];
   }
   return mat_Rt;
 }
@@ -73,11 +73,11 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
   cv::Mat intr_mat;
   intr_mat = cv::Mat::zeros(3,3, CV_64FC1);
 
-  intr_mat.at<int>(0,0) = shot.Intrinsics.FocalMm;
-  intr_mat.at<int>(1,1) = shot.Intrinsics.FocalMm;
-  intr_mat.at<int>(0,2) = shot.Intrinsics.CenterPx[0];
-  intr_mat.at<int>(1,2) = shot.Intrinsics.CenterPx[1];
-  intr_mat.at<int>(2,2) = 1;
+  intr_mat.at<float>(0,0) = shot.Intrinsics.FocalMm;
+  intr_mat.at<float>(1,1) = shot.Intrinsics.FocalMm;
+  intr_mat.at<float>(0,2) = shot.Intrinsics.CenterPx[0];
+  intr_mat.at<float>(1,2) = shot.Intrinsics.CenterPx[1];
+  intr_mat.at<float>(2,2) = 1;
 
   return intr_mat;
 }
@@ -110,8 +110,8 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   
   cv::Mat4f tmpMat;
   tmpMat = pnts3D.col(1000);
-  float w = tmpMat.at<int>(3);
-  std::cout<<tmpMat.at<int>(0)/w <<tmpMat.at<int>(1)/w <<tmpMat.at<int>(2)/w <<std::endl;
+  float w = tmpMat.at<float>(3,0);
+  std::cout<<tmpMat.at<float>(0)/w <<tmpMat.at<int>(1)/w <<tmpMat.at<int>(2)/w <<std::endl;
 
   return pnts3D;
 }
