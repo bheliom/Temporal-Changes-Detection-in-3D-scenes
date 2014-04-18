@@ -85,13 +85,13 @@ void ImgIO::getPtsFromMask(const cv::Mat &mask, std::vector<cv::Point2f> &pts_ve
 
   int rows = mask.rows;
   int cols = mask.cols;
+  pts_vector.clear();
   cv::Point2f tmp_pt;
 
   std::cout<<"Cols:"<<cols<<" Rows:"<<rows<<std::endl;
 
   for(int r = 0; r < rows; r++){
-    for(int c = 0; c < cols; c++){
-      
+    for(int c = 0; c < cols; c++){      
       if(mask.at<int>(r,c)>0){
 	tmp_pt.x = r;
 	tmp_pt.y = c;
