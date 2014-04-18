@@ -139,8 +139,8 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   cv::Mat cam1_intr = getIntrMatrix(cam1);
   cv::Mat cam2_intr = getIntrMatrix(cam2);
 
-  cam1_fmat = cam1_intr*cam1_Rt;
-  cam2_fmat = cam2_intr*cam2_Rt;
+  cam1_fmat = cam1_intr.inv()*cam1_Rt;
+  cam2_fmat = cam2_intr.inv()*cam2_Rt;
 
   std::cout<<"Rt 1:\n"<<cam1_Rt<<"\n intr 1:\n"<<cam1_intr<<std::endl;
   
