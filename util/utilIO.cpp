@@ -50,11 +50,12 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
     for(int c = 0 ; c < pts_3d[i].cols; c++){
       
       tmpMat  = pts_3d[i].col(c);
+
       w = tmpMat.at<float>(3,0);
 
-      x = tmpMat.at<float>(0,0);
-      y = tmpMat.at<float>(1,0);
-      z = tmpMat.at<float>(2,0);
+      x = tmpMat.at<float>(0,0) / w;
+      y = tmpMat.at<float>(1,0) / w;
+      z = tmpMat.at<float>(2,0) / w;
 
       vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(x,y,z));
 
@@ -62,6 +63,7 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
     }
   }
   vcg::tri::UpdateColor<MyMesh>::PerVertexConstant(m, vcg::Color4b::Red, true);
+  std::cout<<"Vertices:"<<m.VN()<<std::endl;
   savePlyFileVcg(name,m);
 }
 
