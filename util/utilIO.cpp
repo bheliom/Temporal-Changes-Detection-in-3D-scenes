@@ -35,12 +35,12 @@ cv::Mat LinearLSTriangulation(cv::Point3d u,       //homogenous image point (u,v
 */
 
 void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::string &name){
-
+  
+  std::cout<<"Saving change 3D mask.."<<std::endl;
+  
   MyMesh m;
   cv::Mat tmpMat;
   float w, x, y, z;
-
-  std::cout<<"Number of rows:"<< pts_3d[0].cols << std::endl;
 
   for(int i = 0 ; i < 3 ; i++){
     DrawProgressBar(40, (double)i/(double)pts_3d.size());
@@ -48,8 +48,8 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
     for(int c = 0 ; c < pts_3d[i].cols; c++){
       
       tmpMat  = pts_3d[i].col(c);
-      w = tmpMat.at<float>(3,0);
 
+      w = tmpMat.at<float>(3,0);
       x = tmpMat.at<float>(0,0)/w;
       y = tmpMat.at<float>(1,0)/w;
       z = tmpMat.at<float>(2,0)/w;
