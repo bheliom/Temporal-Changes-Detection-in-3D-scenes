@@ -110,8 +110,10 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   
   cv::Mat4f tmpMat;
   tmpMat = pnts3D.col(1000);
+  std::cout<<tmpMat<<std::endl;
   float w = tmpMat.at<float>(3,0);
-  std::cout<<tmpMat.at<float>(0)/w <<tmpMat.at<int>(1)/w <<tmpMat.at<int>(2)/w <<std::endl;
+  
+  std::cout<<tmpMat.at<float>(0,0)/w <<tmpMat.at<int>(0,1)/w <<tmpMat.at<int>(0,2)/w <<std::endl;
 
   return pnts3D;
 }
