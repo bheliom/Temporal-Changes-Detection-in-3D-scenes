@@ -97,15 +97,14 @@ cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
   cv::Mat mat_Rt(3,4, CV_64FC1);
   mat_Rt = cv::Mat::zeros(3,4, CV_64FC1);
 
-  vcg::Matrix44f mat_rot = shot.GetExtrinsicsToWorldMatrix();
-  vcg::Point3f mat_tra = shot.Extrinsics.Tra();
+  vcg::Matrix44f mat_rot = shot.GetWorldToExtrinsicsMatrix();
   
   for(int i = 0 ; i < 3 ; i++){
     for(int j = 0 ; j < 4 ; j++){
       mat_Rt.at<double>(i,j) = mat_rot[i][j];
-    }
-    //    mat_Rt.at<double>(i,3) = mat_tra[i];
+    }   
   }
+
   return mat_Rt;
 }
 
