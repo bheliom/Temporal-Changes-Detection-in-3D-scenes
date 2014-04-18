@@ -127,7 +127,7 @@ void testPipeline(map<int,string> inputStrings){
       cv::threshold(finThres, finMask, 30, 255, CV_THRESH_OTSU);
 
       int no_of_elements = cv::sum(finMask).val[0]/255;
-      int thres_val = (finMask.rows*finMask.cols)/4;
+      int thres_val = (finMask.rows*finMask.cols)/6;
       /*    
       tmpImgs.push_back(newImg);
       tmpImgs.push_back(oldImg);
