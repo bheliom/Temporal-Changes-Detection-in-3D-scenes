@@ -82,9 +82,9 @@ void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
 }
 
 void ImgIO::getPtsFromMask(const cv::Mat &mask, std::vector<cv::Point2f> &pts_vector){
-  
-  int count = 0;
-  
+  std::vector<cv::Mat> tmpImg;
+  tmpImg.push_back(mask);
+  dispImgs(tmpImg);
   for(int r = 0; r < mask.rows; r++){
     for(int c = 0; c < mask.cols; c++){
       if(mask.at<int>(r,c)>0) pts_vector.push_back(cv::Point2f(c,r));
@@ -127,15 +127,18 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   const clock_t begin_time = clock();
 
   std::vector<cv::Point2f> cam1_points, cam2_points;
+
   getPtsFromMask(chngMask, cam1_points);
 
   cv::Mat cam1_fmat;
   cv::Mat cam2_fmat;
  
   cv::Mat cam1_Rt = getRtMatrix(cam1);
+
   cv::Mat cam2_Rt = getRtMatrix(cam2);
   
   cv::Mat cam1_intr = getIntrMatrix(cam1);
+
   cv::Mat cam2_intr = getIntrMatrix(cam2);
 
   cam1_fmat = cam1_intr*cam1_Rt;
