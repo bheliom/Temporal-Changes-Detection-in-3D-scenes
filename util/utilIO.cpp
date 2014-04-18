@@ -24,7 +24,7 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
       tmpMat  = pts_3d[i].col(c);
       w = tmpMat.at<float>(3,0);
       
-      vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(tmpMat.at<float>(0,0)/w,tmpMat.at<float>(1,0)/w,tmpMat.at<float>(2,0)/w));
+      vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(tmpMat.at<float>(0,0),tmpMat.at<float>(1,0),tmpMat.at<float>(2,0)));
       m.vert[c].SetS();
     }
 
