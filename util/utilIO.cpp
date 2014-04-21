@@ -149,13 +149,14 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
 /**
 Function projects 2D change mask into 3-dimensional space using triangulation.
  */
-cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> &cam1, const vcg::Shot<float> &cam2, const cv::Mat &H){
+cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const cv::Mat &chngMask2, const vcg::Shot<float> &cam1, const vcg::Shot<float> &cam2, const cv::Mat &H){
 
   const clock_t begin_time = clock();
 
   std::vector<cv::Point2f> cam1_points, cam2_points;
 
   getPtsFromMask(chngMask, cam1_points);
+  getPtsFromMask(chngMask2, cam2_points);
 
   cv::Mat cam1_fmat;
   cv::Mat cam2_fmat;
@@ -170,8 +171,9 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   cam2_fmat = cam2_intr*cam2_Rt;
 
   std::cout<<"Rt 1:\n"<<cam1_Rt<<"\n intr 1:\n"<<cam1_intr<<std::endl;
-  cv::perspectiveTransform(cam1_points, cam2_points, H);  
 
+  //  cv::perspectiveTransform(cam1_points, cam2_points, H);  
+ 
   std::cout<<"P1 size:"<<cam1_points.size()<<" P2 size:"<<cam2_points.size()<<std::endl;
   std::cout<<"Sum of chng:"<<cv::sum(chngMask).val[0]/255<<std::endl;
 
