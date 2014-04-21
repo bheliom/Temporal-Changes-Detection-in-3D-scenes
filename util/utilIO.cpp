@@ -47,7 +47,7 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
   cv::Mat tmpMat;
   float w, x, y, z;
 
-  for(int i = 1 ; i < 2 ; i++){
+  for(int i = 2 ; i < 3 ; i++){
     DrawProgressBar(40, (double)i/(double)pts_3d.size());
 
     for(int c = 0 ; c < pts_3d[i].cols; c++){
@@ -152,13 +152,10 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
 
   const clock_t begin_time = clock();
 
-  std::vector<cv::Mat> tmpImgs;
   std::vector<cv::Point2f> cam1_points, cam2_points;
   
   getPtsFromMask(chngMask, cam1_points);
   
-  cv::Mat tmpMat(cv::Mat::zeros(chngMask.size(),CV_8UC1));
-
   cv::Mat cam1_fmat;
   cv::Mat cam2_fmat;
  
