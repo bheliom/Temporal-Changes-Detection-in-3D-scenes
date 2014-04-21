@@ -8,36 +8,36 @@
 #include <ctime>
 
 /*
-cv::Mat LinearLSTriangulation(cv::Point3d u,       //homogenous image point (u,v,1)
-			      cv::Mat P,       //camera 1 matrix
-			      cv::Point3d u1,      //homogenous image point in 2nd camera
-			      cv::Mat P1       //camera 2 matrix
-			      )
-{
-    //build matrix A for homogenous equation system Ax = 0
-    //assume X = (x,y,z,1), for Linear-LS method
-    //which turns it into a AX = B system, where A is 4x3, X is 3x1 and B is 4x1
+  cv::Mat LinearLSTriangulation(cv::Point3d u,       //homogenous image point (u,v,1)
+  cv::Mat P,       //camera 1 matrix
+  cv::Point3d u1,      //homogenous image point in 2nd camera
+  cv::Mat P1       //camera 2 matrix
+  )
+  {
+  //build matrix A for homogenous equation system Ax = 0
+  //assume X = (x,y,z,1), for Linear-LS method
+  //which turns it into a AX = B system, where A is 4x3, X is 3x1 and B is 4x1
   cv::Mat A =(cv::Mat_<double>(4,3)<<(u.x*P.at<float>(2,0)-P.at<float>(0,0),u.x*P.at<float>(2,1)-P.at<float>(0,1),      u.x*P.at<float>(2,2)-P.at<float>(0,2),
-          u.y*P.at<float>(2,0)-P.at<float>(1,0),    u.y*P.at<float>(2,1)-P.at<float>(1,1),      u.y*P.at<float>(2,2)-P.at<float>(1,2),
-          u1.x*P1.at<float>(2,0)-P1.at<float>(0,0), u1.x*P1.at<float>(2,1)-P1.at<float>(0,1),   u1.x*P1.at<float>(2,2)-P1.at<float>(0,2),
-          u1.y*P1.at<float>(2,0)-P1.at<float>(1,0), u1.y*P1.at<float>(2,1)-P1.at<float>(1,1),   u1.y*P1.at<float>(2,2)-P1.at<float>(1,2)
-				 ));
+  u.y*P.at<float>(2,0)-P.at<float>(1,0),    u.y*P.at<float>(2,1)-P.at<float>(1,1),      u.y*P.at<float>(2,2)-P.at<float>(1,2),
+  u1.x*P1.at<float>(2,0)-P1.at<float>(0,0), u1.x*P1.at<float>(2,1)-P1.at<float>(0,1),   u1.x*P1.at<float>(2,2)-P1.at<float>(0,2),
+  u1.y*P1.at<float>(2,0)-P1.at<float>(1,0), u1.y*P1.at<float>(2,1)-P1.at<float>(1,1),   u1.y*P1.at<float>(2,2)-P1.at<float>(1,2)
+  ));
   cv::Mat B = (cv::Mat(4,1,CV_64FC1) <<    -(u.x*P.at<float>(2,3)    -P.at<float>(0,3)),
-                      -(u.y*P.at<float>(2,3)  -P.at<float>(1,3)),
-                      -(u1.x*P1.at<float>(2,3)    -P1.at<float>(0,3)),
-                      -(u1.y*P1.at<float>(2,3)    -P1.at<float>(1,3)));
+  -(u.y*P.at<float>(2,3)  -P.at<float>(1,3)),
+  -(u1.x*P1.at<float>(2,3)    -P1.at<float>(0,3)),
+  -(u1.y*P1.at<float>(2,3)    -P1.at<float>(1,3)));
   
   cv::Mat X;
   //solve(A,B,X,DECOMP_SVD);
  
-    return X;
-}
+  return X;
+  }
 */
 
 
 /**
-Function creates a mesh from 3D change mask points and saves the PLY file.
- */
+   Function creates a mesh from 3D change mask points and saves the PLY file.
+*/
 void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::string &name){
   
   std::cout<<"Saving change 3D mask.."<<std::endl;
@@ -71,7 +71,7 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
   savePlyFileVcg(name,m);
 }
 /**
-Function displays all the images given in the input vector.
+   Function displays all the images given in the input vector.
 */
 void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
   
@@ -91,31 +91,27 @@ void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
   cv::waitKey(0);                   
 }
 /**
-Function extracts points from the binary change mask.
- */
+   Function extracts points from the binary change mask.
+*/
 void ImgIO::getPtsFromMask(const cv::Mat &mask, std::vector<cv::Point2f> &pts_vector){
 
   int rows = mask.rows;
   int cols = mask.cols;
 
-  pts_vector.clear();
-  pts_vector.resize(rows*cols);
   std::cout<<"Cols:"<<cols<<" Rows:"<<rows<<std::endl;
-  int count = 0;
-
+  
   for(int r = 0; r < rows; r++){
     for(int c = 0; c < cols; c++){      
       if(mask.at<int>(c,r)<0){
-	pts_vector[count++] = cv::Point2f(c,r);
-	std::cout<<cv::Point2f(c,r)<<std::endl;
+	pts_vector.push_back(cv::Point2f(c,r));
       }
     }
   }
 }
 
 /**
-Function extracts rotation translation matrix [R | t] from the VCG shot structure into OpenCV Mat structure
- */
+   Function extracts rotation translation matrix [R | t] from the VCG shot structure into OpenCV Mat structure
+*/
 cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
 
   cv::Mat mat_Rt(3,4, CV_64FC1);
@@ -133,8 +129,8 @@ cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
 }
 
 /**
-Function extracts intrinsic matrix from VCG shot structure into OpenCV Mat structure.
- */
+   Function extracts intrinsic matrix from VCG shot structure into OpenCV Mat structure.
+*/
 cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
 
   cv::Mat intr_mat;
@@ -150,20 +146,18 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
 }
 
 /**
-Function projects 2D change mask into 3-dimensional space using triangulation.
- */
+   Function projects 2D change mask into 3-dimensional space using triangulation.
+*/
 cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> &cam1, const vcg::Shot<float> &cam2, const cv::Mat &H){
 
   const clock_t begin_time = clock();
 
   std::vector<cv::Mat> tmpImgs;
-  
   std::vector<cv::Point2f> cam1_points, cam2_points;
   
   getPtsFromMask(chngMask, cam1_points);
   
   tmpImgs.push_back(chngMask);
-
   cv::Mat tmpMat(cv::Mat::zeros(chngMask.size(),CV_64FC1));
 
   for(int i = 0 ; i < cam1_points.size(); i++){
@@ -171,8 +165,8 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   }
 
   tmpImgs.push_back(tmpMat);
-  
   dispImgs(tmpImgs);
+  
   cv::Mat cam1_fmat;
   cv::Mat cam2_fmat;
  
@@ -214,8 +208,8 @@ ChangeDetectorIO::ChangeDetectorIO(std::string inDir){
   filenames.push_back(inDir);
 }
 /**
-Function saves frames from the input video for given frequency(frameRate).
- */
+   Function saves frames from the input video for given frequency(frameRate).
+*/
 void VidIO::saveImgFromVideo(std::string outDir, int frameRate){
   
   cv::VideoCapture vidCap(filenames[0]);
