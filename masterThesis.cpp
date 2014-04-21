@@ -138,8 +138,7 @@ void testPipeline(map<int,string> inputStrings){
 
       ImgIO::dispImgs(tmpImgs);
       */      
-      cout<<"finMask type:"<<finMask.type()<<"depth:"<<finMask.depth()<<endl;
-      cout<<"newImg type:" <<newImg.type()<<"depth:"<<newImg.depth()<<endl;
+
       if(no_of_elements < thres_val){
 	cv::Mat mask_3d_pts = ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H);
 	tmp_3d_masks.push_back(mask_3d_pts);
