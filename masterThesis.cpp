@@ -130,14 +130,14 @@ void testPipeline(map<int,string> inputStrings){
 
       int no_of_elements = cv::sum(finMask).val[0]/255;
       int thres_val = (finMask.rows*finMask.cols)/6;
-      /*    
+          
       tmpImgs.push_back(newImg);
       tmpImgs.push_back(oldImg);
       tmpImgs.push_back(finMask);
 
 
       ImgIO::dispImgs(tmpImgs);
-      */      
+            
 
       if(no_of_elements < thres_val){
 	cv::Mat mask_3d_pts = ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H);
