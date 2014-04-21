@@ -89,10 +89,6 @@ cv::Mat getImg(std::string fileDir);
 
 void readCmdInput(std::map<int,std::string> &inputStrings, int argc, char** argv);
 
-void inputHandler(std::vector<std::string> inputStrings);
-
-
-
 void getPlyFileVcg(std::string filename, MyMesh &m);
 
 void savePlyFileVcg(std::string filename, MyMesh &m);
@@ -108,7 +104,9 @@ if(pcl::io::loadPLYFile<T> (filename, *outCloud) == -1)
   PCL_ERROR ("Couldn't read file\n"); 
 }
 
-/* Function taken from http://stackoverflow.com/questions/60221/how-to-animate-the-command-line */
+/**
+ Function taken from http://stackoverflow.com/questions/60221/how-to-animate-the-command-line
+ */
 inline void DrawProgressBar(int len, double percent) {
   std::cout << "\x1B[2K"; // Erase the entire current line.
   std::cout << "\x1B[0E"; // Move to the beginning of the current line.
@@ -120,8 +118,9 @@ inline void DrawProgressBar(int len, double percent) {
       progress += " ";
     }
   }
+
   std::cout << "[" << progress << "] " << (static_cast<int>(100 * percent)) << "%";
-  std::flush(std::cout); // Required.
+  std::flush(std::cout);
 }
 
 #endif

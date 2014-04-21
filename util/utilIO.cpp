@@ -34,11 +34,16 @@ cv::Mat LinearLSTriangulation(cv::Point3d u,       //homogenous image point (u,v
 }
 */
 
+
+/**
+Function creates a mesh from 3D change mask points and saves the PLY file.
+ */
 void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::string &name){
   
   std::cout<<"Saving change 3D mask.."<<std::endl;
   
   MyMesh m;
+
   cv::Mat tmpMat;
   float w, x, y, z;
 
@@ -59,12 +64,15 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
       m.vert[c].SetS();
     }
   }
+
   DrawProgressBar(40, 1);
   vcg::tri::UpdateColor<MyMesh>::PerVertexConstant(m, vcg::Color4b::Red, true);
   std::cout<<"Vertices:"<<m.VN()<<std::endl;
   savePlyFileVcg(name,m);
 }
-
+/**
+Function displays all the images given in the input vector.
+*/
 void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
   
   std::ostringstream tmpString;
@@ -72,35 +80,39 @@ void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
 
   for(int i = 0 ; i < inImgs.size(); i++){
     tmpString<<i;
+
     cv::namedWindow(tmpString.str(), cv::WINDOW_NORMAL);
     cv::moveWindow(tmpString.str(), moveFactor, 0);
     cv::imshow(tmpString.str(), inImgs[i]);
+
     tmpString.flush();
     moveFactor+=moveFactor;
   }
   cv::waitKey(0);                   
 }
-
+/**
+Function extracts points from the binary change mask.
+ */
 void ImgIO::getPtsFromMask(const cv::Mat &mask, std::vector<cv::Point2f> &pts_vector){
 
   int rows = mask.rows;
   int cols = mask.cols;
-  pts_vector.clear();
-  cv::Point2f tmp_pt;
 
+  pts_vector.clear();
   std::cout<<"Cols:"<<cols<<" Rows:"<<rows<<std::endl;
 
   for(int r = 0; r < rows; r++){
     for(int c = 0; c < cols; c++){      
       if(mask.at<int>(r,c)>0){
-	tmp_pt.x = r;
-	tmp_pt.y = c;
-	pts_vector.push_back(tmp_pt);
+	pts_vector.push_back(cv::Point2f(r,c));
       }
     }
   }
 }
 
+/**
+Function extracts rotation translation matrix [R | t] from the VCG shot structure into OpenCV Mat structure
+ */
 cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
 
   cv::Mat mat_Rt(3,4, CV_64FC1);
@@ -117,6 +129,9 @@ cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
   return mat_Rt;
 }
 
+/**
+Function extracts intrinsic matrix from VCG shot structure into OpenCV Mat structure.
+ */
 cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
 
   cv::Mat intr_mat;
@@ -131,6 +146,9 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
   return intr_mat;
 }
 
+/**
+Function projects 2D change mask into 3-dimensional space using triangulation.
+ */
 cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> &cam1, const vcg::Shot<float> &cam2, const cv::Mat &H){
 
   const clock_t begin_time = clock();
@@ -178,8 +196,10 @@ ChangeDetectorIO::ChangeDetectorIO(std::vector<std::string> inVector){
 ChangeDetectorIO::ChangeDetectorIO(std::string inDir){
   filenames.push_back(inDir);
 }
-
-void VidIO::saveImgFromVideo(std::string outDir,int frameRate){
+/**
+Function saves frames from the input video for given frequency(frameRate).
+ */
+void VidIO::saveImgFromVideo(std::string outDir, int frameRate){
   
   cv::VideoCapture vidCap(filenames[0]);
   cv::Mat tmpImage;
@@ -200,6 +220,7 @@ void VidIO::saveImgFromVideo(std::string outDir,int frameRate){
   }
   std::cout<<"Done!"<<std::endl;
 }
+
 
 void CmdIO::callVsfm(std::string inCmd){
   
@@ -357,10 +378,6 @@ void readCmdInput(std::map<int,std::string> &inStrings, int argc, char** argv){
 	      argv[0]);
     }
   }
-}
-
-void inputHandler(std::vector<std::string> inputStrings){
-
 }
 
 void getPlyFileVcg(std::string filename, MyMesh &m){
