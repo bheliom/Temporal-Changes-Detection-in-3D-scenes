@@ -47,7 +47,7 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
   cv::Mat tmpMat;
   float w, x, y, z;
 
-  for(int i = 0 ; i < pts_3d.size() ; i++){
+  for(int i = 2 ; i < 3 ; i++){
     DrawProgressBar(40, (double)i/(double)pts_3d.size());
 
     for(int c = 0 ; c < pts_3d[i].cols; c++){
@@ -117,7 +117,7 @@ cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
   cv::Mat mat_Rt(3,4, CV_64FC1);
   mat_Rt = cv::Mat::zeros(3,4, CV_64FC1);
 
-  vcg::Matrix44f mat_rot = shot.GetWorldToExtrinsicsMatrix();
+  vcg::Matrix44f mat_rot = shot.GetExtrinsicsToWorldMatrix();
   
   for(int i = 0 ; i < 3 ; i++){
     for(int j = 0 ; j < 4 ; j++){
