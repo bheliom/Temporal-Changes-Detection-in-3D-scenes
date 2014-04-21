@@ -126,7 +126,7 @@ void testPipeline(map<int,string> inputStrings){
 
       warpPerspective(diffImg, outImgG, H, diffImg.size(), cv::WARP_INVERSE_MAP);
       
-      cv::cvtColor(outImgG, finThres, CV_BGR2GRAY);      
+      //      cv::cvtColor(outImgG, finThres, CV_BGR2GRAY);      
       cv::threshold(finThres, finMask, 30, 255, CV_THRESH_OTSU);
 
       int no_of_elements = cv::sum(finMask).val[0]/255;

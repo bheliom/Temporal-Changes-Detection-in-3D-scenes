@@ -101,12 +101,8 @@ void ImgIO::getPtsFromMask(const cv::Mat &mask, std::vector<cv::Point2f> &pts_ve
   std::cout<<"Cols:"<<cols<<" Rows:"<<rows<<std::endl;
   
   for(int r = 0; r < rows; r++){
-    std::cout<< "tu"<<std::endl;
     for(int c = 0; c < cols; c++){      
-      std::cout<< "tururu"<<std::endl;
-      std::cout<< mask.at<int>(r,c)<<std::endl;
       if(mask.at<int>(r,c)==255){
-	std::cout<< "tutu"<<std::endl;
 	pts_vector.push_back(cv::Point2f(r,c));
       }
     }
@@ -357,7 +353,7 @@ void getImgSet(std::vector<std::string> fileDirs, std::vector<cv::Mat> &outImgSe
 
 cv::Mat getImg(std::string fileDirs){
   
-  return cv::imread(fileDirs.c_str());//, CV_LOAD_IMAGE_COLOR);
+  return cv::imread(fileDirs.c_str(), CV_LOAD_IMAGE_GRAYSCALE);//, CV_LOAD_IMAGE_COLOR);
 }
 
 void readCmdInput(std::map<int,std::string> &inStrings, int argc, char** argv){
