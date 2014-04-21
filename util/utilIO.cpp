@@ -55,8 +55,8 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
       tmpMat  = pts_3d[i].col(c);
 
       w = tmpMat.at<float>(3,0);
-      y = tmpMat.at<float>(0,0)/w;
-      x = tmpMat.at<float>(1,0)/w;
+      x = tmpMat.at<float>(0,0)/w;
+      y = tmpMat.at<float>(1,0)/w;
       z = tmpMat.at<float>(2,0)/w;
 
       vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(x,y,z));
@@ -117,11 +117,16 @@ cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
   cv::Mat mat_Rt(3,4, CV_64FC1);
   mat_Rt = cv::Mat::zeros(3,4, CV_64FC1);
 
-  vcg::Matrix44f mat_rot = shot.GetWorldToExtrinsicsMatrix();
+  vcg::Matrix44f rotM;
+  shot.Extrinsics.Rot().ToMatrix(rotM);
+  
+  rotM.SetTranslate(shot.Extrinsics.Tra());
+
+  //  vcg::Matrix44f mat_rot = shot.GetWorldToExtrinsicsMatrix();
   
   for(int i = 0 ; i < 3 ; i++){
     for(int j = 0 ; j < 4 ; j++){
-      mat_Rt.at<double>(i,j) = mat_rot[i][j];
+      mat_Rt.at<double>(i,j) = rotM[i][j];
     }   
   }
 
@@ -178,12 +183,16 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   cv::Mat pnts3D(1, cam1_points.size(), CV_64FC4);
 
   cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D);
+
+  
   
   std::cout << "Time:"<<float( clock () - begin_time ) /  CLOCKS_PER_SEC << std::endl;
   std::cout << "No of 3D points:"<<pnts3D.size() << std::endl;
   
   return pnts3D;
 }
+
+
 
 /**
    Class responsible for Input/Output operations.
