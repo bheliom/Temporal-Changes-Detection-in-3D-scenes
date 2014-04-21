@@ -117,7 +117,7 @@ cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
   cv::Mat mat_Rt(3,4, CV_64FC1);
   mat_Rt = cv::Mat::zeros(3,4, CV_64FC1);
 
-  vcg::Matrix44f mat_rot = shot.GetExtrinsicsToWorldMatrix();
+  vcg::Matrix44f mat_rot = shot.GetWorldToExtrinsicsMatrix();
   
   for(int i = 0 ; i < 3 ; i++){
     for(int j = 0 ; j < 4 ; j++){
@@ -151,9 +151,12 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
 cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> &cam1, const vcg::Shot<float> &cam2, const cv::Mat &H){
 
   const clock_t begin_time = clock();
-
+  
+  std::vector<cv::Mat> tmpImgs;
   std::vector<cv::Point2f> cam1_points, cam2_points;
   
+  tmpImgs.push_back(chngMask);
+
   getPtsFromMask(chngMask, cam1_points);
   
   cv::Mat cam1_fmat;
@@ -171,6 +174,18 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   std::cout<<"Rt 1:\n"<<cam1_Rt<<"\n intr 1:\n"<<cam1_intr<<std::endl;
 
   cv::perspectiveTransform(cam1_points, cam2_points, H);  
+
+  cv::Mat tmp1(cv::Mat::zeros(chngMask.size(), CV_8UC1));
+  cv::Mat tmp2(cv::Mat::zeros(chngMask.size(), CV_8UC1));
+
+  for(int i = 0 ; i < cam1_points.size(); i++){
+    tmp1.at<uchar>(cam1_points[i].x, cam1_points[i].y) = 255;
+    tmp2.at<uchar>(cam2_points[i].x, cam2_points[i].y) = 255;
+  }
+
+  tmpImgs.push_back(tmp1);
+  tmpImgs.push_back(tmp2);
+  dispImgs(tmpImgs);
  
   std::cout<<"P1 size:"<<cam1_points.size()<<" P2 size:"<<cam2_points.size()<<std::endl;
   std::cout<<"Sum of chng:"<<cv::sum(chngMask).val[0]/255<<std::endl;
