@@ -45,7 +45,7 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
   MyMesh m;
 
   cv::Mat tmpMat;
-  float w, x, y, z;
+  double w, x, y, z;
 
   for(int i = 2 ; i < 3 ; i++){
     DrawProgressBar(40, (double)i/(double)pts_3d.size());
@@ -54,10 +54,10 @@ void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::strin
       
       tmpMat  = pts_3d[i].col(c);
 
-      w = tmpMat.at<float>(3,0);
-      x = tmpMat.at<float>(0,0)/w;
-      y = tmpMat.at<float>(1,0)/w;
-      z = tmpMat.at<float>(2,0)/w;
+      w = tmpMat.at<double>(3,0);
+      x = tmpMat.at<double>(0,0)/w;
+      y = tmpMat.at<double>(1,0)/w;
+      z = tmpMat.at<double>(2,0)/w;
 
       vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(x,y,z));
 
@@ -114,19 +114,7 @@ void ImgIO::getPtsFromMask(const cv::Mat &mask, std::vector<cv::Point2f> &pts_ve
 */
 cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
 
-  cv::Mat mat_Rt(3,4, CV_64FC1);
-  mat_Rt = cv::Mat::zeros(3,4, CV_64FC1);
 
-  vcg::Matrix44f rotM = shot.Extrinsics.Rot();
-  vcg::Matrix44f mat_rot = vcg::Matrix44f().SetTranslate(-shot.Extrinsics.Tra()) * rotM.transpose();
-  
-  for(int i = 0 ; i < 3 ; i++){
-    for(int j = 0 ; j < 4 ; j++){
-      mat_Rt.at<double>(i,j) = static_cast<double>(mat_rot[i][j]);
-    }   
-  }
-
-  /*
   cv::Mat mat_Rt(3,4, CV_64FC1);
   mat_Rt = cv::Mat::zeros(3,4, CV_64FC1);
 
@@ -137,8 +125,7 @@ cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
       mat_Rt.at<double>(i,j) = static_cast<double>(mat_rot[i][j]);
     }   
   }
-  */
-
+ 
   return mat_Rt;
 }
 
