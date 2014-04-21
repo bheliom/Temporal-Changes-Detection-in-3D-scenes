@@ -102,7 +102,7 @@ void ImgIO::getPtsFromMask(const cv::Mat &mask, std::vector<cv::Point2f> &pts_ve
   
   for(int r = 0; r < rows; r++){
     for(int c = 0; c < cols; c++){      
-      if(mask.at<int>(r,c)==255){
+      if(mask.at<uchar>(r,c)==255){
 	pts_vector.push_back(cv::Point2f(r,c));
       }
     }
