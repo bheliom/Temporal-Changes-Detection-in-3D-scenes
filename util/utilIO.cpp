@@ -114,8 +114,8 @@ void ImgIO::getPtsFromMask(const cv::Mat &mask, std::vector<cv::Point2f> &pts_ve
 */
 cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
 
-  cv::Mat mat_Rt(3,4, CV_64FC1);
-  mat_Rt = cv::Mat::zeros(3,4, CV_64FC1);
+  cv::Mat mat_Rt(3,4, CV_32FC1);
+  mat_Rt = cv::Mat::zeros(3,4, CV_32FC1);
 
   vcg::Matrix44f rotM = shot.Extrinsics.Rot();
   rotM.SetTranslate(shot.Extrinsics.Tra());
@@ -139,7 +139,7 @@ cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
 cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
 
   cv::Mat intr_mat;
-  intr_mat = cv::Mat::zeros(3,3, CV_64FC1);
+  intr_mat = cv::Mat::zeros(3,3, CV_32FC1);
 
   intr_mat.at<double>(0,0) = shot.Intrinsics.FocalMm/shot.Intrinsics.PixelSizeMm[0];
   intr_mat.at<double>(1,1) = shot.Intrinsics.FocalMm/shot.Intrinsics.PixelSizeMm[1];
