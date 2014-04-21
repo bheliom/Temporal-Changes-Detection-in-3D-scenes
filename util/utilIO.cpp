@@ -117,6 +117,19 @@ cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
   cv::Mat mat_Rt(3,4, CV_64FC1);
   mat_Rt = cv::Mat::zeros(3,4, CV_64FC1);
 
+  vcg::Matrix44f mat_rot = shot.Extrinsics.Rot();
+  mat_rot.SetTranslate(shot.Extrinsics.Tra());
+  
+  for(int i = 0 ; i < 3 ; i++){
+    for(int j = 0 ; j < 4 ; j++){
+      mat_Rt.at<double>(i,j) = static_cast<double>(mat_rot[i][j]);
+    }   
+  }
+
+  /*
+  cv::Mat mat_Rt(3,4, CV_64FC1);
+  mat_Rt = cv::Mat::zeros(3,4, CV_64FC1);
+
   vcg::Matrix44f mat_rot = shot.GetWorldToExtrinsicsMatrix();
   
   for(int i = 0 ; i < 3 ; i++){
@@ -124,6 +137,7 @@ cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
       mat_Rt.at<double>(i,j) = static_cast<double>(mat_rot[i][j]);
     }   
   }
+  */
 
   return mat_Rt;
 }
