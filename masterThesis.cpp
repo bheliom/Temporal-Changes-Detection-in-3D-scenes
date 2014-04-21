@@ -118,13 +118,16 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat finThres;
 
       cv::Mat finMask2;
-
+      std::cout<<"read";
       cv::Mat H = ImgProcessing::getImgFundMat(newImg, oldImg);
+      
+      std::cout<<"geMat";
       warpPerspective(newImg, outImg, H, newImg.size());
-     
+           std::cout<<"warp";
       cv::Mat diffImg = cv::abs(oldImg-outImg);
-
+  
       warpPerspective(diffImg, outImgG, H, diffImg.size(), cv::WARP_INVERSE_MAP);
+      
       
       //      cv::cvtColor(outImgG, finThres, CV_BGR2GRAY);      
       cv::threshold(finThres, finMask, 30, 255, CV_THRESH_OTSU);
