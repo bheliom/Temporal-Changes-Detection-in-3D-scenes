@@ -353,7 +353,7 @@ void getImgSet(std::vector<std::string> fileDirs, std::vector<cv::Mat> &outImgSe
 
 cv::Mat getImg(std::string fileDirs){
   
-  return cv::imread(fileDirs.c_str(), 0);//, CV_LOAD_IMAGE_COLOR);
+  return cv::imread(fileDirs.c_str());//, CV_LOAD_IMAGE_COLOR);
 }
 
 void readCmdInput(std::map<int,std::string> &inStrings, int argc, char** argv){
