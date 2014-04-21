@@ -180,7 +180,8 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
 
   for(int i = 0 ; i < cam1_points.size(); i++){
     tmp1.at<uchar>(cam1_points[i].x, cam1_points[i].y) = 255;
-    tmp2.at<uchar>(cam2_points[i].x, cam2_points[i].y) = 255;
+    if(cam2_points[i].x>=0 && cam2_points[i].y>=0)
+      tmp2.at<uchar>(cam2_points[i].x, cam2_points[i].y) = 255;
   }
 
   tmpImgs.push_back(tmp1);
