@@ -125,7 +125,7 @@ cv::Mat ImgIO::getRtMatrix(const vcg::Shot<float> &shot){
   
   for(int i = 0 ; i < 3 ; i++){
     for(int j = 0 ; j < 4 ; j++){
-      mat_Rt.at<double>(i,j) = rotM[i][j];
+      mat_Rt.at<float>(i,j) = rotM[i][j];
     }   
     //mat_Rt.at<double>(i,3) = trans_point[i];
   }
