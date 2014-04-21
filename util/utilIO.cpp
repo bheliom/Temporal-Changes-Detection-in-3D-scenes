@@ -165,8 +165,8 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   cv::Mat cam1_intr = getIntrMatrix(cam1);
   cv::Mat cam2_intr = getIntrMatrix(cam2);
 
-  cam1_fmat = cam1_Rt;
-  cam2_fmat = cam2_Rt;
+  cam1_fmat = cam1_intr*cam1_Rt;
+  cam2_fmat = cam2_intr*cam2_Rt;
 
   std::cout<<"Rt 1:\n"<<cam1_Rt<<"\n intr 1:\n"<<cam1_intr<<std::endl;
 
@@ -178,7 +178,7 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   cv::Mat pnts3D(1, cam1_points.size(), CV_64FC4);
 
   cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D);
-
+  
   std::cout << "Time:"<<float( clock () - begin_time ) /  CLOCKS_PER_SEC << std::endl;
   std::cout << "No of 3D points:"<<pnts3D.size() << std::endl;
   
