@@ -51,7 +51,7 @@ public:
   ImgIO() : ChangeDetectorIO(){};
   static void dispImgs(const std::vector<cv::Mat>&);
   static void getPtsFromMask(const cv::Mat&, std::vector<cv::Point2f>&);
-  static cv::Mat projChngMaskTo3D(const cv::Mat&, const cv::Mat&, const vcg::Shot<float>&, const vcg::Shot<float>&, const cv::Mat&);
+  static cv::Mat projChngMaskTo3D(const cv::Mat&, const vcg::Shot<float>&, const vcg::Shot<float>&, const cv::Mat&);
   static cv::Mat getRtMatrix(const vcg::Shot<float>&);
   static cv::Mat getIntrMatrix(const vcg::Shot<float>&);
 };
