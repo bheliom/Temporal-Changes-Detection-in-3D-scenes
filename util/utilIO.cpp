@@ -164,7 +164,7 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   cv::Mat tmpMat(cv::Mat::zeros(chngMask.size(),CV_64FC1));
 
   for(int i = 0 ; i < cam1_points.size(); i++){
-    tmpMat.at<int>(cam1_points[i].x, cam1_points[i].y) = 255;
+    tmpMat.at<double>(cam1_points[i].x, cam1_points[i].y) = 255;
   }
 
   tmpImgs.push_back(tmpMat);
