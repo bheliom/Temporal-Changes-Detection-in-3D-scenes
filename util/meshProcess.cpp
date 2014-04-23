@@ -77,7 +77,7 @@ bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
       img2_pts.push_back( keyPtsImg2[ good_matches[i].trainIdx ].pt );
     }
 
-  H = cv::findHomography(img1_pts, img2_pts, CV_RANSAC);
+  H = cv::findHomography(img1_pts, img2_pts, CV_RANSAC, 1);
 
   return true;
 }
