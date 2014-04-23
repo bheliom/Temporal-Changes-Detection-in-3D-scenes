@@ -68,7 +68,8 @@ bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
 
   if(good_matches.size()<4)
     return false;
-
+  
+  std::cout<<"Good matches size:" << good_matches.size()<<std::endl;
   for( int i = 0; i < good_matches.size(); i++ )
     {
       //-- Get the keypoints from the good matches
