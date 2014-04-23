@@ -13,7 +13,8 @@
 typedef vcg::tri::UpdateTopology<MyMesh>::PEdge SingleEdge;
 
 cv::Mat ImgProcessing::diffThres(cv::Mat img1, cv::Mat img2){
-  cv::Mat F = getImgFundMat(img1, img2);
+  cv::Mat F;
+  getImgFundMat(img1, img2, F);
   cv::Mat outImg;  
   cv::warpPerspective(img1, outImg, F, img2.size());
   
@@ -23,7 +24,7 @@ cv::Mat ImgProcessing::diffThres(cv::Mat img1, cv::Mat img2){
 /**
 Function finds fundamental matrix F for two input images. Function mostly based on OpenCV documentation tutorials.
  */
-cv::Mat ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2){
+bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
 
   //-- Step 1: Detect the keypoints using SURF Detector
   int minHessian = 400;
@@ -65,6 +66,9 @@ cv::Mat ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2){
   std::vector<cv::Point2f> img1_pts;
   std::vector<cv::Point2f> img2_pts;
 
+  if(good_matches.size()<4)
+    return false;
+
   for( int i = 0; i < good_matches.size(); i++ )
     {
       //-- Get the keypoints from the good matches
@@ -72,9 +76,9 @@ cv::Mat ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2){
       img2_pts.push_back( keyPtsImg2[ good_matches[i].trainIdx ].pt );
     }
 
-  cv::Mat H = cv::findHomography(img1_pts, img2_pts, CV_RANSAC);
+  H = cv::findHomography(img1_pts, img2_pts, CV_RANSAC);
 
-  return H;
+  return true;
 }
 
 

@@ -33,7 +33,7 @@ class ImgProcessing : public DataProcessing{
 public:
   ImgProcessing(MyMesh &inM) : DataProcessing(inM){};
   ImgProcessing() : DataProcessing(){};
-  static cv::Mat getImgFundMat(cv::Mat, cv::Mat);
+  static bool getImgFundMat(cv::Mat, cv::Mat, cv::Mat&);
   cv::Mat alignImages(cv::Mat,cv::Mat);
   cv::Mat diffThres(cv::Mat,cv::Mat);
     

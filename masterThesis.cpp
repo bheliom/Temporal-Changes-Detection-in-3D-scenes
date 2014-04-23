@@ -110,42 +110,38 @@ void testPipeline(map<int,string> inputStrings){
     vector<cv::Mat> tmpImgs;
     if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
 
-      cv::Mat newImg = getImg(imgFilenames[i]);
-      cv::Mat oldImg = getImg(image_filenames[pointIdxNKNSearch[0]]);
-      cv::Mat outImgG = oldImg.clone();
+      cv::Mat newImg( getImg(imgFilenames[i]) );
+      cv::Mat oldImg( getImg(image_filenames[pointIdxNKNSearch[0]]) );
+      cv::Mat outImgG( oldImg.clone() );
+
       cv::Mat outImg;
       cv::Mat finMask;
       cv::Mat finThres;
       
-      cv::Mat H = ImgProcessing::getImgFundMat(newImg, oldImg);
+      cv::Mat H;
+
+      if(ImgProcessing::getImgFundMat(newImg, oldImg, H)){
       
-      warpPerspective(newImg, outImg, H, newImg.size());
+	warpPerspective(newImg, outImg, H, newImg.size());
       
-      cv::Mat diffImg = cv::abs(oldImg-outImg);
+	cv::Mat diffImg(cv::abs(oldImg-outImg));
   
-      warpPerspective(diffImg, outImgG, H, diffImg.size(), cv::WARP_INVERSE_MAP);
+	warpPerspective(diffImg, outImgG, H, diffImg.size(), cv::WARP_INVERSE_MAP);
             
-      cv::cvtColor(outImgG, finThres, CV_BGR2GRAY);      
-      cv::threshold(finThres, finMask, 30, 255, CV_THRESH_OTSU);
-
-      int no_of_elements = cv::sum(finMask).val[0]/255;
-      int thres_val = (finMask.rows*finMask.cols)/6;
+	cv::cvtColor(outImgG, finThres, CV_BGR2GRAY);      
+	cv::threshold(finThres, finMask, 30, 255, CV_THRESH_OTSU);
           
-      tmpImgs.push_back(newImg);
-      tmpImgs.push_back(oldImg);
-      tmpImgs.push_back(finMask);
+	tmpImgs.push_back(newImg);
+	tmpImgs.push_back(oldImg);
+	tmpImgs.push_back(finMask);
 
-
-      ImgIO::dispImgs(tmpImgs);
-            
-
-      if(no_of_elements < thres_val){
-	cv::Mat mask_3d_pts = ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H);
+	ImgIO::dispImgs(tmpImgs);
+      
+	cv::Mat mask_3d_pts( ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H));
 	tmp_3d_masks.push_back(mask_3d_pts);
       }
     }
   }
-
   MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask3d.ply");
 }
 
@@ -223,7 +219,7 @@ void testBundler(string filename, string filename2, string filename3){
 
 }
 /*
-void testNN(map<int,string> inputStrings){
+  void testNN(map<int,string> inputStrings){
 
   pcl::PointCloud<pcl::PointXYZ>::Ptr pmvsCloud(new pcl::PointCloud<pcl::PointXYZ>);
   pcl::PointCloud<pcl::PointXYZ>::Ptr mCloud(new pcl::PointCloud<pcl::PointXYZ>);
@@ -246,48 +242,48 @@ void testNN(map<int,string> inputStrings){
 
 
   for(int i = 0 ; i < pmvsMesh.vert.size(); i++)
-    {
+  {
 
-      if(!named_hv[i].empty())
-	{
+  if(!named_hv[i].empty())
+  {
 	  
-	  for(int j = 0; j< named_hv[i].size(); j++)
-	    {
-	      int idImg = named_hv[i].at(j).id_img;
-	      cv::Mat image = getImg(image_filenames[idImg]);
-	      cv::Size s = image.size();
+  for(int j = 0; j< named_hv[i].size(); j++)
+  {
+  int idImg = named_hv[i].at(j).id_img;
+  cv::Mat image = getImg(image_filenames[idImg]);
+  cv::Size s = image.size();
 
-	      vcg::Point2i tmpDisp(s.width/2+named_hv[i].at(j).x,s.height/2-named_hv[i].at(j).y);
-	      vcg::Point3f tmpDisp2 = pmvsMesh.vert[i].P();
+  vcg::Point2i tmpDisp(s.width/2+named_hv[i].at(j).x,s.height/2-named_hv[i].at(j).y);
+  vcg::Point3f tmpDisp2 = pmvsMesh.vert[i].P();
 	      
-	      vcg::Point2i tmpDisp3 = getPtImgCoord(shots[idImg].Project(tmpDisp2), shots[i]);
-	      vcg::Point2f tmpDisp4 = shots[idImg].Project(tmpDisp2);
-	      tmpDisp4[0] = s.width-tmpDisp4.X();
-	      tmpDisp4[1] = s.height - tmpDisp4.Y();
+  vcg::Point2i tmpDisp3 = getPtImgCoord(shots[idImg].Project(tmpDisp2), shots[i]);
+  vcg::Point2f tmpDisp4 = shots[idImg].Project(tmpDisp2);
+  tmpDisp4[0] = s.width-tmpDisp4.X();
+  tmpDisp4[1] = s.height - tmpDisp4.Y();
 
 	      
-	      for(int k = 1; k<100; k++)
-		pmvsMesh.vert[i+k].SetS();
+  for(int k = 1; k<100; k++)
+  pmvsMesh.vert[i+k].SetS();
       
-	      vcg::tri::UpdateSelection<MyMesh>::FaceFromVertexLoose(m);
-	      vcg::tri::UpdateColor<MyMesh>::PerFaceConstant(pmvsMesh,vcg::Color4b::Red, true);
-	      vcg::tri::UpdateColor<MyMesh>::PerVertexConstant(pmvsMesh,vcg::Color4b::Red, true);
+  vcg::tri::UpdateSelection<MyMesh>::FaceFromVertexLoose(m);
+  vcg::tri::UpdateColor<MyMesh>::PerFaceConstant(pmvsMesh,vcg::Color4b::Red, true);
+  vcg::tri::UpdateColor<MyMesh>::PerVertexConstant(pmvsMesh,vcg::Color4b::Red, true);
       
-	      savePlyFileVcg("testColor3.ply", pmvsMesh);
+  savePlyFileVcg("testColor3.ply", pmvsMesh);
 
-	      std::cout<<"Dimensions:"<< s.width << " " << s.height << std::endl;
-	      std::cout<<"SIFT:"<< tmpDisp.X()<<" "<<tmpDisp.Y()<<std::endl;
-	      std::cout<<"Point X Y:" << tmpDisp3.X()<< " " <<tmpDisp3.Y() << std::endl;
-	      std::cout<<"difference"<< tmpDisp.X()-tmpDisp3.X() << " "<<tmpDisp.Y()-tmpDisp3.Y()<<std::endl;
-	      static cv::Scalar color = cv::Scalar(255, 0, 0);	
-	      static cv::Scalar color1 = cv::Scalar(0, 255, 0);	
-	      cv::circle(image, cv::Point(tmpDisp4.X(),tmpDisp4.Y()), 50 , color1, 15);
-	      cv::circle(image, cv::Point(tmpDisp.X(),tmpDisp.Y()), 50 , color, 15);
-	      dispProjPt(tmpDisp3, image);
-	      dispProjPt(tmpDisp, image);
-	    }
-	}
-    }
+  std::cout<<"Dimensions:"<< s.width << " " << s.height << std::endl;
+  std::cout<<"SIFT:"<< tmpDisp.X()<<" "<<tmpDisp.Y()<<std::endl;
+  std::cout<<"Point X Y:" << tmpDisp3.X()<< " " <<tmpDisp3.Y() << std::endl;
+  std::cout<<"difference"<< tmpDisp.X()-tmpDisp3.X() << " "<<tmpDisp.Y()-tmpDisp3.Y()<<std::endl;
+  static cv::Scalar color = cv::Scalar(255, 0, 0);	
+  static cv::Scalar color1 = cv::Scalar(0, 255, 0);	
+  cv::circle(image, cv::Point(tmpDisp4.X(),tmpDisp4.Y()), 50 , color1, 15);
+  cv::circle(image, cv::Point(tmpDisp.X(),tmpDisp.Y()), 50 , color, 15);
+  dispProjPt(tmpDisp3, image);
+  dispProjPt(tmpDisp, image);
+  }
+  }
+  }
   //  visibilityEstimation(m, pmvsMesh, pmvsCloud, 30, mCloud, shots, image_filenames);
-}
+  }
 */
