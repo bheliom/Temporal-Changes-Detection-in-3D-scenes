@@ -1,6 +1,8 @@
 #include "utilIO.hpp"
 #include "pbaDataInterface.h"
 #include "../common/globVariables.hpp"
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/filters/voxel_grid_occlusion_estimation.h>
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
@@ -10,30 +12,23 @@
 /**
    Function creates a mesh from 3D change mask points and saves the PLY file.
 */
-void MeshIO::saveChngMask3d(const std::vector<cv::Mat> &pts_3d, const std::string &name){
+void MeshIO::saveChngMask3d(const std::vector<std::vector<vcg::Point3f> > &pts_3d, const std::string &name){
   
   std::cout<<"Saving change 3D mask.."<<std::endl;
   
   MyMesh m;
-
-  cv::Mat tmpMat;
-  float w, x, y, z;
+  float x, y, z;
   int count = 0;
 
   for(int i = 2 ; i < 5 ; i++){
     DrawProgressBar(40, (double)i/(double)pts_3d.size());
 
-    for(int c = 0 ; c < pts_3d[i].cols; c++){
-      
-      tmpMat  = pts_3d[i].col(c);
-
-      w = tmpMat.at<float>(3,0);
-      x = tmpMat.at<float>(0,0)/w;
-      y = tmpMat.at<float>(1,0)/w;
-      z = tmpMat.at<float>(2,0)/w;
+    for(int j = 0 ; j < pts_3d[i].size(); j++){
+      x = pts_3d[i].at(j).X();
+      y = pts_3d[i].at(j).Y();
+      z = pts_3d[i].at(j).Z();
 
       vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(x,y,z));
-
       m.vert[count++].SetS();
     }
   }
@@ -118,6 +113,63 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
 
   return intr_mat;
 }
+
+/**
+Function projects 2D change mask into 3-dimensional space using point cloud voxelization and computation of ray intersections with the voxels
+*/
+std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const cv::Mat &chng_mask, const vcg::Shot<float> &shot){
+  
+
+  std::vector<vcg::Point3f> out_pts;
+
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+  
+  MeshIO::getPlyFilePCL(filename, cloud);
+
+  //  pcl::VoxelGridOcclusionEstimation<pcl::PointXYZ> voxel_grid;
+  rayBox voxel_grid;
+
+  voxel_grid.setInputCloud(cloud);
+  voxel_grid.initializeVoxelGrid();
+  
+  std::vector<cv::Point2f> mask_pts;
+  getPtsFromMask(chng_mask, mask_pts);
+
+  for(int i = 0 ; i < mask_pts.size(); i++){
+
+    Eigen::Vector4f origin;
+    Eigen::Vector4f direction;
+    
+    vcg::Point3f tmp_pt = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 0);
+    vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 5);
+
+    origin[0] = tmp_pt[0];
+    origin[1] = tmp_pt[1];
+    origin[2] = tmp_pt[2];
+
+    direction[0] = tmp_dir[0];
+    direction[1] = tmp_dir[1];
+    direction[2] = tmp_dir[2];
+    
+    Eigen::Vector3i vox_coord = voxel_grid.getGridCoordinates(direction[0],direction[1],direction[2]);
+    int is_occ = 0;
+    int mp_factor = 1.5;
+
+    while(voxel_grid.occlusionEstimation(is_occ, vox_coord)==0){
+      direction*=mp_factor;
+      vox_coord = voxel_grid.getGridCoordinates(direction[0],direction[1],direction[2]);        
+    }
+    
+    tmp_pt[0] = direction[0];
+    tmp_pt[1] = direction[1];
+    tmp_pt[2] = direction[2];
+    
+    out_pts.push_back(tmp_pt);
+  } 
+
+  return out_pts;
+}
+
 
 /**
    Function projects 2D change mask into 3-dimensional space using triangulation.

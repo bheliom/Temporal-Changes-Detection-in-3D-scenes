@@ -12,6 +12,24 @@
 
 typedef vcg::tri::UpdateTopology<MyMesh>::PEdge SingleEdge;
 
+void DataProcessing::cvt3Dmat2vcg(const cv::Mat &inMat, std::vector<vcg::Point3f> &out_pts){
+
+  cv::Mat tmpMat;
+  float w, x, y, z;
+
+  for(int c = 0 ; c < inMat.cols; c++){
+      
+      tmpMat  = inMat.col(c);
+
+      w = tmpMat.at<float>(3,0);
+      x = tmpMat.at<float>(0,0)/w;
+      y = tmpMat.at<float>(1,0)/w;
+      z = tmpMat.at<float>(2,0)/w;
+      
+      out_pts.push_back(vcg::Point3f(x,y,z));
+    }
+}
+
 cv::Mat ImgProcessing::diffThres(cv::Mat img1, cv::Mat img2){
   cv::Mat F;
   getImgFundMat(img1, img2, F);
@@ -66,7 +84,7 @@ bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
   std::vector<cv::Point2f> img1_pts;
   std::vector<cv::Point2f> img2_pts;
 
-  if(good_matches.size()<4)
+  if(good_matches.size()>200)
     return false;
   
   std::cout<<"Good matches size:" << good_matches.size()<<std::endl;
@@ -77,7 +95,7 @@ bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
       img2_pts.push_back( keyPtsImg2[ good_matches[i].trainIdx ].pt );
     }
 
-  H = cv::findHomography(img1_pts, img2_pts, CV_RANSAC, 1);
+  H = cv::findHomography(img1_pts, img2_pts, CV_RANSAC, 5);
 
   return true;
 }

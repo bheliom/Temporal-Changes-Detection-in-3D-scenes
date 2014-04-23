@@ -20,6 +20,7 @@ protected:
 public:
   DataProcessing(MyMesh &inM){vcg::tri::Append<MyMesh,MyMesh>::MeshCopy(m,inM);}
   DataProcessing(){};
+  static void cvt3Dmat2vcg(const cv::Mat&, std::vector<vcg::Point3f>&);
 };
 
 class MeshProcessing : public DataProcessing{

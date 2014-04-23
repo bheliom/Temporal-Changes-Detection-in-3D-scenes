@@ -14,6 +14,7 @@
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <pcl/filters/voxel_grid_occlusion_estimation.h>
 
 #include "pbaUtil.h"
 
@@ -25,6 +26,18 @@ VisualSFM sfm+resume+fixcam <fullPathInput>/input.nvm <fullPathOutput>/output.nv
 
 It requires an image list called [input].nvm.txt with new images paths
 */
+
+class rayBox : public pcl::VoxelGridOcclusionEstimation<pcl::PointXYZ>{
+
+public:
+
+float getBoxIntersection(const Eigen::Vector4f &origin, const Eigen::Vector4f &direction){
+
+return rayBoxIntersection(origin, direction);
+
+}
+
+};
 
 class ChangeDetectorIO{
 
@@ -40,7 +53,14 @@ class MeshIO : public ChangeDetectorIO{
 
 public:
   MeshIO() : ChangeDetectorIO(){};
-  static void saveChngMask3d(const std::vector<cv::Mat>&, const std::string&);
+  static void saveChngMask3d(const std::vector<std::vector<vcg::Point3f> >&, const std::string&);
+
+  template <typename T>
+  static void getPlyFilePCL(const std::string filename, boost::shared_ptr<pcl::PointCloud<T> > outCloud){  
+    if(pcl::io::loadPLYFile<T> (filename, *outCloud) == -1)
+      PCL_ERROR ("Couldn't read file\n"); 
+  }
+  
 };
 
 class ImgIO : public ChangeDetectorIO{
@@ -52,6 +72,7 @@ public:
   static void dispImgs(const std::vector<cv::Mat>&);
   static void getPtsFromMask(const cv::Mat&, std::vector<cv::Point2f>&);
   static cv::Mat projChngMaskTo3D(const cv::Mat&, const vcg::Shot<float>&, const vcg::Shot<float>&, const cv::Mat&);
+  static std::vector<vcg::Point3f> projChngMask(const std::string&, const cv::Mat&, const vcg::Shot<float>&);
   static cv::Mat getRtMatrix(const vcg::Shot<float>&);
   static cv::Mat getIntrMatrix(const vcg::Shot<float>&);
 };

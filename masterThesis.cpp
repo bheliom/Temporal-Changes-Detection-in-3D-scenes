@@ -41,7 +41,7 @@ void testProjections(map<int,string> inputStrings){
 void testPipeline(map<int,string> inputStrings){
 
   //Get initial NVM file
-  vector<cv::Mat> tmp_3d_masks;
+  vector<vector<vcg::Point3f> > tmp_3d_masks;
 
   vector<vcg::Shot<float> > shots;
   vector<vcg::Shot<float> > newShots;
@@ -134,11 +134,17 @@ void testPipeline(map<int,string> inputStrings){
 	tmpImgs.push_back(newImg);
 	tmpImgs.push_back(oldImg);
 	tmpImgs.push_back(finMask);
-
 	ImgIO::dispImgs(tmpImgs);
-      
-	cv::Mat mask_3d_pts( ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H));
-	tmp_3d_masks.push_back(mask_3d_pts);
+	/*
+	cv::Mat mask_3d_pts(ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H));
+	std::vector<vcg::Point3f> tmp_vec_pts;
+	DataProcessing::cvt3Dmat2vcg(mask_3d_pts, tmp_vec_pts);
+	
+
+	tmp_3d_masks.push_back(tmp_vec_pts);
+	*/
+
+	tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i]));
       }
     }
   }
