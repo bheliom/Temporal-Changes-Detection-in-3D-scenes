@@ -126,7 +126,9 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   
   MeshIO::getPlyFilePCL(filename, cloud);
 
-  std::cout<< cloud->points.size();
+  shot.Extrinsics.Tra().ToEigenVector(cloud->sensor_origin_);
+
+  std::cout<<cloud->points.size();
 
   //pcl::VoxelGridOcclusionEstimation<pcl::PointXYZ> voxel_grid;
 
@@ -143,6 +145,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   vcg::Point3f tmp_pt;
 
   shot.Extrinsics.Tra().ToEigenVector(origin);  
+  
   
   for(int i = 0 ; i < mask_pts.size(); i++){
 
@@ -168,7 +171,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
 
     voxel_grid.occlusionEstimation(is_occ, vox_coord);
 
-    while(is_occ==0 && cnt<10){
+    while(is_occ==0 && cnt<5){
 
       direction = origin + mp_factor*direction;  
       vox_coord = voxel_grid.getGridCoord(direction[0] , direction[1], direction[2]);        
@@ -177,6 +180,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
       cnt++;
     }
     
+
     tmp_pt[0] = direction[0];
     tmp_pt[1] = direction[1];
     tmp_pt[2] = direction[2];
