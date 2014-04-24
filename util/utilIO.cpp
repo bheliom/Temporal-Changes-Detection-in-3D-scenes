@@ -157,10 +157,11 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     if(tmp_mp==-1)
       continue;
 
-    std::vector<Eigen::Vector3i> occluded_voxels;
+    //    std::vector<Eigen::Vector3i> occluded_voxels;
 
-    voxel_grid.occlusionEstimationAll(occluded_voxels);
-    std::cout<<"occluded:"<<occluded_voxels.size()<<std::endl;
+    //voxel_grid.occlusionEstimationAll(occluded_voxels);
+
+    //std::cout<<"occluded:"<<occluded_voxels.size()<<std::endl;
     
     direction = origin + tmp_mp*direction;
 
