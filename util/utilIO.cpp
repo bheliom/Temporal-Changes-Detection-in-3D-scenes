@@ -135,7 +135,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   rayBox voxel_grid;
 
   voxel_grid.setInputCloud(cloud);
-  voxel_grid.setLeafSize (5.0f, 5.0f, 5.0f);
+  voxel_grid.setLeafSize (10.0f, 10.0f, 10.0f);
   voxel_grid.initializeVoxelGrid();
     
   std::vector<cv::Point2f> mask_pts;
@@ -179,7 +179,6 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
       cnt++;
     }
     
-    direction = origin + tmp_mp*direction;
     tmp_pt[0] = direction[0];
     tmp_pt[1] = direction[1];
     tmp_pt[2] = direction[2];
