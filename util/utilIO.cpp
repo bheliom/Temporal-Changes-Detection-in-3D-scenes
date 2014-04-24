@@ -149,7 +149,8 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     vcg::Point3f tmp_pt = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 0.0);
     vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 1);
 
-    tmp_pt.ToEigenVector(origin);
+    //tmp_pt.ToEigenVector(origin);
+    shot.Extrinsics.Tra().ToEigenVector(origin);
     tmp_dir.ToEigenVector(direction);
 
     float tmp_mp = voxel_grid.getBoxIntersection(origin, direction);
