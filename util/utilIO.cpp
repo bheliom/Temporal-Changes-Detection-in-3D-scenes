@@ -169,6 +169,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
 
       voxel_grid.occlusionEstimation(is_occ, vox_coord);
       cnt++;
+
     }
     
     tmp_pt[0] = direction[0];
@@ -178,7 +179,6 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     std::cout<<"Still here ";
 
     out_pts.push_back(tmp_pt);
-
   } 
   
   return out_pts;
