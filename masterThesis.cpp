@@ -131,8 +131,7 @@ void testPipeline(map<int,string> inputStrings){
             
 	cv::cvtColor(outImgG, finThres, CV_BGR2GRAY);      
 	cv::threshold(finThres, finMask, 30, 255, CV_THRESH_OTSU);
-        
-  
+          
 	tmpImgs.push_back(newImg);
 	tmpImgs.push_back(oldImg);
 	tmpImgs.push_back(finMask);

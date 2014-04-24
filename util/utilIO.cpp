@@ -156,7 +156,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
       continue;
     
     Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);     
-    float mp_factor = 15;
+    float mp_factor = 25;
     int is_occ = 0;
     int cnt = 0;
 
@@ -166,7 +166,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   
       vox_coord = voxel_grid.getGridCoord(direction[0] , direction[1], direction[2]);        
 
-      voxel_grid.occlusionEstimation(is_occ, vox_coord);
+      std::cout<<voxel_grid.occlusionEstimation(is_occ, vox_coord)<<std::endl;
 
       cnt++;
     }
