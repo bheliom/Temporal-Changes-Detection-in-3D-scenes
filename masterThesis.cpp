@@ -113,6 +113,8 @@ void testPipeline(map<int,string> inputStrings){
 
       cv::Mat newImg( getImg(imgFilenames[i]) );
       cv::Mat oldImg( getImg(image_filenames[pointIdxNKNSearch[0]]) );
+      std::cout<<image_filenames[pointIdxNKNSearch[0]]<<std::endl;
+      break;
       cv::Mat outImgG( oldImg.clone() );
 
       cv::Mat outImg;
