@@ -126,6 +126,8 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   
   MeshIO::getPlyFilePCL(filename, cloud);
 
+  std::cout<<cloud->points.size();
+
   //  pcl::VoxelGridOcclusionEstimation<pcl::PointXYZ> voxel_grid;
   rayBox voxel_grid;
 
@@ -134,7 +136,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   
   std::vector<cv::Point2f> mask_pts;
   getPtsFromMask(chng_mask, mask_pts);
-
+  /*
   for(int i = 0 ; i < mask_pts.size(); i++){
 
     Eigen::Vector4f origin;
@@ -173,7 +175,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     out_pts.push_back(tmp_pt);
 
   } 
-    
+  */
   return out_pts;
 }
 
