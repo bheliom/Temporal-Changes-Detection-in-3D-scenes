@@ -164,7 +164,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     direction = origin + 10*tmp_mp*direction;
 
     Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);     
-    float mp_factor = 1.5;
+    float mp_factor = 5.5;
     int is_occ = 0;
     int cnt = 0;
 
