@@ -134,13 +134,11 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   voxel_grid.setInputCloud(cloud);
   voxel_grid.setLeafSize (0.1f, 0.1f, 0.1f);
   voxel_grid.initializeVoxelGrid();
-  
-  if(cloud->isOrganized())
-    std::cout<<"Is organized!"<<std::endl;
-  
+    
   std::vector<cv::Point2f> mask_pts;
   getPtsFromMask(chng_mask, mask_pts);
-  /*
+  
+
   for(int i = 0 ; i < mask_pts.size(); i++){
 
     Eigen::Vector4f origin;
@@ -153,16 +151,16 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     tmp_dir.ToEigenVector(direction);
 
     Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);
-    Eigen::Vector4f mp_factor = 0.1*direction;
+    int mp_factor = 0.5;
 
     int is_occ = 0;
 
     while(is_occ==0){
 
-      std::cout<<"Still here 6\n"<<voxel_grid.getBoxIntersection(origin, direction);
+      std::cout<<"Still here 6\n"<< voxel_grid.getBoxIntersection(origin, direction);
 
-      direction+=mp_factor;
-      vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);        
+      direction = origin + mp_factor*direction;
+      vox_coord = voxel_grid.getGridCoord(direction[0] , direction[1], direction[2]);        
 
       std::cout<<direction[0]<<direction[1]<<direction[2]<<std::endl;
       std::cout<<vox_coord[0]<<vox_coord[1]<<vox_coord[2]<<std::endl;
@@ -179,7 +177,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     out_pts.push_back(tmp_pt);
 
   } 
-  */
+  
   return out_pts;
 }
 
