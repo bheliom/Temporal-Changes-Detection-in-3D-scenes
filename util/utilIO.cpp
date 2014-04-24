@@ -160,11 +160,11 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     direction = origin + tmp_mp*direction;
 
     Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);     
-    float mp_factor = 1.05;
+    float mp_factor = 1.01;
     int is_occ = 0;
     int cnt = 0;
 
-    while(is_occ==0 && cnt<100){
+    while(is_occ==0 && cnt<3){
 
       direction = origin + mp_factor*direction;
   
