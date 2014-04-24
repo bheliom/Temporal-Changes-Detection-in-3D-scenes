@@ -152,21 +152,30 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     tmp_pt.ToEigenVector(origin);
     tmp_dir.ToEigenVector(direction);
 
-    if(voxel_grid.getBoxIntersection(origin, direction)<0)
+    float tmp_mp = voxel_grid.getBoxIntersection(origin, direction);
+      
+    if(tmp_mp==-1)
       continue;
+
+    std::vector<Eigen::Vector3i> occluded_voxels;
+
+    voxel_grid.occlusionEstimationAll(occluded_voxels);
+    std::cout<<"occluded:"<<occluded_voxels.size()<<std::endl;
     
+    direction = origin + tmp_mp*direction;
+
     Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);     
-    float mp_factor = 25;
+    float mp_factor = 5;
     int is_occ = 0;
     int cnt = 0;
 
-    while(is_occ==0 && cnt<10){
+    while(is_occ==0 && cnt<100){
 
       direction = origin + mp_factor*direction;
   
       vox_coord = voxel_grid.getGridCoord(direction[0] , direction[1], direction[2]);        
 
-      std::cout<<voxel_grid.occlusionEstimation(is_occ, vox_coord)<<std::endl;
+      voxel_grid.occlusionEstimation(is_occ, vox_coord);
 
       cnt++;
     }
