@@ -155,15 +155,12 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     if(voxel_grid.getBoxIntersection(origin, direction)<0)
       continue;
     
-    Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);
-      
-    float mp_factor = 5;
-
+    Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);     
+    float mp_factor = 15;
     int is_occ = 0;
-
     int cnt = 0;
 
-    while(is_occ==0 && cnt<100){
+    while(is_occ==0 && cnt<10){
 
       direction = origin + mp_factor*direction;
   
