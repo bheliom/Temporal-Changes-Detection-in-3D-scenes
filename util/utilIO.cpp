@@ -165,7 +165,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     int is_occ = 0;
     int cnt = 0;
 
-    while(is_occ==0 && cnt<1){
+    while(is_occ==0 && cnt<100){
 
       direction = origin + mp_factor*direction;
   
