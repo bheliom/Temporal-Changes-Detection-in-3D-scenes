@@ -143,13 +143,13 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   vcg::Point3f tmp_pt;
 
   shot.Extrinsics.Tra().ToEigenVector(origin);  
-
+    int tak = 0;
   for(int i = 0 ; i < mask_pts.size(); i++){
 
     DrawProgressBar(40, static_cast<double>(double(i)/double(mask_pts.size())));
 
     Eigen::Vector4f direction;
-    vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 8);
+    vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 10);
 
     tmp_dir.ToEigenVector(direction);
 
@@ -165,14 +165,18 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     int is_occ = 0;
     int cnt = 0;
 
-    while(is_occ==0 && cnt<1){
+
+
+    while(is_occ==0 && cnt<2){
 
       direction = origin + mp_factor*direction;
   
       vox_coord = voxel_grid.getGridCoord(direction[0] , direction[1], direction[2]);        
 
       voxel_grid.occlusionEstimation(is_occ, vox_coord);
-
+      
+      if(is_occ==1)
+	tak = 1;
       cnt++;
     }
     
@@ -180,9 +184,10 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     tmp_pt[1] = direction[1];
     tmp_pt[2] = direction[2];
 
+
     out_pts.push_back(tmp_pt);
   } 
-  
+    std::cout<<"byl okluded:"<<tak<<std::endl;  
   return out_pts;
 }
 
