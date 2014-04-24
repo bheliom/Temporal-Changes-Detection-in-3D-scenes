@@ -141,6 +141,8 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
 
   for(int i = 0 ; i < mask_pts.size(); i++){
 
+    DrawProgressBar(40, static_cast<double>(double(i)/double(mask_pts.size())));
+
     Eigen::Vector4f origin;
     Eigen::Vector4f direction;
 
@@ -169,14 +171,11 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
 
       voxel_grid.occlusionEstimation(is_occ, vox_coord);
       cnt++;
-
     }
     
     tmp_pt[0] = direction[0];
     tmp_pt[1] = direction[1];
     tmp_pt[2] = direction[2];
-
-    std::cout<<"Still here ";
 
     out_pts.push_back(tmp_pt);
   } 
