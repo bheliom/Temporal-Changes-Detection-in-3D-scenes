@@ -141,39 +141,35 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     Eigen::Vector4f direction;
 
     vcg::Point3f tmp_pt = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 0);
-    vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 1);
+    vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 01);
 
-    
-    origin[0] = tmp_pt[0];
-    origin[1] = tmp_pt[1];
-    origin[2] = tmp_pt[2];
-
-    direction[0] = tmp_dir[0];
-    direction[1] = tmp_dir[1];
-    direction[2] = tmp_dir[2];
+    shot.Extrinsics.Tra().ToEigenVector(origin);
+    tmp_dir.ToEigenVector(direction);
 
     Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);
-    int is_occ = 0;
-    Eigen::Vector4f mp_factor = 5*direction;
+    Eigen::Vector4f mp_factor = 2*direction;
 
-    vcg::Point3f disp_vec = shot.Extrinsics.Tra() - (tmp_pt - tmp_dir);
-    /*
-    while(voxel_grid.occlusionEstimation(is_occ, vox_coord)==0){
-      //      std::cout<<shot.Extrinsics.Tra()-(tmp_pt-tmp_dir);
+    int is_occ = 0;
+
+    while(is_occ==0){
+
       std::cout<<"Still here 6\n"<<voxel_grid.getBoxIntersection(origin, direction);
       direction+=mp_factor;
       vox_coord = voxel_grid.getGridCoordinates(direction[0],direction[1],direction[2]);        
       std::cout<<direction[0]<<direction[1]<<direction[2]<<std::endl;
       std::cout<<vox_coord[0]<<vox_coord[1]<<vox_coord[2]<<std::endl;
+
+      voxel_grid.occlusionEstimation(is_occ, vox_coord);
     }
     
     tmp_pt[0] = direction[0];
     tmp_pt[1] = direction[1];
     tmp_pt[2] = direction[2];
+
     std::cout<<"Still here ";
+
     out_pts.push_back(tmp_pt);
-*/
-    std::cout<<disp_vec.Norm()<<std::endl;;
+
   } 
     
   return out_pts;
