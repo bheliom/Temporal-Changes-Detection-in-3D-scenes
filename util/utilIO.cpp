@@ -20,7 +20,7 @@ void MeshIO::saveChngMask3d(const std::vector<std::vector<vcg::Point3f> > &pts_3
   float x, y, z;
   int count = 0;
 
-  for(int i = 2 ; i < 5 ; i++){
+  for(int i = 0 ; i < 1 ; i++){
     DrawProgressBar(40, (double)i/(double)pts_3d.size());
 
     for(int j = 0 ; j < pts_3d[i].size(); j++){
@@ -157,16 +157,10 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     if(tmp_mp==-1)
       continue;
 
-    //    std::vector<Eigen::Vector3i> occluded_voxels;
-
-    //voxel_grid.occlusionEstimationAll(occluded_voxels);
-
-    //std::cout<<"occluded:"<<occluded_voxels.size()<<std::endl;
-    
     direction = origin + tmp_mp*direction;
 
     Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);     
-    float mp_factor = 5;
+    float mp_factor = 1.5;
     int is_occ = 0;
     int cnt = 0;
 
