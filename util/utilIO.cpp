@@ -128,11 +128,12 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
 
   std::cout<< cloud->points.size();
 
-  //  pcl::VoxelGridOcclusionEstimation<pcl::PointXYZ> voxel_grid;
+  //pcl::VoxelGridOcclusionEstimation<pcl::PointXYZ> voxel_grid;
+
   rayBox voxel_grid;
 
   voxel_grid.setInputCloud(cloud);
-  voxel_grid.setLeafSize (0.1f, 0.1f, 0.1f);
+  //  voxel_grid.setLeafSize (0.1f, 0.1f, 0.1f);
   voxel_grid.initializeVoxelGrid();
     
   std::vector<cv::Point2f> mask_pts;
