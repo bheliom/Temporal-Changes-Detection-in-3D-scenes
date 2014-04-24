@@ -154,9 +154,9 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);
     int is_occ = 0;
     Eigen::Vector4f mp_factor = 5*direction;
-
+    
     while(voxel_grid.occlusionEstimation(is_occ, vox_coord)==0){
-      std::cout<<"Still here 6";
+      std::cout<<"Still here 6\n"<<voxel_grid.getBoxIntersection(origin, direction);
       direction+=mp_factor;
       vox_coord = voxel_grid.getGridCoordinates(direction[0],direction[1],direction[2]);        
       std::cout<<direction[0]<<direction[1]<<direction[2]<<std::endl;
