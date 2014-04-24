@@ -140,7 +140,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     Eigen::Vector4f origin;
     Eigen::Vector4f direction;
     
-    vcg::Point3f tmp_pt = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 0);
+    vcg::Point3f tmp_pt = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 0.5);
     vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 5);
 
     origin[0] = tmp_pt[0];
@@ -153,17 +153,17 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     
     Eigen::Vector3i vox_coord = voxel_grid.getGridCoordinates(direction[0],direction[1],direction[2]);
     int is_occ = 0;
-    int mp_factor = 1.5;
+    Eigen::Vector4f mp_factor = 5*direction;
 
     while(voxel_grid.occlusionEstimation(is_occ, vox_coord)==0){
-      direction*=mp_factor;
+      direction+=mp_factor;
       vox_coord = voxel_grid.getGridCoordinates(direction[0],direction[1],direction[2]);        
     }
     
     tmp_pt[0] = direction[0];
     tmp_pt[1] = direction[1];
     tmp_pt[2] = direction[2];
-    
+    std::cout<<"Still here ";
     out_pts.push_back(tmp_pt);
   } 
 
