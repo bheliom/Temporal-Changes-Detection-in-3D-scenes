@@ -96,7 +96,8 @@ void testPipeline(map<int,string> inputStrings){
   kdtree.setInputCloud(cloud);
   pcl::PointXYZ searchPoint;
 
-  for(int i = 0 ; i < newShots.size(); i++){
+  //  for(int i = 0 ; i < newShots.size(); i++){
+  for(int i = 1 ; i < 2; i++){
 
     searchPoint.x = newShots[i].Extrinsics.Tra().X();
     searchPoint.y = newShots[i].Extrinsics.Tra().Y();
