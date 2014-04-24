@@ -157,14 +157,16 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
 
     float tmp_mp = voxel_grid.getBoxIntersection(origin, direction);
       
-    if(tmp_mp==-1)
+    if(tmp_mp==-1){
+      std::cout<<"Totu";
       continue;
+    }
 
     //    origin*=10*tmp_mp;
     direction = origin + 10*tmp_mp*direction;
 
     Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);     
-    float mp_factor = -1.5;
+    float mp_factor = 1.2;
     int is_occ = 0;
     int cnt = 0;
 
