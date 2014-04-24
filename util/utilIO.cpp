@@ -149,7 +149,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     DrawProgressBar(40, static_cast<double>(double(i)/double(mask_pts.size())));
 
     Eigen::Vector4f direction;
-    vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 10);
+    vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 1);
 
     tmp_dir.ToEigenVector(direction);
 
@@ -164,8 +164,6 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     float mp_factor = 1.5;
     int is_occ = 0;
     int cnt = 0;
-
-
 
     while(is_occ==0 && cnt<2){
 
