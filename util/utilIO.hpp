@@ -32,9 +32,11 @@ class rayBox : public pcl::VoxelGridOcclusionEstimation<pcl::PointXYZ>{
 public:
 
 float getBoxIntersection(const Eigen::Vector4f &origin, const Eigen::Vector4f &direction){
-
 return rayBoxIntersection(origin, direction);
+}
 
+Eigen::Vector3i getGridCoord(float x, float y, float z){
+return getGridCoordinatesRound(x,y,z);
 }
 
 };

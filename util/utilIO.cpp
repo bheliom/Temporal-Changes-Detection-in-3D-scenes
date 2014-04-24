@@ -136,22 +136,22 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   getPtsFromMask(chng_mask, mask_pts);
 
   for(int i = 0 ; i < mask_pts.size(); i++){
-    std::cout<<"Still here 1";
+
     Eigen::Vector4f origin;
     Eigen::Vector4f direction;
-        std::cout<<"Still here 2";
-    vcg::Point3f tmp_pt = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 0.5);
-    vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 5);
-    std::cout<<"Still here 3";
+
+    vcg::Point3f tmp_pt = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 0.1);
+    vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 1);
+
     origin[0] = tmp_pt[0];
     origin[1] = tmp_pt[1];
     origin[2] = tmp_pt[2];
-    std::cout<<"Still here 4";
+
     direction[0] = tmp_dir[0];
     direction[1] = tmp_dir[1];
     direction[2] = tmp_dir[2];
-        std::cout<<"Still here 5";
-    Eigen::Vector3i vox_coord = voxel_grid.getGridCoordinates(direction[0],direction[1],direction[2]);
+
+    Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);
     int is_occ = 0;
     Eigen::Vector4f mp_factor = 5*direction;
 
