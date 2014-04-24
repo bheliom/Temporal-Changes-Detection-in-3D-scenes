@@ -135,7 +135,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   rayBox voxel_grid;
 
   voxel_grid.setInputCloud(cloud);
-  voxel_grid.setLeafSize (1.0f, 1.0f, 1.0f);
+  voxel_grid.setLeafSize (5.0f, 5.0f, 5.0f);
   voxel_grid.initializeVoxelGrid();
     
   std::vector<cv::Point2f> mask_pts;
