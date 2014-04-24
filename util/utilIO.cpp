@@ -179,7 +179,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
       cnt++;
     }
     
-
+    direction = origin + tmp_mp*direction;
     tmp_pt[0] = direction[0];
     tmp_pt[1] = direction[1];
     tmp_pt[2] = direction[2];
