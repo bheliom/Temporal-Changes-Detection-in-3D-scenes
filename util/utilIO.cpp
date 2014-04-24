@@ -135,7 +135,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   rayBox voxel_grid;
 
   voxel_grid.setInputCloud(cloud);
-  voxel_grid.setLeafSize (0.1f, 0.1f, 0.1f);
+  voxel_grid.setLeafSize (0.01f, 0.01f, 0.01f);
   voxel_grid.initializeVoxelGrid();
     
   std::vector<cv::Point2f> mask_pts;
@@ -145,8 +145,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   vcg::Point3f tmp_pt;
 
   shot.Extrinsics.Tra().ToEigenVector(origin);  
-  
-  
+    
   for(int i = 0 ; i < mask_pts.size(); i++){
 
     DrawProgressBar(40, static_cast<double>(double(i)/double(mask_pts.size())));
@@ -171,7 +170,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
 
     voxel_grid.occlusionEstimation(is_occ, vox_coord);
 
-    while(is_occ==0 && cnt<5){
+    while(is_occ==0 && cnt<3){
 
       direction = origin + mp_factor*direction;  
       vox_coord = voxel_grid.getGridCoord(direction[0] , direction[1], direction[2]);        
