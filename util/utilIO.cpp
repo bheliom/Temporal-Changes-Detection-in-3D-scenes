@@ -126,13 +126,17 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   
   MeshIO::getPlyFilePCL(filename, cloud);
 
-  std::cout<<cloud->points.size();
+  std::cout<< cloud->points.size();
 
   //  pcl::VoxelGridOcclusionEstimation<pcl::PointXYZ> voxel_grid;
   rayBox voxel_grid;
 
   voxel_grid.setInputCloud(cloud);
+  voxel_grid.setLeafSize (0.1f, 0.1f, 0.1f);
   voxel_grid.initializeVoxelGrid();
+  
+  if(cloud.isOrganized())
+    std::cout<<"Is organized!"<std::endl;
   
   std::vector<cv::Point2f> mask_pts;
   getPtsFromMask(chng_mask, mask_pts);
