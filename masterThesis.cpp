@@ -82,7 +82,9 @@ void testPipeline(map<int,string> inputStrings){
     vector<cv::Mat> nn_imgs;
 
     if(ImgIO::getKNNcamData(kdtree, searchPoint, image_filenames, nn_imgs, 1)>0){
+      std::cout<<"Im here\n";
       cv::Mat newImg( getImg(new_image_filenames[i]) );
+   
       for(int j = 0 ; j < K ; j++){
 	cv::Mat oldImg( nn_imgs[K] );
 	cv::Mat finMask;
@@ -107,8 +109,7 @@ void testPipeline(map<int,string> inputStrings){
 	  */
 	  
 	  tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i]));
-	}
-	
+	}	
       }
     }
   }
