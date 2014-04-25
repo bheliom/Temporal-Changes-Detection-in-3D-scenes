@@ -89,10 +89,10 @@ void testPipeline(map<int,string> inputStrings){
       for(int j = 0 ; j < K ; j++){
 	cv::Mat oldImg( nn_imgs[j] );
 	
-	/*	of_stream<<j;
+		of_stream<<j;
 	cv::imwrite(of_stream.str()+".jpg", oldImg);
-	of_stream.flush();
-	*/
+	of_stream.clear();
+	
 	
 	/*
 	cv::Mat finMask, H;
