@@ -150,7 +150,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   shot.Extrinsics.Tra().ToEigenVector(cloud->sensor_origin_);
 
   voxel_grid.setInputCloud(cloud);
-  voxel_grid.setLeafSize (0.5f, 0.5f, 0.5f);
+  voxel_grid.setLeafSize (1.5f, 1.5f, 1.5f);
   voxel_grid.initializeVoxelGrid();
     
   getPtsFromMask(chng_mask, mask_pts);
