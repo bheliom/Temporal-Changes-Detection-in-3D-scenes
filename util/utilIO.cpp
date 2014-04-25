@@ -186,18 +186,21 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     int is_occ = 0;
     int check_occ = 0;
     int cnt = 0;
+    int v_idx = 0;
     std::vector<Eigen::Vector3i> out_ray;
 
     voxel_grid.occlusionEstimation(is_occ, out_ray, vox_coord);
+    
+    v_idx = out_ray.size();
 
     while(is_occ == 0 && check_occ == 0){
 
       //      direction = origin + mp_factor*direction;  
       //      vox_coord = voxel_grid.getGridCoord(direction[0] , direction[1], direction[2]);        
-      vox_coord = out_ray[cnt];
+      vox_coord = out_ray[v_idx];
 
       check_occ = voxel_grid.occlusionEstimation(is_occ, vox_coord);
-      std::cout<<"Yo sprawdz mnie"<<std::endl;
+      v_idx--;
       cnt++;
     }
     
