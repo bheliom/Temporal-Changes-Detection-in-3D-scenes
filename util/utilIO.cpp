@@ -45,12 +45,12 @@ int ImgIO::getKNNcamData(const pcl::KdTreeFLANN<pcl::PointXYZ> &kdtree, pcl::Poi
 
   std::vector<int> pointIdxNKNSearch(K);
   std::vector<float> pointNKNSquaredDistance(K);
-  int out = -1;
+  int out = 0;
   
   if(kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance)>0){
     for(int i = 0 ; i < K ; i++)
       out_imgs.push_back( getImg(filenames[pointIdxNKNSearch[i]]) );
-    out = 0;
+    out = 1;
   }
   return out;
 }

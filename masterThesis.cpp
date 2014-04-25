@@ -76,36 +76,39 @@ void testPipeline(map<int,string> inputStrings){
   for(int i = 1 ; i < 2; i++){
     searchPoint = PclProcessing::vcg2pclPt(newShots[i].Extrinsics.Tra());
 
-    std::vector<int> pointIdxNKNSearch(K);
-    std::vector<float> pointNKNSquaredDistance(K);
+    vector<int> pointIdxNKNSearch(K);
+    vector<float> pointNKNSquaredDistance(K);
     vector<cv::Mat> tmpImgs;
+    vector<cv::Mat> nn_imgs;
 
-    if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
-
+    if(ImgIO::getKNNcamData(kdtree, searchPoint, image_filenames, nn_imgs, 1)>0){
       cv::Mat newImg( getImg(new_image_filenames[i]) );
-      cv::Mat oldImg( getImg(image_filenames[pointIdxNKNSearch[0]]) );
-      cv::Mat finMask;
-      cv::Mat H;
-
-      if(ImgProcessing::getImgFundMat(newImg, oldImg, H)){
-
-	ImgChangeDetector::imgDiffThres(newImg, oldImg, H, finMask);
+      for(int j = 0 ; j < K ; j++){
+	cv::Mat oldImg( nn_imgs[K] );
+	cv::Mat finMask;
+	cv::Mat H;
+	
+	if(ImgProcessing::getImgFundMat(newImg, oldImg, H)){
+	  
+	  ImgChangeDetector::imgDiffThres(newImg, oldImg, H, finMask);
           
-	tmpImgs.push_back(newImg);
-	tmpImgs.push_back(oldImg);
-	tmpImgs.push_back(finMask);
-	ImgIO::dispImgs(tmpImgs);
-
-	/*
-
-	cv::Mat mask_3d_pts(ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H));
-	std::vector<vcg::Point3f> tmp_vec_pts;
-	DataProcessing::cvt3Dmat2vcg(mask_3d_pts, tmp_vec_pts);
+	  tmpImgs.push_back(newImg);
+	  tmpImgs.push_back(oldImg);
+	  tmpImgs.push_back(finMask);
+	  ImgIO::dispImgs(tmpImgs);
+	  
+	  /*
+	    
+	    cv::Mat mask_3d_pts(ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H));
+	    std::vector<vcg::Point3f> tmp_vec_pts;
+	    DataProcessing::cvt3Dmat2vcg(mask_3d_pts, tmp_vec_pts);
+	    
+	    tmp_3d_masks.push_back(tmp_vec_pts);
+	  */
+	  
+	  tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i]));
+	}
 	
-	tmp_3d_masks.push_back(tmp_vec_pts);
-	*/
-	
-	tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i]));
       }
     }
   }
