@@ -44,7 +44,6 @@ void testPipeline(map<int,string> inputStrings){
   vector<CameraT> camera_data, newCameraData;
   pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
   pcl::PointXYZ searchPoint;
-  int K = 1;
 
   FileIO::getNVM(inputStrings[BUNDLER], camera_data, image_filenames);
   shots = FileIO::nvmCam2vcgShot(camera_data, image_filenames);
@@ -71,6 +70,7 @@ void testPipeline(map<int,string> inputStrings){
     cloud->points[i] = PclProcessing::vcg2pclPt(shots[i].Extrinsics.Tra());
   }
   kdtree.setInputCloud(cloud);
+  int K = 5;
 
   //  for(int i = 0 ; i < newShots.size(); i++){
   for(int i = 1 ; i < 2; i++){
@@ -78,17 +78,18 @@ void testPipeline(map<int,string> inputStrings){
 
     vector<int> pointIdxNKNSearch(K);
     vector<float> pointNKNSquaredDistance(K);
-    vector<cv::Mat> tmpImgs;
-    vector<cv::Mat> nn_imgs;
+    vector<cv::Mat> tmpImgs, nn_imgs;
 
     if(ImgIO::getKNNcamData(kdtree, searchPoint, image_filenames, nn_imgs, 1)>0){
-      std::cout<<"Im here\n";
+
       cv::Mat newImg( getImg(new_image_filenames[i]) );
    
       for(int j = 0 ; j < K ; j++){
 	cv::Mat oldImg( nn_imgs[j] );
-	cv::Mat finMask;
-	cv::Mat H;
+	
+	cv::imwrite(image_filenames[i], oldImg);
+	/*
+	cv::Mat finMask, H;
 	
 	if(ImgProcessing::getImgFundMat(newImg, oldImg, H)){
 	  
@@ -106,10 +107,10 @@ void testPipeline(map<int,string> inputStrings){
 	    DataProcessing::cvt3Dmat2vcg(mask_3d_pts, tmp_vec_pts);
 	    
 	    tmp_3d_masks.push_back(tmp_vec_pts);
-	  */
+	  /
 	  
 	  tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i]));
-	}	
+	}*/	
       }
     }
   }
