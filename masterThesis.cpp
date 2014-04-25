@@ -84,7 +84,7 @@ void testPipeline(map<int,string> inputStrings){
 
       cv::Mat newImg( getImg(new_image_filenames[i]) );
       ostringstream of_stream;
-      cv::imwrite("new", newImg);
+      cv::imwrite("new.jpg", newImg);
 
       for(int j = 0 ; j < K ; j++){
 	cv::Mat oldImg( nn_imgs[j] );
