@@ -84,11 +84,16 @@ void testPipeline(map<int,string> inputStrings){
 
       cv::Mat newImg( getImg(new_image_filenames[i]) );
       ostringstream of_stream;
+      cv::imwrite("new", newImg);
+
       for(int j = 0 ; j < K ; j++){
 	cv::Mat oldImg( nn_imgs[j] );
-	of_stream<<j;
+	
+	/*	of_stream<<j;
 	cv::imwrite(of_stream.str()+".jpg", oldImg);
 	of_stream.flush();
+	*/
+	
 	/*
 	cv::Mat finMask, H;
 	
@@ -111,11 +116,12 @@ void testPipeline(map<int,string> inputStrings){
 	  /
 	  
 	  tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i]));
-	}*/	
+	}
+	*/	
       }
     }
   }
-  //  MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask3d.ply");
+  //   MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask3d.ply");
 }
 
 void testNewNVM(map<int,string> inputStrings){
