@@ -169,7 +169,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     }
 
     Eigen::Vector4f direction;
-    vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 100);
+    vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 1000);
 
     tmp_dir.ToEigenVector(direction);
 
