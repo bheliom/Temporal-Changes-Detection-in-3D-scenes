@@ -181,8 +181,11 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     float mp_factor = 0.6;
     int is_occ = 0;
     int cnt = 0;
+    std::vector<Eigen::Vector3i> out_ray;
 
-    voxel_grid.occlusionEstimation(is_occ, vox_coord);
+    voxel_grid.occlusionEstimation(is_occ, out_ray, vox_coord);
+
+    std::cout<<"traversed voxels:"<< out_ray.size()<< std::endl;
 
     while(is_occ==0 && cnt<3){
 
