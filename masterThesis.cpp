@@ -87,7 +87,7 @@ void testPipeline(map<int,string> inputStrings){
       for(int j = 0 ; j < K ; j++){
 	cv::Mat oldImg( nn_imgs[j] );
 	
-	cv::imwrite(image_filenames[i], oldImg);
+	cv::imwrite(image_filenames[j], oldImg);
 	/*
 	cv::Mat finMask, H;
 	
