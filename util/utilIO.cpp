@@ -143,16 +143,12 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   
   MeshIO::getPlyFilePCL(filename, cloud);
 
-  std::cout<< "old:"<<cloud->sensor_origin_<<std::endl;
-
-  //  shot.Extrinsics.Tra().ToEigenVector(cloud->sensor_origin_);
-
-  std::cout << "new:"<<cloud->sensor_origin_<< std::endl;
+  shot.Extrinsics.Tra().ToEigenVector(cloud->sensor_origin_);
 
   rayBox voxel_grid;
 
   voxel_grid.setInputCloud(cloud);
-  voxel_grid.setLeafSize (0.05f, 0.07f, 0.07f);
+  voxel_grid.setLeafSize (0.05f, 0.05f, 0.05f);
   voxel_grid.initializeVoxelGrid();
     
   std::vector<cv::Point2f> mask_pts;
