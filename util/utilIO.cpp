@@ -136,8 +136,12 @@ Function projects 2D change mask into 3-dimensional space using point cloud voxe
 */
 std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const cv::Mat &chng_mask, const vcg::Shot<float> &shot){
   
-
   std::vector<vcg::Point3f> out_pts;
+  std::vector<cv::Point2f> mask_pts;
+  rayBox voxel_grid;
+  Eigen::Vector4f origin;
+  vcg::Point3f tmp_pt;
+  double prog_perc = 0;
 
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
   
@@ -145,18 +149,12 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
 
   shot.Extrinsics.Tra().ToEigenVector(cloud->sensor_origin_);
 
-  rayBox voxel_grid;
-
   voxel_grid.setInputCloud(cloud);
   voxel_grid.setLeafSize (0.05f, 0.05f, 0.05f);
   voxel_grid.initializeVoxelGrid();
     
-  std::vector<cv::Point2f> mask_pts;
   getPtsFromMask(chng_mask, mask_pts);
 
-  Eigen::Vector4f origin;
-  vcg::Point3f tmp_pt;
-  double prog_perc = 0;
   shot.Extrinsics.Tra().ToEigenVector(origin);  
     
   for(int i = 0 ; i < mask_pts.size(); i++){
@@ -180,7 +178,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     direction = origin + tmp_mp*direction;
 
     Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);     
-    float mp_factor = 0.1;
+    float mp_factor = 0.6;
     int is_occ = 0;
     int cnt = 0;
 
