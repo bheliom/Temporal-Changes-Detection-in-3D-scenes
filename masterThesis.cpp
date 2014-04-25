@@ -70,7 +70,7 @@ void testPipeline(map<int,string> inputStrings){
     cloud->points[i] = PclProcessing::vcg2pclPt(shots[i].Extrinsics.Tra());
   }
   kdtree.setInputCloud(cloud);
-  int K = 5;
+  int K = 1;
 
   //  for(int i = 0 ; i < newShots.size(); i++){
   for(int i = 1 ; i < 2; i++){
@@ -83,18 +83,17 @@ void testPipeline(map<int,string> inputStrings){
     if(ImgIO::getKNNcamData(kdtree, searchPoint, image_filenames, nn_imgs, K)>0){
 
       cv::Mat newImg( getImg(new_image_filenames[i]) );
-      ostringstream of_stream;
-      cv::imwrite("new.jpg", newImg);
+      
+      // ostringstream of_stream;
+      // cv::imwrite("new.jpg", newImg);
 
       for(int j = 0 ; j < K ; j++){
 	cv::Mat oldImg( nn_imgs[j] );
 	
-		of_stream<<j;
-	cv::imwrite(of_stream.str()+".jpg", oldImg);
-	of_stream.clear();
-	
-	
-	/*
+	// of_stream<<j;
+	// cv::imwrite(of_stream.str()+".jpg", oldImg);
+	// of_stream.clear();
+		
 	cv::Mat finMask, H;
 	
 	if(ImgProcessing::getImgFundMat(newImg, oldImg, H)){
@@ -106,22 +105,20 @@ void testPipeline(map<int,string> inputStrings){
 	  tmpImgs.push_back(finMask);
 	  ImgIO::dispImgs(tmpImgs);
 	  
-	  /*
-	    
-	    cv::Mat mask_3d_pts(ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H));
-	    std::vector<vcg::Point3f> tmp_vec_pts;
-	    DataProcessing::cvt3Dmat2vcg(mask_3d_pts, tmp_vec_pts);
-	    
-	    tmp_3d_masks.push_back(tmp_vec_pts);
-	  /
-	  
+	  /*	    
+		    cv::Mat mask_3d_pts(ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H));
+		    std::vector<vcg::Point3f> tmp_vec_pts;
+		    DataProcessing::cvt3Dmat2vcg(mask_3d_pts, tmp_vec_pts);
+		    
+		    tmp_3d_masks.push_back(tmp_vec_pts);
+	  */  
+
 	  tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i]));
-	}
-	*/	
+	}		
       }
     }
   }
-  //   MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask3d.ply");
+  MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask3d.ply");
 }
 
 void testNewNVM(map<int,string> inputStrings){
