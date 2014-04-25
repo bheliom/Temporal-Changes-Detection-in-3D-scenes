@@ -83,11 +83,12 @@ void testPipeline(map<int,string> inputStrings){
     if(ImgIO::getKNNcamData(kdtree, searchPoint, image_filenames, nn_imgs, K)>0){
 
       cv::Mat newImg( getImg(new_image_filenames[i]) );
-   
+      ostringstream of_stream;
       for(int j = 0 ; j < K ; j++){
 	cv::Mat oldImg( nn_imgs[j] );
-	
-	cv::imwrite(image_filenames[j], oldImg);
+	of_stream<<j;
+	cv::imwrite(of_stream.str()+".jpg", oldImg);
+	of_stream.flush();
 	/*
 	cv::Mat finMask, H;
 	
@@ -114,7 +115,7 @@ void testPipeline(map<int,string> inputStrings){
       }
     }
   }
-  MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask3d.ply");
+  //  MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask3d.ply");
 }
 
 void testNewNVM(map<int,string> inputStrings){
