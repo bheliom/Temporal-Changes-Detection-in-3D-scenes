@@ -80,7 +80,7 @@ void testPipeline(map<int,string> inputStrings){
     vector<float> pointNKNSquaredDistance(K);
     vector<cv::Mat> tmpImgs, nn_imgs;
 
-    if(ImgIO::getKNNcamData(kdtree, searchPoint, image_filenames, nn_imgs, 1)>0){
+    if(ImgIO::getKNNcamData(kdtree, searchPoint, image_filenames, nn_imgs, K)>0){
 
       cv::Mat newImg( getImg(new_image_filenames[i]) );
    
