@@ -150,7 +150,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   rayBox voxel_grid;
 
   voxel_grid.setInputCloud(cloud);
-  voxel_grid.setLeafSize (0.05f, 0.05f, 0.05f);
+  voxel_grid.setLeafSize (0.01f, 0.01f, 0.01f);
   voxel_grid.initializeVoxelGrid();
     
   std::vector<cv::Point2f> mask_pts;
@@ -158,15 +158,18 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
 
   Eigen::Vector4f origin;
   vcg::Point3f tmp_pt;
-
+  double prog_perc = 0;
   shot.Extrinsics.Tra().ToEigenVector(origin);  
     
   for(int i = 0 ; i < mask_pts.size(); i++){
-
-    DrawProgressBar(40, static_cast<double>(double(i)/double(mask_pts.size())));
+    
+    if(i % 100 == 0){
+      prog_perc = double(i)/double(mask_pts.size());
+      DrawProgressBar(40, prog_perc);
+    }
 
     Eigen::Vector4f direction;
-    vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 1000);
+    vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 100);
 
     tmp_dir.ToEigenVector(direction);
 
@@ -178,10 +181,10 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     }
 
     //    origin*=10*tmp_mp;
-    direction = origin + 10*tmp_mp*direction;
+    direction = origin + tmp_mp*direction;
 
     Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);     
-    float mp_factor = 1.2;
+    float mp_factor = 0.2;
     int is_occ = 0;
     int cnt = 0;
 
