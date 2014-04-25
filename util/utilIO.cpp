@@ -145,9 +145,9 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
 
   std::cout<< "old:"<<cloud->sensor_origin_<<std::endl;
 
-  shot.Extrinsics.Tra().ToEigenVector(cloud->sensor_origin_);
+  //  shot.Extrinsics.Tra().ToEigenVector(cloud->sensor_origin_);
 
-  std::cout<< "new:"<<cloud->sensor_origin_<<std::endl;
+  std::cout << "new:"<<cloud->sensor_origin_<< std::endl;
 
   rayBox voxel_grid;
 
