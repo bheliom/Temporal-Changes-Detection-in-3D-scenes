@@ -86,7 +86,7 @@ void testPipeline(map<int,string> inputStrings){
       cv::Mat newImg( getImg(new_image_filenames[i]) );
    
       for(int j = 0 ; j < K ; j++){
-	cv::Mat oldImg( nn_imgs[K] );
+	cv::Mat oldImg( nn_imgs[j] );
 	cv::Mat finMask;
 	cv::Mat H;
 	
