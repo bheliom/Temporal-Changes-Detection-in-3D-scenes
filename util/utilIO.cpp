@@ -150,7 +150,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   rayBox voxel_grid;
 
   voxel_grid.setInputCloud(cloud);
-  voxel_grid.setLeafSize (0.1f, 0.1f, 0.1f);
+  voxel_grid.setLeafSize (0.05f, 0.05f, 0.05f);
   voxel_grid.initializeVoxelGrid();
     
   std::vector<cv::Point2f> mask_pts;
@@ -187,7 +187,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
 
     voxel_grid.occlusionEstimation(is_occ, vox_coord);
 
-    while(is_occ==0 && cnt<20){
+    while(is_occ==0 && cnt<3){
 
       direction = origin + mp_factor*direction;  
       vox_coord = voxel_grid.getGridCoord(direction[0] , direction[1], direction[2]);        
