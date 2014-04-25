@@ -162,7 +162,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     
   for(int i = 0 ; i < mask_pts.size(); i++){
     
-    if(i % 100 == 0){
+    if(i % 10 == 0){
       prog_perc = double(i)/double(mask_pts.size());
       DrawProgressBar(40, prog_perc);
     }
@@ -183,18 +183,19 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);     
     float mp_factor = 0.6;
     int is_occ = 0;
+    int check_occ = 0;
     int cnt = 0;
     std::vector<Eigen::Vector3i> out_ray;
 
     voxel_grid.occlusionEstimation(is_occ, out_ray, vox_coord);
 
-    while(is_occ==0){
+    while(is_occ==0 && check_occ == 0){
 
       //      direction = origin + mp_factor*direction;  
       //      vox_coord = voxel_grid.getGridCoord(direction[0] , direction[1], direction[2]);        
       vox_coord = out_ray[cnt];
 
-      voxel_grid.occlusionEstimation(is_occ, vox_coord);
+      check_occ = voxel_grid.occlusionEstimation(is_occ, vox_coord);
       
       cnt++;
     }
