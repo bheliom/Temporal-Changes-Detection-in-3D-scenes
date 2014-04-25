@@ -150,7 +150,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   rayBox voxel_grid;
 
   voxel_grid.setInputCloud(cloud);
-  voxel_grid.setLeafSize (0.05f, 0.05f, 0.05f);
+  voxel_grid.setLeafSize (0.05f, 0.07f, 0.07f);
   voxel_grid.initializeVoxelGrid();
     
   std::vector<cv::Point2f> mask_pts;
@@ -175,7 +175,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
 
     float tmp_mp = voxel_grid.getBoxIntersection(origin, direction);
       
-    if(tmp_mp < 0){
+    if(tmp_mp == -1.0f){
       std::cout<<"Totu";
       continue;
     }
