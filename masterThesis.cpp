@@ -20,125 +20,83 @@ void testNVM(map<int,string> inputStrings);
 void testNewNVM(map<int,string> inputStrings);
 void testPipeline(map<int,string> inputStrings);
 void testProjections(map<int,string> inputStrings);
+
 int main(int argc, char** argv){
   
   map<int,string> inputStrings;
   readCmdInput(inputStrings, argc, argv);
 
   testPipeline(inputStrings);
-  //  testNewNVM(inputStrings);
-  //  testVid(inputStrings);
+
   return 0;
 }
 
 void testProjections(map<int,string> inputStrings){
-
   MyMesh m;
   getPlyFileVcg(inputStrings[MESH],m);
-
 }
 
 void testPipeline(map<int,string> inputStrings){
 
-  //Get initial NVM file
   vector<vector<vcg::Point3f> > tmp_3d_masks;
+  vector<vcg::Shot<float> > shots, newShots;
+  vector<string> image_filenames, new_image_filenames;
+  vector<CameraT> camera_data, newCameraData;
+  pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+  pcl::PointXYZ searchPoint;
+  int K = 1;
 
-  vector<vcg::Shot<float> > shots;
-  vector<vcg::Shot<float> > newShots;
-  vector<string> image_filenames;
-  vector<CameraT> camera_data;
-  vector<CameraT> newCameraData;
-  
   FileIO::getNVM(inputStrings[BUNDLER], camera_data, image_filenames);
   shots = FileIO::nvmCam2vcgShot(camera_data, image_filenames);
   
   CmdIO::callCmd("cp "+inputStrings[PMVS]+" "+inputStrings[BUNDLER]+".txt");
 
-  //Call VisualSfM
   CmdIO vsfmHandler("./");
   vsfmHandler.callVsfm(" sfm+resume+fixcam "+inputStrings[BUNDLER]+" "+inputStrings[OUTDIR]);
 
-  //Process the output file to get new cameras positions
-  FileProcessing fileProc;
+  FileIO::readNewFiles(inputStrings[PMVS], new_image_filenames);
+  string  tmpString = "newNVM.nvm";
 
-  //Read list of new files
-  ifstream inFile(inputStrings[PMVS].c_str());
-  string tmpString;
-  vector<string> imgFilenames;
+  FileProcessing fileProc;  
+  fileProc.procNewNVMfile(inputStrings[OUTDIR], new_image_filenames, tmpString);
 
-  while(getline(inFile,tmpString))
-    imgFilenames.push_back(tmpString);
+  FileIO::getNVM(tmpString, newCameraData, new_image_filenames);
+  newShots = FileIO::nvmCam2vcgShot(newCameraData, new_image_filenames);
 
-  inFile.close();
-
-  tmpString = "newNVM.nvm";
-
-  //Get positions of new cameras
-  fileProc.procNewNVMfile(inputStrings[OUTDIR],imgFilenames, tmpString);
-
-  FileIO::getNVM(tmpString, newCameraData, imgFilenames);
-  newShots = FileIO::nvmCam2vcgShot(newCameraData, imgFilenames);
-
-  //Find nearest neighbor
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
 
   // Generate pointcloud data
   cloud->points.resize(shots.size());
-
   for (size_t i = 0; i < cloud->points.size (); ++i){
-    cloud->points[i].x = shots[i].Extrinsics.Tra().X();
-    cloud->points[i].y = shots[i].Extrinsics.Tra().Y();
-    cloud->points[i].z = shots[i].Extrinsics.Tra().Z();
+    cloud->points[i] = PclProcessing::vcg2pclPt(shots[i].Extrinsics.Tra());
   }
-
-  pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
-
   kdtree.setInputCloud(cloud);
-  pcl::PointXYZ searchPoint;
 
   //  for(int i = 0 ; i < newShots.size(); i++){
   for(int i = 1 ; i < 2; i++){
-
-    searchPoint.x = newShots[i].Extrinsics.Tra().X();
-    searchPoint.y = newShots[i].Extrinsics.Tra().Y();
-    searchPoint.z = newShots[i].Extrinsics.Tra().Z();
-
-    // K nearest neighbor search
-    int K = 1;
+    searchPoint = PclProcessing::vcg2pclPt(newShots[i].Extrinsics.Tra());
 
     std::vector<int> pointIdxNKNSearch(K);
     std::vector<float> pointNKNSquaredDistance(K);
     vector<cv::Mat> tmpImgs;
+
     if (kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
 
-      cv::Mat newImg( getImg(imgFilenames[i]) );
+      cv::Mat newImg( getImg(new_image_filenames[i]) );
       cv::Mat oldImg( getImg(image_filenames[pointIdxNKNSearch[0]]) );
-      std::cout<<image_filenames[pointIdxNKNSearch[0]]<<std::endl;
-      break;
-      cv::Mat outImgG( oldImg.clone() );
-
-      cv::Mat outImg;
       cv::Mat finMask;
-      cv::Mat finThres;
-      
       cv::Mat H;
 
       if(ImgProcessing::getImgFundMat(newImg, oldImg, H)){
-      
-	warpPerspective(newImg, outImg, H, newImg.size());
-      
-	cv::Mat diffImg(cv::abs(oldImg-outImg));
-  
-	warpPerspective(diffImg, outImgG, H, diffImg.size(), cv::WARP_INVERSE_MAP);
-            
-	cv::cvtColor(outImgG, finThres, CV_BGR2GRAY);      
-	cv::threshold(finThres, finMask, 30, 255, CV_THRESH_OTSU);
-/*          
+
+	ImgChangeDetector::imgDiffThres(newImg, oldImg, H, finMask);
+          
 	tmpImgs.push_back(newImg);
 	tmpImgs.push_back(oldImg);
 	tmpImgs.push_back(finMask);
 	ImgIO::dispImgs(tmpImgs);
-	
+
+	/*
 
 	cv::Mat mask_3d_pts(ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H));
 	std::vector<vcg::Point3f> tmp_vec_pts;
@@ -161,12 +119,12 @@ void testNewNVM(map<int,string> inputStrings){
   ifstream inFile(inputStrings[IMAGELIST].c_str());
   
   string tmpString;
-  vector<string> imgFilenames;
+  vector<string> new_image_filenames;
 
   while(getline(inFile,tmpString))
-    imgFilenames.push_back(tmpString);
+    new_image_filenames.push_back(tmpString);
   
-  fileProc.procNewNVMfile(inputStrings[MESH], imgFilenames, "newNVM.nvm");
+  fileProc.procNewNVMfile(inputStrings[MESH], new_image_filenames, "newNVM.nvm");
 }
 
 void testNVM(map<int,string> inputStrings){

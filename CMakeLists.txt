@@ -11,7 +11,7 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 add_executable(masterThesis masterThesis.cpp util/utilIO.cpp util/meshProcess.cpp
- /usr/include/wrap/ply/plylib.cpp util/pbaUtil.cpp)
+ /usr/include/wrap/ply/plylib.cpp util/pbaUtil.cpp chngDet/chngDet.cpp)
  
 target_link_libraries(masterThesis ${PCL_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
 

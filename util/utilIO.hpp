@@ -11,6 +11,7 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
+#include <pcl/kdtree/kdtree_flann.h>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -77,6 +78,7 @@ public:
   static std::vector<vcg::Point3f> projChngMask(const std::string&, const cv::Mat&, const vcg::Shot<float>&);
   static cv::Mat getRtMatrix(const vcg::Shot<float>&);
   static cv::Mat getIntrMatrix(const vcg::Shot<float>&);
+  static int getKNNcamData(const pcl::KdTreeFLANN<pcl::PointXYZ>&, pcl::PointXYZ&, const std::vector<std::string>&, std::vector<cv::Mat>&, int K);
 };
 
 class VidIO : public ChangeDetectorIO{
@@ -93,6 +95,7 @@ public:
   FileIO(std::string inFile) : ChangeDetectorIO(inFile){};
   static void getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names); 
   static std::vector<vcg::Shot<float> > nvmCam2vcgShot(const std::vector<CameraT> &camera_data, const std::vector<std::string> names);
+  static void readNewFiles(const std::string&, std::vector<std::string>&);
 
 };
 

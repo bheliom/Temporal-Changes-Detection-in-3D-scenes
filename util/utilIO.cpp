@@ -39,6 +39,23 @@ void MeshIO::saveChngMask3d(const std::vector<std::vector<vcg::Point3f> > &pts_3
   savePlyFileVcg(name,m);
 }
 /**
+Function returns K-nearest neighbors camera images for given search point
+ */
+int ImgIO::getKNNcamData(const pcl::KdTreeFLANN<pcl::PointXYZ> &kdtree, pcl::PointXYZ &searchPoint, const std::vector<std::string> &filenames, std::vector<cv::Mat> &out_imgs, int K){
+
+  std::vector<int> pointIdxNKNSearch(K);
+  std::vector<float> pointNKNSquaredDistance(K);
+  int out = -1;
+  
+  if(kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance)>0){
+    for(int i = 0 ; i < K ; i++)
+      out_imgs.push_back( getImg(filenames[pointIdxNKNSearch[i]]) );
+    out = 0;
+  }
+  return out;
+}
+
+/**
    Function displays all the images given in the input vector.
 */
 void ImgIO::dispImgs(const std::vector<cv::Mat>& inImgs){
@@ -280,6 +297,18 @@ void CmdIO::callVsfm(std::string inCmd){
 
 void CmdIO::callCmd(std::string inCmd){
   system(inCmd.c_str());
+}
+
+
+void FileIO::readNewFiles(const std::string &list_filename, std::vector<std::string> &out_filenames){
+
+  std::ifstream inFile(list_filename.c_str());
+  std::string tmpString;
+
+  while(getline(inFile,tmpString))
+    out_filenames.push_back(tmpString);
+
+  inFile.close();
 }
 
 /**

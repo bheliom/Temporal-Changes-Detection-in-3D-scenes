@@ -4,6 +4,7 @@
 
 #include<vcg/space/point3.h>
 #include "../common/common.hpp"
+#include <opencv2/imgproc/imgproc.hpp>
 
 class ChangeDetector{
 
@@ -32,12 +33,15 @@ public:
   void setNewImgFilenames(std::vector<std::string> filenames)
   {newImgFilenames = filenames;}
   cv::Mat getImageDifference(cv::Mat img1, cv::Mat img2);
-  
+
   std::vector<vcg::Point3f> projChngMask(cv::Mat chngMask, vcg::Shot<float> inShot);
+  
   std::vector<float> getPofChange(){
   }
   std::vector<vcg::Point3f> getChangeMap(){
   }
+
+  static void imgDiffThres(cv::Mat, cv::Mat, cv::Mat, cv::Mat&);
   
 };
 

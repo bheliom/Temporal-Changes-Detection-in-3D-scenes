@@ -54,7 +54,7 @@ class PclProcessing : public DataProcessing{
 
 public:
   PclProcessing() : DataProcessing(){};
-  
+  static pcl::PointXYZ vcg2pclPt(vcg::Point3<float> inPt);
 };
 
 vcg::Point2i getPtImgCoord(const vcg::Point2f &inPoint, const vcg::Shot<float> &inShot);
@@ -62,7 +62,7 @@ double getEdgeAverage(MyMesh &m);
 double getFaceEdgeAverage(MyFace &f);
 void removeUnnFaces(MyMesh &m, int thresVal);
 void findOcc(std::map<int,int> &inMap, std::vector<int> &outVector, int noOfOut);
-pcl::PointXYZ vcg2pclPt(vcg::Point3<float> inPt);
+//pcl::PointXYZ vcg2pclPt(vcg::Point3<float> inPt);
 /*
 template <typename T>
 void visibilityEstimation(MyMesh &m, MyMesh &pmvsMesh, boost::shared_ptr<pcl::PointCloud<T> > pmvsCloud, int K, boost::shared_ptr<pcl::PointCloud<T> > mCloud, std::vector<vcg::Shot<float> > shots, std::vector<std::string> image_filenames){
