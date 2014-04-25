@@ -156,6 +156,17 @@ void FileProcessing::procNewNVMfile(const std::string &nvmFileDir, const std::ve
 
 }
 
+vcg::Point3f PclProcessing::pcl2vcgPt(pcl::PointXYZ inPt){
+  vcg::Point3f outPt;
+ 
+  outPt[0] = inPt.x;
+  outPt[1] = inPt.y;
+  outPt[2] = inPt.z;
+ 
+  return outPt;
+}
+
+
 pcl::PointXYZ PclProcessing::vcg2pclPt(vcg::Point3<float> inPt){
   pcl::PointXYZ outPt;
   outPt.x = inPt.X();

@@ -1,8 +1,11 @@
 #include "utilIO.hpp"
 #include "pbaDataInterface.h"
+#include "meshProcess.hpp"
 #include "../common/globVariables.hpp"
+
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/voxel_grid_occlusion_estimation.h>
+
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
@@ -185,20 +188,26 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
 
     voxel_grid.occlusionEstimation(is_occ, out_ray, vox_coord);
 
-    std::cout<<"traversed voxels:"<< out_ray.size()<< std::endl;
+    while(is_occ==0){
 
-    while(is_occ==0 && cnt<3){
+      //      direction = origin + mp_factor*direction;  
+      //      vox_coord = voxel_grid.getGridCoord(direction[0] , direction[1], direction[2]);        
+      vox_coord = out_ray[cnt];
 
-      direction = origin + mp_factor*direction;  
-      vox_coord = voxel_grid.getGridCoord(direction[0] , direction[1], direction[2]);        
       voxel_grid.occlusionEstimation(is_occ, vox_coord);
       
       cnt++;
     }
     
+    pcl::PointXYZ fin_pt = cloud->points[voxel_grid.getCentroidIndexAt(vox_coord)];
+
+    tmp_pt = PclProcessing::pcl2vcgPt(fin_pt);
+
+    /*
     tmp_pt[0] = direction[0];
     tmp_pt[1] = direction[1];
     tmp_pt[2] = direction[2];
+    */
 
     out_pts.push_back(tmp_pt);
   } 

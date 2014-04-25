@@ -55,6 +55,7 @@ class PclProcessing : public DataProcessing{
 public:
   PclProcessing() : DataProcessing(){};
   static pcl::PointXYZ vcg2pclPt(vcg::Point3<float> inPt);
+  static vcg::Point3f pcl2vcgPt(pcl::PointXYZ inPt);
 };
 
 vcg::Point2i getPtImgCoord(const vcg::Point2f &inPoint, const vcg::Shot<float> &inShot);
