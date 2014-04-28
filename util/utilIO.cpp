@@ -289,7 +289,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     }
   } 
   DrawProgressBar(40, 1);
-  std::endl;
+  std::cout<<"\n";
   return out_pts;
 }
 
