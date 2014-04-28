@@ -20,7 +20,7 @@ int rayBox::getFirstOccl(const Eigen::Vector4f& origin, const Eigen::Vector4f& d
   // coordinate of the boundary of the voxel grid
   Eigen::Vector4f start = origin + t_min * direction;
    
-  start*=0.5;
+  start*=0.3;
   // i,j,k coordinate of the voxel were the ray enters the voxel grid
   Eigen::Vector3i ijk = getGridCoordinatesRound (start[0], start[1], start[2]);
    
@@ -264,22 +264,22 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     if(tmp_mp == -1.0f){
       continue;
     }
-
+    
     /*
-    float mp_factor = 0.6;
-    direction = origin + tmp_mp*direction;
-    direction = origin + mp_factor*direction;  
-    Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);     
-    int is_occ = 0;
+      float mp_factor = 0.6;
+      direction = origin + tmp_mp*direction;
+      direction = origin + mp_factor*direction;  
+      Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);     
+      int is_occ = 0;
     */
-
+    
     int cloud_idx = -1;
-
+    
     //    std::vector<Eigen::Vector3i> out_ray;
     //    voxel_grid.occlusionEstimation(is_occ, out_ray, vox_coord);    
     
     cloud_idx = voxel_grid.getFirstOccl(origin, direction, tmp_mp);
-
+    
     if(cloud_idx!=-1){
       pcl::PointXYZ fin_pt = cloud->points[cloud_idx];
       
@@ -289,6 +289,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     }
   } 
   DrawProgressBar(40, 1);
+  std::endl;
   return out_pts;
 }
 
