@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include "opencv2/calib3d/calib3d.hpp"
 #include <ctime>
+
 /**
    Function returns index of the first encountered voxel that is occluded. It is a modification of rayTraversal function implemented in PCL library class VoxelGridOcclusionEstimation.
 */
@@ -19,6 +20,7 @@ int rayBox::getFirstOccl(const Eigen::Vector4f& origin, const Eigen::Vector4f& d
   // coordinate of the boundary of the voxel grid
   Eigen::Vector4f start = origin + t_min * direction;
    
+  start*=0.5;
   // i,j,k coordinate of the voxel were the ray enters the voxel grid
   Eigen::Vector3i ijk = getGridCoordinatesRound (start[0], start[1], start[2]);
    
@@ -68,13 +70,12 @@ int rayBox::getFirstOccl(const Eigen::Vector4f& origin, const Eigen::Vector4f& d
   float t_delta_z = leaf_size_[2] / static_cast<float> (fabs (direction[2]));
    
   // index of the point in the point cloud
-  int index;
+  int index = -1;
    
   while ( (ijk[0] < max_b_[0]+1) && (ijk[0] >= min_b_[0]) && 
 	  (ijk[1] < max_b_[1]+1) && (ijk[1] >= min_b_[1]) && 
 	  (ijk[2] < max_b_[2]+1) && (ijk[2] >= min_b_[2]) )
     {
-
       index = this->getCentroidIndexAt (ijk);
       if (index != -1)
 	return index;
@@ -110,7 +111,7 @@ void MeshIO::saveChngMask3d(const std::vector<std::vector<vcg::Point3f> > &pts_3
   float x, y, z;
   int count = 0;
 
-  for(int i = 0 ; i < 1 ; i++){
+  for(int i = 0 ; i < pts_3d.size() ; i++){
     DrawProgressBar(40, (double)i/(double)pts_3d.size());
 
     for(int j = 0 ; j < pts_3d[i].size(); j++){
@@ -237,10 +238,10 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   
   MeshIO::getPlyFilePCL(filename, cloud);
 
-  //  shot.Extrinsics.Tra().ToEigenVector(cloud->sensor_origin_);
+  shot.Extrinsics.Tra().ToEigenVector(cloud->sensor_origin_);
 
   voxel_grid.setInputCloud(cloud);
-  voxel_grid.setLeafSize (0.04f, 0.04f, 0.04f);
+  voxel_grid.setLeafSize (0.05f, 0.05f, 0.05f);
   voxel_grid.initializeVoxelGrid();
     
   getPtsFromMask(chng_mask, mask_pts);
@@ -249,7 +250,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     
   for(int i = 0 ; i < mask_pts.size(); i++){
     
-    if(i % 10 == 0){
+    if(i % 100 == 0){
       prog_perc = double(i)/double(mask_pts.size());
       DrawProgressBar(40, prog_perc);
     }
@@ -265,43 +266,27 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
       continue;
     }
 
+    /*
     float mp_factor = 0.6;
     direction = origin + tmp_mp*direction;
     direction = origin + mp_factor*direction;  
     Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);     
     int is_occ = 0;
-    int check_occ = -1;
-    int cnt = 0;
-    int v_idx = 0;
-    std::vector<Eigen::Vector3i> out_ray;
-
-    voxel_grid.occlusionEstimation(is_occ, out_ray, vox_coord);    
-    v_idx = out_ray.size();
-
-    //    while(is_occ == 0 && check_occ == 0 ){
-    //    while(cnt<1000){
-      //      direction = origin + mp_factor*direction;  
-      //      vox_coord = voxel_grid.getGridCoord(direction[0] , direction[1], direction[2]);        
-      //      vox_coord = out_ray[v_idx];
-
-      //      check_occ = voxel_grid.occlusionEstimation(is_occ, vox_coord);
-      
-
-      // v_idx--;
-      // cnt++;
-      //}
-    if(voxel_grid.getFirstOccl(origin, direction, tmp_mp)!=-1){
-      pcl::PointXYZ fin_pt = cloud->points[voxel_grid.getCentroidIndexAt(vox_coord)];
-
-      tmp_pt = PclProcessing::pcl2vcgPt(fin_pt);
-    
-    /*
-      tmp_pt[0] = direction[0];
-      tmp_pt[1] = direction[1];
-      tmp_pt[2] = direction[2];
     */
 
-    out_pts.push_back(tmp_pt);
+    int cloud_idx = -1;
+
+    //    std::vector<Eigen::Vector3i> out_ray;
+    //    voxel_grid.occlusionEstimation(is_occ, out_ray, vox_coord);    
+    
+    cloud_idx = voxel_grid.getFirstOccl(origin, direction, tmp_mp);
+
+    if(cloud_idx!=-1){
+      pcl::PointXYZ fin_pt = cloud->points[cloud_idx];
+      
+      tmp_pt = PclProcessing::pcl2vcgPt(fin_pt);    
+      tmp_pt[0] += rand()%-1+1;
+      out_pts.push_back(tmp_pt);
     }
   } 
 

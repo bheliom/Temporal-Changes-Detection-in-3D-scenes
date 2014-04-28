@@ -78,8 +78,8 @@ void testPipeline(map<int,string> inputStrings){
   kdtree.setInputCloud(cloud);
   int K = 1;
 
-  //  for(int i = 0 ; i < newShots.size(); i++){
-  for(int i = 1 ; i < 2; i++){
+  for(int i = 0 ; i < newShots.size(); i++){
+  //  for(int i = 1 ; i < 2; i++){
     searchPoint = PclProcessing::vcg2pclPt(newShots[i].Extrinsics.Tra());
 
     vector<int> pointIdxNKNSearch(K);
@@ -105,11 +105,12 @@ void testPipeline(map<int,string> inputStrings){
 	if(ImgProcessing::getImgFundMat(newImg, oldImg, H)){
 	  
 	  ImgChangeDetector::imgDiffThres(newImg, oldImg, H, finMask);
-          
-	  tmpImgs.push_back(newImg);
-	  tmpImgs.push_back(oldImg);
-	  tmpImgs.push_back(finMask);
-	  ImgIO::dispImgs(tmpImgs);
+	  /*        
+		    tmpImgs.push_back(newImg);
+		    tmpImgs.push_back(oldImg);
+		    tmpImgs.push_back(finMask);
+		    ImgIO::dispImgs(tmpImgs);
+	  */
 	  
 	  /*	    
 		    cv::Mat mask_3d_pts(ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H));
