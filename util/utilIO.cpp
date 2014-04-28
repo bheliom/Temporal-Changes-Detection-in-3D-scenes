@@ -284,7 +284,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
       pcl::PointXYZ fin_pt = cloud->points[cloud_idx];
       
       tmp_pt = PclProcessing::pcl2vcgPt(fin_pt);    
-      tmp_pt[0] += rand()%-1+1;
+      tmp_pt *= rand()%-3+3;
       out_pts.push_back(tmp_pt);
     }
   } 
