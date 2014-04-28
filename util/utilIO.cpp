@@ -11,6 +11,93 @@
 #include <cstdlib>
 #include "opencv2/calib3d/calib3d.hpp"
 #include <ctime>
+/**
+   Function returns index of the first encountered voxel that is occluded. It is a modification of rayTraversal function implemented in PCL library class VoxelGridOcclusionEstimation.
+*/
+
+int rayBox::getFirstOccl(const Eigen::Vector4f& origin, const Eigen::Vector4f& direction, const float t_min){
+  // coordinate of the boundary of the voxel grid
+  Eigen::Vector4f start = origin + t_min * direction;
+   
+  // i,j,k coordinate of the voxel were the ray enters the voxel grid
+  Eigen::Vector3i ijk = getGridCoordinatesRound (start[0], start[1], start[2]);
+   
+  // steps in which direction we have to travel in the voxel grid
+  int step_x, step_y, step_z;
+   
+  // centroid coordinate of the entry voxel
+  Eigen::Vector4f voxel_max = getCentroidCoordinate (ijk);
+   
+  if (direction[0] >= 0)
+    {
+      voxel_max[0] += leaf_size_[0] * 0.5f;
+      step_x = 1;
+    }
+  else
+    {
+      voxel_max[0] -= leaf_size_[0] * 0.5f;
+      step_x = -1;
+    }
+  if (direction[1] >= 0)
+    {
+      voxel_max[1] += leaf_size_[1] * 0.5f;
+      step_y = 1;
+    }
+  else
+    {
+      voxel_max[1] -= leaf_size_[1] * 0.5f;
+      step_y = -1;
+    }
+  if (direction[2] >= 0)
+    {
+      voxel_max[2] += leaf_size_[2] * 0.5f;
+      step_z = 1;
+    }
+  else
+    {
+      voxel_max[2] -= leaf_size_[2] * 0.5f;
+      step_z = -1;
+    }
+   
+  float t_max_x = t_min + (voxel_max[0] - start[0]) / direction[0];
+  float t_max_y = t_min + (voxel_max[1] - start[1]) / direction[1];
+  float t_max_z = t_min + (voxel_max[2] - start[2]) / direction[2];
+        
+  float t_delta_x = leaf_size_[0] / static_cast<float> (fabs (direction[0]));
+  float t_delta_y = leaf_size_[1] / static_cast<float> (fabs (direction[1]));
+  float t_delta_z = leaf_size_[2] / static_cast<float> (fabs (direction[2]));
+   
+  // index of the point in the point cloud
+  int index;
+   
+  while ( (ijk[0] < max_b_[0]+1) && (ijk[0] >= min_b_[0]) && 
+	  (ijk[1] < max_b_[1]+1) && (ijk[1] >= min_b_[1]) && 
+	  (ijk[2] < max_b_[2]+1) && (ijk[2] >= min_b_[2]) )
+    {
+
+      index = this->getCentroidIndexAt (ijk);
+      if (index != -1)
+	return index;
+   
+      // estimate next voxel
+      if(t_max_x <= t_max_y && t_max_x <= t_max_z)
+	{
+	  t_max_x += t_delta_x;
+	  ijk[0] += step_x;
+	}
+      else if(t_max_y <= t_max_z && t_max_y <= t_max_x)
+	{
+	  t_max_y += t_delta_y;
+	  ijk[1] += step_y;
+	}
+      else
+	{
+	  t_max_z += t_delta_z;
+	  ijk[2] += step_z;
+	}
+    }
+  return index;
+}
 
 /**
    Function creates a mesh from 3D change mask points and saves the PLY file.
@@ -42,8 +129,8 @@ void MeshIO::saveChngMask3d(const std::vector<std::vector<vcg::Point3f> > &pts_3
   savePlyFileVcg(name,m);
 }
 /**
-Function returns K-nearest neighbors camera images for given search point
- */
+   Function returns K-nearest neighbors camera images for given search point
+*/
 int ImgIO::getKNNcamData(const pcl::KdTreeFLANN<pcl::PointXYZ> &kdtree, pcl::PointXYZ &searchPoint, const std::vector<std::string> &filenames, std::vector<cv::Mat> &out_imgs, int K){
 
   std::vector<int> pointIdxNKNSearch(K);
@@ -135,7 +222,7 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
 }
 
 /**
-Function projects 2D change mask into 3-dimensional space using point cloud voxelization and computation of ray intersections with the voxels
+   Function projects 2D change mask into 3-dimensional space using point cloud voxelization and computation of ray intersections with the voxels
 */
 std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const cv::Mat &chng_mask, const vcg::Shot<float> &shot){
   
@@ -150,7 +237,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   
   MeshIO::getPlyFilePCL(filename, cloud);
 
-  shot.Extrinsics.Tra().ToEigenVector(cloud->sensor_origin_);
+  //  shot.Extrinsics.Tra().ToEigenVector(cloud->sensor_origin_);
 
   voxel_grid.setInputCloud(cloud);
   voxel_grid.setLeafSize (0.04f, 0.04f, 0.04f);
@@ -177,44 +264,45 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     if(tmp_mp == -1.0f){
       continue;
     }
+
     float mp_factor = 0.6;
     direction = origin + tmp_mp*direction;
     direction = origin + mp_factor*direction;  
     Eigen::Vector3i vox_coord = voxel_grid.getGridCoord(direction[0],direction[1],direction[2]);     
-
-
     int is_occ = 0;
-    int check_occ = 0;
+    int check_occ = -1;
     int cnt = 0;
     int v_idx = 0;
     std::vector<Eigen::Vector3i> out_ray;
 
-    voxel_grid.occlusionEstimation(is_occ, out_ray, vox_coord);
-    
+    voxel_grid.occlusionEstimation(is_occ, out_ray, vox_coord);    
     v_idx = out_ray.size();
 
-    while(is_occ == 0 && check_occ == 0){
-
+    //    while(is_occ == 0 && check_occ == 0 ){
+    //    while(cnt<1000){
       //      direction = origin + mp_factor*direction;  
       //      vox_coord = voxel_grid.getGridCoord(direction[0] , direction[1], direction[2]);        
-      vox_coord = out_ray[v_idx];
+      //      vox_coord = out_ray[v_idx];
 
-      check_occ = voxel_grid.occlusionEstimation(is_occ, vox_coord);
-      v_idx--;
-      cnt++;
-    }
+      //      check_occ = voxel_grid.occlusionEstimation(is_occ, vox_coord);
+      
+
+      // v_idx--;
+      // cnt++;
+      //}
+    if(voxel_grid.getFirstOccl(origin, direction, tmp_mp)!=-1){
+      pcl::PointXYZ fin_pt = cloud->points[voxel_grid.getCentroidIndexAt(vox_coord)];
+
+      tmp_pt = PclProcessing::pcl2vcgPt(fin_pt);
     
-    pcl::PointXYZ fin_pt = cloud->points[voxel_grid.getCentroidIndexAt(vox_coord)];
-
-    tmp_pt = PclProcessing::pcl2vcgPt(fin_pt);
-
     /*
-    tmp_pt[0] = direction[0];
-    tmp_pt[1] = direction[1];
-    tmp_pt[2] = direction[2];
+      tmp_pt[0] = direction[0];
+      tmp_pt[1] = direction[1];
+      tmp_pt[2] = direction[2];
     */
 
     out_pts.push_back(tmp_pt);
+    }
   } 
 
   return out_pts;

@@ -83,9 +83,6 @@ bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
   //-- Localize the object
   std::vector<cv::Point2f> img1_pts;
   std::vector<cv::Point2f> img2_pts;
-
-  if(good_matches.size()>200)
-    return false;
   
   std::cout<<"Good matches size:" << good_matches.size()<<std::endl;
   for( int i = 0; i < good_matches.size(); i++ )
@@ -94,6 +91,9 @@ bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
       img1_pts.push_back( keyPtsImg1[ good_matches[i].queryIdx ].pt );
       img2_pts.push_back( keyPtsImg2[ good_matches[i].trainIdx ].pt );
     }
+
+  if(good_matches.size()>200 || good_matches.size()<4)
+    return false;
 
   H = cv::findHomography(img1_pts, img2_pts, CV_RANSAC, 5);
 

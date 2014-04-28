@@ -51,13 +51,19 @@ void testPipeline(map<int,string> inputStrings){
   CmdIO::callCmd("cp "+inputStrings[PMVS]+" "+inputStrings[BUNDLER]+".txt");
 
   CmdIO vsfmHandler("./");
-  vsfmHandler.callVsfm(" sfm+resume+fixcam "+inputStrings[BUNDLER]+" "+inputStrings[OUTDIR]);
+  
+  //HOOK TO WORK ON LAPTOP
+
+ //  vsfmHandler.callVsfm(" sfm+resume+fixcam "+inputStrings[BUNDLER]+" "+inputStrings[OUTDIR]);
 
   FileIO::readNewFiles(inputStrings[PMVS], new_image_filenames);
   string  tmpString = "newNVM.nvm";
 
   FileProcessing fileProc;  
-  fileProc.procNewNVMfile(inputStrings[OUTDIR], new_image_filenames, tmpString);
+
+  //HOOK TO WORK ON LAPTOP
+
+  //  fileProc.procNewNVMfile(inputStrings[OUTDIR], new_image_filenames, tmpString);
 
   FileIO::getNVM(tmpString, newCameraData, new_image_filenames);
   newShots = FileIO::nvmCam2vcgShot(newCameraData, new_image_filenames);

@@ -29,17 +29,19 @@ It requires an image list called [input].nvm.txt with new images paths
 */
 
 class rayBox : public pcl::VoxelGridOcclusionEstimation<pcl::PointXYZ>{
-
+  
 public:
-
-float getBoxIntersection(const Eigen::Vector4f &origin, const Eigen::Vector4f &direction){
-return rayBoxIntersection(origin, direction);
-}
-
-Eigen::Vector3i getGridCoord(float x, float y, float z){
-return getGridCoordinatesRound(x,y,z);
-}
-
+  
+  float getBoxIntersection(const Eigen::Vector4f &origin, const Eigen::Vector4f &direction){
+    return rayBoxIntersection(origin, direction);
+  }
+  
+  Eigen::Vector3i getGridCoord(float x, float y, float z){
+    return getGridCoordinatesRound(x,y,z);
+  }
+  
+  int getFirstOccl(const Eigen::Vector4f& origin, const Eigen::Vector4f& direction, const float t_min);
+  
 };
 
 class ChangeDetectorIO{
