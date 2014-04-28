@@ -19,7 +19,6 @@
 
 #include "pbaUtil.h"
 
-
 /*
 To run VisualSFM:
 
@@ -81,6 +80,7 @@ public:
   static cv::Mat getRtMatrix(const vcg::Shot<float>&);
   static cv::Mat getIntrMatrix(const vcg::Shot<float>&);
   static int getKNNcamData(const pcl::KdTreeFLANN<pcl::PointXYZ>&, pcl::PointXYZ&, const std::vector<std::string>&, std::vector<cv::Mat>&, int K);
+
 };
 
 class VidIO : public ChangeDetectorIO{

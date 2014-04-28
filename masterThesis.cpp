@@ -79,7 +79,6 @@ void testPipeline(map<int,string> inputStrings){
   int K = 5;
 
   for(int i = 0 ; i < newShots.size(); i++){
-  //  for(int i = 1 ; i < 2; i++){
     searchPoint = PclProcessing::vcg2pclPt(newShots[i].Extrinsics.Tra());
 
     vector<int> pointIdxNKNSearch(K);
@@ -119,7 +118,7 @@ void testPipeline(map<int,string> inputStrings){
 		    
 		    tmp_3d_masks.push_back(tmp_vec_pts);
 	  */  
-
+	  
 	  tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i]));
 	}		
       }
