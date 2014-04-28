@@ -76,7 +76,7 @@ void testPipeline(map<int,string> inputStrings){
     cloud->points[i] = PclProcessing::vcg2pclPt(shots[i].Extrinsics.Tra());
   }
   kdtree.setInputCloud(cloud);
-  int K = 1;
+  int K = 5;
 
   for(int i = 0 ; i < newShots.size(); i++){
   //  for(int i = 1 ; i < 2; i++){

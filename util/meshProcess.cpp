@@ -83,8 +83,7 @@ bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
   //-- Localize the object
   std::vector<cv::Point2f> img1_pts;
   std::vector<cv::Point2f> img2_pts;
-  
-  std::cout<<"Good matches size:" << good_matches.size()<<std::endl;
+ 
   for( int i = 0; i < good_matches.size(); i++ )
     {
       //-- Get the keypoints from the good matches

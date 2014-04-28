@@ -173,8 +173,6 @@ void ImgIO::getPtsFromMask(const cv::Mat &mask, std::vector<cv::Point2f> &pts_ve
 
   int rows = mask.rows;
   int cols = mask.cols;
-
-  std::cout<<"Cols:"<<cols<<" Rows:"<<rows<<std::endl;
   
   for(int r = 0; r < rows; r++){
     for(int c = 0; c < cols; c++){      
@@ -227,6 +225,7 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
 */
 std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const cv::Mat &chng_mask, const vcg::Shot<float> &shot){
   
+  std::cout<<"Projecting 2D change mask into 3D space..." <<std::endl;
   std::vector<vcg::Point3f> out_pts;
   std::vector<cv::Point2f> mask_pts;
   rayBox voxel_grid;
@@ -241,7 +240,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   shot.Extrinsics.Tra().ToEigenVector(cloud->sensor_origin_);
 
   voxel_grid.setInputCloud(cloud);
-  voxel_grid.setLeafSize (0.05f, 0.05f, 0.05f);
+  voxel_grid.setLeafSize (0.1f, 0.1f, 0.1f);
   voxel_grid.initializeVoxelGrid();
     
   getPtsFromMask(chng_mask, mask_pts);
@@ -289,7 +288,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
       out_pts.push_back(tmp_pt);
     }
   } 
-
+  DrawProgressBar(40, 1);
   return out_pts;
 }
 
