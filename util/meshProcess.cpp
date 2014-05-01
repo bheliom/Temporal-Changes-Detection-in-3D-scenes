@@ -241,6 +241,7 @@ void FileProcessing::procNewNVMfile(const std::string &nvmFileDir, const std::ve
 	outFile << tmpString + "\n";      
       tmpStrVec.clear();
     }
+  outFile<<"0";
   outFile.close();
 
   std::cout<<"Done."<<std::endl;
