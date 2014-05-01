@@ -33,11 +33,15 @@ This file originaly from Changchang Wu has been modified for purpose of this pro
 #include <time.h>
 #include <iomanip>
 #include <algorithm>
+
+#include "../common/common.hpp"
+#include "pbaDataInterface.h"
+#include "utilIO.hpp"
+
 using namespace std;
 
-#include "pbaDataInterface.h"
-
 /////////////////////////////////////////////////////////////////////////////
-bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names);
+
+bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names, vector<PtCamCorr>& pt_corr);
 
 #endif

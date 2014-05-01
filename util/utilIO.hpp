@@ -18,6 +18,16 @@
 
 #include "pbaUtil.h"
 
+struct PtCamCorrespondence{
+  std::vector<vcg::Point3f> pts_3d;
+  std::vector<cv::Point2i> feat_coords;
+  std::vector<int> ptidx;
+  std::vector<int> camidx;
+  std::vector<int> ptc;
+
+};
+
+
 /*
 To run VisualSFM:
 
@@ -78,7 +88,7 @@ class FileIO : public ChangeDetectorIO{
 
 public:
   FileIO(std::string inFile) : ChangeDetectorIO(inFile){};
-  static void getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names); 
+  static void getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names,std::vector<PtCamCorr>&); 
   static std::vector<vcg::Shot<float> > nvmCam2vcgShot(const std::vector<CameraT> &camera_data, const std::vector<std::string> names);
   static void readNewFiles(const std::string&, std::vector<std::string>&);
 
@@ -118,6 +128,9 @@ if(pcl::io::loadPLYFile<T> (filename, *outCloud) == -1)
 /**
  Function taken from http://stackoverflow.com/questions/60221/how-to-animate-the-command-line
  */
+
+
+
 inline void DrawProgressBar(int len, double percent) {
   std::cout << "\x1B[2K"; // Erase the entire current line.
   std::cout << "\x1B[0E"; // Move to the beginning of the current line.

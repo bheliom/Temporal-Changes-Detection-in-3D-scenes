@@ -44,8 +44,11 @@ void testPipeline(map<int,string> inputStrings){
   vector<CameraT> camera_data, newCameraData;
   pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
   pcl::PointXYZ searchPoint;
+  
+  vector<PtCamCorr> pt_cam_corr;
+  vector<PtCamCorr> tmp_corr;
 
-  FileIO::getNVM(inputStrings[BUNDLER], camera_data, image_filenames);
+  FileIO::getNVM(inputStrings[BUNDLER], camera_data, image_filenames, pt_cam_corr);
   shots = FileIO::nvmCam2vcgShot(camera_data, image_filenames);
   
   CmdIO::callCmd("cp "+inputStrings[PMVS]+" "+inputStrings[BUNDLER]+".txt");
@@ -65,7 +68,7 @@ void testPipeline(map<int,string> inputStrings){
 
   fileProc.procNewNVMfile(inputStrings[OUTDIR], new_image_filenames, tmpString);
 
-  FileIO::getNVM(tmpString, newCameraData, new_image_filenames);
+  FileIO::getNVM(tmpString, newCameraData, new_image_filenames, tmp_corr);
   newShots = FileIO::nvmCam2vcgShot(newCameraData, new_image_filenames);
 
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
@@ -176,8 +179,9 @@ void testNVM(map<int,string> inputStrings){
 
   vector<CameraT> camera_data;
   vector<string> names;
+  vector<PtCamCorr> tmp_corr;
 
-  FileIO::getNVM(inputStrings[MESH], camera_data, names);
+  FileIO::getNVM(inputStrings[MESH], camera_data, names, tmp_corr);
 
   vector<vcg::Shot<float> > shots = FileIO::nvmCam2vcgShot(camera_data, names);
 

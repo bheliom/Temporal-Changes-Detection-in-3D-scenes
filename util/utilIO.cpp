@@ -368,12 +368,13 @@ std::vector<vcg::Shot<float> > FileIO::nvmCam2vcgShot(const std::vector<CameraT>
 /**
 Function loads data from NVM file
 */
-void FileIO::getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names){
+void FileIO::getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names, std::vector<PtCamCorr>& pt_cam_corr){
+  
 
   std::ifstream inFile(filename.c_str());
   
   std::cout<<"Loading NVM file... ";
-  if(LoadNVM(inFile, camera_data, names))
+  if(LoadNVM(inFile, camera_data, names, pt_cam_corr))
     std::cout<<"Done!"<<endl;
   inFile.close();
 }

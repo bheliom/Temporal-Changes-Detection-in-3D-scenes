@@ -1,7 +1,8 @@
 #include "pbaUtil.h"
 
 using namespace std;
-bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names)
+
+bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names, vector<PtCamCorr>& pt_corr)
 {
     int rotation_parameter_num = 4; 
     bool format_r9t = false;
@@ -52,11 +53,13 @@ bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names)
       std::cout << ncam << "new cameras\n";
       return true; 
     }
-    /* 
+     
     //read image projections and 3D points.
-    point_data.resize(npoint); 
+    pt_corr.resize(npoint); 
     for(int i = 0; i < npoint; ++i)
       {
+	PtCamCorr tmp_corr;
+
 	float pt[3]; int cc[3], npj;
 	in  >> pt[0] >> pt[1] >> pt[2] 
 	    >> cc[0] >> cc[1] >> cc[2] >> npj;
@@ -65,17 +68,25 @@ bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names)
 	    int cidx, fidx; float imx, imy;
 	    in >> cidx >> fidx >> imx >> imy;
 	    
-	    camidx.push_back(cidx);    //camera index
-	    ptidx.push_back(i);        //point index
+	    tmp_corr.camidx.push_back(cidx);    //camera index
+	    tmp_corr.ptidx.push_back(i);        //point index
 	    
 	    //add a measurment to the vector
-	    measurements.push_back(Point2D(imx, imy));
-	      nproj ++;
+	    tmp_corr.feat_coords.push_back(cv::Point2i(imx, imy));
+	    nproj ++;
 	  }
-	point_data[i].SetPoint(pt);
-	ptc.insert(ptc.end(), cc, cc + 3);
+
+	tmp_corr.pts_3d[0] = pt[0];
+	tmp_corr.pts_3d[1] = pt[1];
+	tmp_corr.pts_3d[2] = pt[2];
+
+	tmp_corr.ptc.x = cc[0];
+	tmp_corr.ptc.y = cc[1];
+	tmp_corr.ptc.z = cc[2];
+ 
+	pt_corr[i] = tmp_corr;
       }
-    */
+    
     std::cout << ncam << " old cameras\n";
 
     return true;

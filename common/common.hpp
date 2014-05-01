@@ -23,7 +23,14 @@ class MyFace    : public vcg::Face<   MyUsedTypes, vcg::face::Color4b, vcg::face
 class MyEdge    : public vcg::Edge<   MyUsedTypes> {};
   
 class MyMesh    : public vcg::tri::TriMesh< std::vector<MyVertex>, std::vector<MyFace> , std::vector<MyEdge>  > {};
-  
+
+struct PtCamCorr{
+  vcg::Point3f pts_3d;
+  std::vector<cv::Point2i> feat_coords;
+  std::vector<int> ptidx;
+  std::vector<int> camidx;
+  cv::Point3i ptc;
+};
 
 
 #endif
