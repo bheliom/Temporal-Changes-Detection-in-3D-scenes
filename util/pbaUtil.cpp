@@ -46,7 +46,37 @@ bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names)
         names[i] = token;
     }
 
-    std::cout << ncam << " cameras\n";
+
+    in >> npoint;
+    if(npoint <= 0){
+      std::cout << ncam << "new cameras\n";
+      return true; 
+    }
+    /* 
+    //read image projections and 3D points.
+    point_data.resize(npoint); 
+    for(int i = 0; i < npoint; ++i)
+      {
+	float pt[3]; int cc[3], npj;
+	in  >> pt[0] >> pt[1] >> pt[2] 
+	    >> cc[0] >> cc[1] >> cc[2] >> npj;
+	for(int j = 0; j < npj; ++j)
+	  {
+	    int cidx, fidx; float imx, imy;
+	    in >> cidx >> fidx >> imx >> imy;
+	    
+	    camidx.push_back(cidx);    //camera index
+	    ptidx.push_back(i);        //point index
+	    
+	    //add a measurment to the vector
+	    measurements.push_back(Point2D(imx, imy));
+	      nproj ++;
+	  }
+	point_data[i].SetPoint(pt);
+	ptc.insert(ptc.end(), cc, cc + 3);
+      }
+    */
+    std::cout << ncam << " old cameras\n";
 
     return true;
 }

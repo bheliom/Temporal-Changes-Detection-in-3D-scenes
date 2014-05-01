@@ -13,94 +13,6 @@
 #include <ctime>
 
 /**
-   Function returns index of the first encountered voxel that is occluded. It is a modification of rayTraversal function implemented in PCL library class VoxelGridOcclusionEstimation.
-*/
-
-int rayBox::getFirstOccl(const Eigen::Vector4f& origin, const Eigen::Vector4f& direction, const float t_min){
-  // coordinate of the boundary of the voxel grid
-  Eigen::Vector4f start = origin + t_min * direction;
-   
-  start*=0.5;
-  // i,j,k coordinate of the voxel were the ray enters the voxel grid
-  Eigen::Vector3i ijk = getGridCoordinatesRound (start[0], start[1], start[2]);
-   
-  // steps in which direction we have to travel in the voxel grid
-  int step_x, step_y, step_z;
-   
-  // centroid coordinate of the entry voxel
-  Eigen::Vector4f voxel_max = getCentroidCoordinate (ijk);
-   
-  if (direction[0] >= 0)
-    {
-      voxel_max[0] += leaf_size_[0] * 0.5f;
-      step_x = 1;
-    }
-  else
-    {
-      voxel_max[0] -= leaf_size_[0] * 0.5f;
-      step_x = -1;
-    }
-  if (direction[1] >= 0)
-    {
-      voxel_max[1] += leaf_size_[1] * 0.5f;
-      step_y = 1;
-    }
-  else
-    {
-      voxel_max[1] -= leaf_size_[1] * 0.5f;
-      step_y = -1;
-    }
-  if (direction[2] >= 0)
-    {
-      voxel_max[2] += leaf_size_[2] * 0.5f;
-      step_z = 1;
-    }
-  else
-    {
-      voxel_max[2] -= leaf_size_[2] * 0.5f;
-      step_z = -1;
-    }
-   
-  float t_max_x = t_min + (voxel_max[0] - start[0]) / direction[0];
-  float t_max_y = t_min + (voxel_max[1] - start[1]) / direction[1];
-  float t_max_z = t_min + (voxel_max[2] - start[2]) / direction[2];
-        
-  float t_delta_x = leaf_size_[0] / static_cast<float> (fabs (direction[0]));
-  float t_delta_y = leaf_size_[1] / static_cast<float> (fabs (direction[1]));
-  float t_delta_z = leaf_size_[2] / static_cast<float> (fabs (direction[2]));
-   
-  // index of the point in the point cloud
-  int index = -1;
-   
-  while ( (ijk[0] < max_b_[0]+1) && (ijk[0] >= min_b_[0]) && 
-	  (ijk[1] < max_b_[1]+1) && (ijk[1] >= min_b_[1]) && 
-	  (ijk[2] < max_b_[2]+1) && (ijk[2] >= min_b_[2]) )
-    {
-      index = this->getCentroidIndexAt (ijk);
-      if (index != -1)
-	return index;
-   
-      // estimate next voxel
-      if(t_max_x <= t_max_y && t_max_x <= t_max_z)
-	{
-	  t_max_x += t_delta_x;
-	  ijk[0] += step_x;
-	}
-      else if(t_max_y <= t_max_z && t_max_y <= t_max_x)
-	{
-	  t_max_y += t_delta_y;
-	  ijk[1] += step_y;
-	}
-      else
-	{
-	  t_max_z += t_delta_z;
-	  ijk[2] += step_z;
-	}
-    }
-  return index;
-}
-
-/**
    Function creates a mesh from 3D change mask points and saves the PLY file.
 */
 void MeshIO::saveChngMask3d(const std::vector<std::vector<vcg::Point3f> > &pts_3d, const std::string &name){
@@ -129,6 +41,7 @@ void MeshIO::saveChngMask3d(const std::vector<std::vector<vcg::Point3f> > &pts_3
   std::cout<<"Vertices:"<<m.VN()<<std::endl;
   savePlyFileVcg(name,m);
 }
+
 /**
    Function returns K-nearest neighbors camera images for given search point
 */
@@ -282,8 +195,6 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   return out_pts;
 }
 
-
-
 /**
    Function projects 2D change mask into 3-dimensional space using triangulation.
 */
@@ -359,7 +270,9 @@ void VidIO::saveImgFromVideo(std::string outDir, int frameRate){
   }
   std::cout<<"Done!"<<std::endl;
 }
-
+/**
+Function used to call external VisualSfM software
+*/
 
 void CmdIO::callVsfm(std::string inCmd){
   
@@ -369,12 +282,16 @@ void CmdIO::callVsfm(std::string inCmd){
   
   system(outCommand.c_str());
 }
-
+/**
+Function to call the command line commands
+*/
 void CmdIO::callCmd(std::string inCmd){
   system(inCmd.c_str());
 }
 
-
+/**
+Function reads lines from the input text file
+*/
 void FileIO::readNewFiles(const std::string &list_filename, std::vector<std::string> &out_filenames){
 
   std::ifstream inFile(list_filename.c_str());
@@ -448,6 +365,9 @@ std::vector<vcg::Shot<float> > FileIO::nvmCam2vcgShot(const std::vector<CameraT>
   return outputShots;
 }
 
+/**
+Function loads data from NVM file
+*/
 void FileIO::getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names){
 
   std::ifstream inFile(filename.c_str());
@@ -457,7 +377,6 @@ void FileIO::getNVM(std::string filename, std::vector<CameraT>& camera_data, std
     std::cout<<"Done!"<<endl;
   inFile.close();
 }
-
 
 
 void dispProjPt(const vcg::Point2i &inPt, cv::Mat &inImg){

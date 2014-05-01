@@ -51,19 +51,19 @@ void testPipeline(map<int,string> inputStrings){
   CmdIO::callCmd("cp "+inputStrings[PMVS]+" "+inputStrings[BUNDLER]+".txt");
 
   CmdIO vsfmHandler("./");
-  
-  //HOOK TO WORK ON LAPTOP
 
- //  vsfmHandler.callVsfm(" sfm+resume+fixcam "+inputStrings[BUNDLER]+" "+inputStrings[OUTDIR]);
+  //HOOK TO WORK WITHOUT VisualSFM
+
+   vsfmHandler.callVsfm(" sfm+resume+fixcam "+inputStrings[BUNDLER]+" "+inputStrings[OUTDIR]);
 
   FileIO::readNewFiles(inputStrings[PMVS], new_image_filenames);
   string  tmpString = "newNVM.nvm";
 
   FileProcessing fileProc;  
 
-  //HOOK TO WORK ON LAPTOP
+  //HOOK TO WORK WITHOUT VisualSFM
 
-  //  fileProc.procNewNVMfile(inputStrings[OUTDIR], new_image_filenames, tmpString);
+  fileProc.procNewNVMfile(inputStrings[OUTDIR], new_image_filenames, tmpString);
 
   FileIO::getNVM(tmpString, newCameraData, new_image_filenames);
   newShots = FileIO::nvmCam2vcgShot(newCameraData, new_image_filenames);
@@ -78,7 +78,8 @@ void testPipeline(map<int,string> inputStrings){
   kdtree.setInputCloud(cloud);
   int K = 5;
 
-  for(int i = 0 ; i < newShots.size(); i++){
+    for(int i = 0 ; i < newShots.size(); i++){
+      //for(int i = 1 ; i < 2 ; i++){    
     searchPoint = PclProcessing::vcg2pclPt(newShots[i].Extrinsics.Tra());
 
     vector<int> pointIdxNKNSearch(K);
@@ -88,28 +89,57 @@ void testPipeline(map<int,string> inputStrings){
     if(ImgIO::getKNNcamData(kdtree, searchPoint, image_filenames, nn_imgs, K)>0){
 
       cv::Mat newImg( getImg(new_image_filenames[i]) );
-      
-      // ostringstream of_stream;
-      // cv::imwrite("new.jpg", newImg);
 
+      /*    
+	    ostringstream of_stream;
+	    of_stream<<i;
+	    cv::imwrite("new.jpg", newImg);
+      */
+      
       for(int j = 0 ; j < K ; j++){
 	cv::Mat oldImg( nn_imgs[j] );
-	
-	// of_stream<<j;
-	// cv::imwrite(of_stream.str()+".jpg", oldImg);
-	// of_stream.clear();
-		
+
+	/*	
+		of_stream<<j;
+		cv::imwrite(of_stream.str()+".jpg", oldImg);
+		of_stream.clear();
+	*/	
+
 	cv::Mat finMask, H;
 	
 	if(ImgProcessing::getImgFundMat(newImg, oldImg, H)){
 	  
 	  ImgChangeDetector::imgDiffThres(newImg, oldImg, H, finMask);
-	  /*        
-		    tmpImgs.push_back(newImg);
-		    tmpImgs.push_back(oldImg);
-		    tmpImgs.push_back(finMask);
-		    ImgIO::dispImgs(tmpImgs);
+	  cv::Mat testImg;
+	  cv::Mat fin_mask2;
+
+	  warpPerspective(finMask, fin_mask2, H, finMask.size());	  
+	  oldImg.copyTo(testImg, 255 - fin_mask2);
+
+	  std::vector<cv::Point2f> mask_pts;
+	  ImgIO::getPtsFromMask(fin_mask2, mask_pts);
+	  
+	  cv::Size tmp_size =  fin_mask2.size();
+	  
+	  if(mask_pts.size()>((fin_mask2.rows*fin_mask2.cols)/4))
+	    continue;
+
+	  for(int g = 0 ; g < mask_pts.size(); g++){
+	    cv::Point2f tmp_pt2 = mask_pts[g];
+	    testImg.at<cv::Vec3b>(tmp_pt2.y, tmp_pt2.x)[0] = 255;
+	    testImg.at<cv::Vec3b>(tmp_pt2.y, tmp_pt2.x)[1] = 0;
+	    testImg.at<cv::Vec3b>(tmp_pt2.y, tmp_pt2.x)[2] = 0;
+	  }
+
+	  /*
+	    tmpImgs.push_back(newImg);
+	    tmpImgs.push_back(oldImg);
+	    //	    tmpImgs.push_back(finMask);
+	    tmpImgs.push_back(testImg);
+	    ImgIO::dispImgs(tmpImgs);
 	  */
+
+	  //  cv::imwrite("outShelf/"+of_stream.str()+".jpg", testImg);
 	  
 	  /*	    
 		    cv::Mat mask_3d_pts(ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H));
@@ -118,13 +148,13 @@ void testPipeline(map<int,string> inputStrings){
 		    
 		    tmp_3d_masks.push_back(tmp_vec_pts);
 	  */  
-	  
-	  tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i]));
+    
+	  //	  tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i]));
 	}		
       }
     }
   }
-  MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask3d.ply");
+  // MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask3d.ply");
 }
 
 void testNewNVM(map<int,string> inputStrings){
@@ -242,7 +272,6 @@ void testBundler(string filename, string filename2, string filename3){
   vcg::Point2f tmpDisp4 = shots[idImg].Project(tmpDisp2);
   tmpDisp4[0] = s.width-tmpDisp4.X();
   tmpDisp4[1] = s.height - tmpDisp4.Y();
-
 	      
   for(int k = 1; k<100; k++)
   pmvsMesh.vert[i+k].SetS();

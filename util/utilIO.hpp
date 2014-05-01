@@ -15,7 +15,6 @@
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <pcl/filters/voxel_grid_occlusion_estimation.h>
 
 #include "pbaUtil.h"
 
@@ -26,22 +25,6 @@ VisualSFM sfm+resume+fixcam <fullPathInput>/input.nvm <fullPathOutput>/output.nv
 
 It requires an image list called [input].nvm.txt with new images paths
 */
-
-class rayBox : public pcl::VoxelGridOcclusionEstimation<pcl::PointXYZ>{
-  
-public:
-  
-  float getBoxIntersection(const Eigen::Vector4f &origin, const Eigen::Vector4f &direction){
-    return rayBoxIntersection(origin, direction);
-  }
-  
-  Eigen::Vector3i getGridCoord(float x, float y, float z){
-    return getGridCoordinatesRound(x,y,z);
-  }
-  
-  int getFirstOccl(const Eigen::Vector4f& origin, const Eigen::Vector4f& direction, const float t_min);
-  
-};
 
 class ChangeDetectorIO{
 

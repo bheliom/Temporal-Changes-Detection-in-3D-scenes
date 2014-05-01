@@ -10,7 +10,27 @@
 
 #include "../common/common.hpp"
 #include "utilIO.hpp"
+#include <pcl/filters/voxel_grid_occlusion_estimation.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/io/ply_io.h>
+#include <pcl/point_types.h>
+#include <pcl/kdtree/kdtree_flann.h>
 
+class rayBox : public pcl::VoxelGridOcclusionEstimation<pcl::PointXYZ>{
+  
+public:
+  
+  float getBoxIntersection(const Eigen::Vector4f &origin, const Eigen::Vector4f &direction){
+    return rayBoxIntersection(origin, direction);
+  }
+  
+  Eigen::Vector3i getGridCoord(float x, float y, float z){
+    return getGridCoordinatesRound(x,y,z);
+  }
+  
+  int getFirstOccl(const Eigen::Vector4f& origin, const Eigen::Vector4f& direction, const float t_min);
+  
+};
 
 class DataProcessing{
 

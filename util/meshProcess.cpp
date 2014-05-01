@@ -9,27 +9,119 @@
 #include "opencv2/calib3d/calib3d.hpp"
 #include "opencv2/nonfree/nonfree.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
+#include <ctime>
 
 typedef vcg::tri::UpdateTopology<MyMesh>::PEdge SingleEdge;
 
+/**
+   Function returns index of the first encountered voxel that is occluded. It is a modification of rayTraversal function implemented in PCL library class VoxelGridOcclusionEstimation.
+*/
+int rayBox::getFirstOccl(const Eigen::Vector4f& origin, const Eigen::Vector4f& direction, const float t_min){
+  // coordinate of the boundary of the voxel grid
+  Eigen::Vector4f start = origin + t_min * direction;
+   
+  start*=0.5;
+  // i,j,k coordinate of the voxel were the ray enters the voxel grid
+  Eigen::Vector3i ijk = getGridCoordinatesRound (start[0], start[1], start[2]);
+   
+  // steps in which direction we have to travel in the voxel grid
+  int step_x, step_y, step_z;
+   
+  // centroid coordinate of the entry voxel
+  Eigen::Vector4f voxel_max = getCentroidCoordinate (ijk);
+   
+  if (direction[0] >= 0)
+    {
+      voxel_max[0] += leaf_size_[0] * 0.5f;
+      step_x = 1;
+    }
+  else
+    {
+      voxel_max[0] -= leaf_size_[0] * 0.5f;
+      step_x = -1;
+    }
+  if (direction[1] >= 0)
+    {
+      voxel_max[1] += leaf_size_[1] * 0.5f;
+      step_y = 1;
+    }
+  else
+    {
+      voxel_max[1] -= leaf_size_[1] * 0.5f;
+      step_y = -1;
+    }
+  if (direction[2] >= 0)
+    {
+      voxel_max[2] += leaf_size_[2] * 0.5f;
+      step_z = 1;
+    }
+  else
+    {
+      voxel_max[2] -= leaf_size_[2] * 0.5f;
+      step_z = -1;
+    }
+   
+  float t_max_x = t_min + (voxel_max[0] - start[0]) / direction[0];
+  float t_max_y = t_min + (voxel_max[1] - start[1]) / direction[1];
+  float t_max_z = t_min + (voxel_max[2] - start[2]) / direction[2];
+        
+  float t_delta_x = leaf_size_[0] / static_cast<float> (fabs (direction[0]));
+  float t_delta_y = leaf_size_[1] / static_cast<float> (fabs (direction[1]));
+  float t_delta_z = leaf_size_[2] / static_cast<float> (fabs (direction[2]));
+   
+  // index of the point in the point cloud
+  int index = -1;
+   
+  while ( (ijk[0] < max_b_[0]+1) && (ijk[0] >= min_b_[0]) && 
+	  (ijk[1] < max_b_[1]+1) && (ijk[1] >= min_b_[1]) && 
+	  (ijk[2] < max_b_[2]+1) && (ijk[2] >= min_b_[2]) )
+    {
+      index = this->getCentroidIndexAt (ijk);
+      if (index != -1)
+	return index;
+   
+      // estimate next voxel
+      if(t_max_x <= t_max_y && t_max_x <= t_max_z)
+	{
+	  t_max_x += t_delta_x;
+	  ijk[0] += step_x;
+	}
+      else if(t_max_y <= t_max_z && t_max_y <= t_max_x)
+	{
+	  t_max_y += t_delta_y;
+	  ijk[1] += step_y;
+	}
+      else
+	{
+	  t_max_z += t_delta_z;
+	  ijk[2] += step_z;
+	}
+    }
+  return index;
+}
+
+/**
+Function converts OpenCV matrix of 3D points into vector of VCG points
+*/
 void DataProcessing::cvt3Dmat2vcg(const cv::Mat &inMat, std::vector<vcg::Point3f> &out_pts){
 
   cv::Mat tmpMat;
   float w, x, y, z;
 
-  for(int c = 0 ; c < inMat.cols; c++){
-      
-      tmpMat  = inMat.col(c);
+  for(int c = 0 ; c < inMat.cols; c++){      
+    tmpMat  = inMat.col(c);
 
-      w = tmpMat.at<float>(3,0);
-      x = tmpMat.at<float>(0,0)/w;
-      y = tmpMat.at<float>(1,0)/w;
-      z = tmpMat.at<float>(2,0)/w;
+    w = tmpMat.at<float>(3,0);
+    x = tmpMat.at<float>(0,0)/w;
+    y = tmpMat.at<float>(1,0)/w;
+    z = tmpMat.at<float>(2,0)/w;
       
-      out_pts.push_back(vcg::Point3f(x,y,z));
-    }
+    out_pts.push_back(vcg::Point3f(x,y,z));
+  }
 }
-
+/**
+Function performs simple change detection operation for two images based on image difference and thresholding using Otsu algorithm
+*/
 cv::Mat ImgProcessing::diffThres(cv::Mat img1, cv::Mat img2){
   cv::Mat F;
   getImgFundMat(img1, img2, F);
@@ -40,8 +132,8 @@ cv::Mat ImgProcessing::diffThres(cv::Mat img1, cv::Mat img2){
 }
 
 /**
-Function finds fundamental matrix F for two input images. Function mostly based on OpenCV documentation tutorials.
- */
+   Function finds fundamental matrix F for two input images. Function mostly based on OpenCV documentation tutorials.
+*/
 bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
 
   //-- Step 1: Detect the keypoints using SURF Detector
@@ -155,6 +247,9 @@ void FileProcessing::procNewNVMfile(const std::string &nvmFileDir, const std::ve
 
 }
 
+/**
+Function converts PCL 3D point into VCG point
+*/
 vcg::Point3f PclProcessing::pcl2vcgPt(pcl::PointXYZ inPt){
   vcg::Point3f outPt;
  
@@ -165,7 +260,9 @@ vcg::Point3f PclProcessing::pcl2vcgPt(pcl::PointXYZ inPt){
   return outPt;
 }
 
-
+/**
+Function converts VCG 3D point into PCL point
+*/
 pcl::PointXYZ PclProcessing::vcg2pclPt(vcg::Point3<float> inPt){
   pcl::PointXYZ outPt;
   outPt.x = inPt.X();
@@ -175,7 +272,9 @@ pcl::PointXYZ PclProcessing::vcg2pclPt(vcg::Point3<float> inPt){
   return outPt;
 }
 
-/**Function calculates image coordinates of the point projected using vcg::Shot class member function*/
+/**
+Function calculates image coordinates of the point projected using vcg::Shot class member function
+*/
 vcg::Point2i getPtImgCoord(const vcg::Point2f &inPoint, const vcg::Shot<float> &inShot){
   
   vcg::Point2i tmpPoint(static_cast<int>(inPoint.X()), static_cast<int>(inPoint.Y()));
