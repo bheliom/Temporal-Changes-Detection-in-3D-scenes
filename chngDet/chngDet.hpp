@@ -6,6 +6,7 @@
 #include "../common/common.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include <set>
 class ChangeDetector{
 
 protected:
@@ -24,11 +25,7 @@ class ImgChangeDetector : public ChangeDetector{
 
 protected:
   std::vector<std::string> newImgFilenames;
-  /*
-    -nvm workspace directory
-    -IO for calling VisualSfM to get new bundler.out
-    -function to process new bundler.out just to get camera positions
-  */
+
 public:
   void setNewImgFilenames(std::vector<std::string> filenames)
   {newImgFilenames = filenames;}
@@ -43,6 +40,7 @@ public:
 
   static void imgDiffThres(cv::Mat, cv::Mat, cv::Mat, cv::Mat&);
   
+  static std::vector<vcg::Point3f> imgFeatDiff(const std::vector<ImgFeature>&, const std::vector<ImgFeature>&, const std::vector<PtCamCorr>&, const std::set<int>&);
 };
 
 class MeshChangeDetector : public ChangeDetector{

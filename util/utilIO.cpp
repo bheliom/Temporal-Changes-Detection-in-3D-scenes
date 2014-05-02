@@ -45,15 +45,15 @@ void MeshIO::saveChngMask3d(const std::vector<std::vector<vcg::Point3f> > &pts_3
 /**
    Function returns K-nearest neighbors camera images for given search point
 */
-int ImgIO::getKNNcamData(const pcl::KdTreeFLANN<pcl::PointXYZ> &kdtree, pcl::PointXYZ &searchPoint, const std::vector<std::string> &filenames, std::vector<cv::Mat> &out_imgs, int K){
+int ImgIO::getKNNcamData(const pcl::KdTreeFLANN<pcl::PointXYZ> &kdtree, pcl::PointXYZ &searchPoint, const std::vector<std::string> &filenames, std::vector<cv::Mat> &out_imgs, int K, std::vector<int> &pointIdxNKNSearch){
 
-  std::vector<int> pointIdxNKNSearch(K);
   std::vector<float> pointNKNSquaredDistance(K);
   int out = 0;
   
   if(kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance)>0){
-    for(int i = 0 ; i < K ; i++)
-      out_imgs.push_back( getImg(filenames[pointIdxNKNSearch[i]]) );
+    for(int i = 0 ; i < K ; i++){
+      out_imgs.push_back(getImg(filenames[pointIdxNKNSearch[i]]) );
+    }
     out = 1;
   }
   return out;
@@ -131,6 +131,23 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
   intr_mat.at<double>(2,2) = 1;
 
   return intr_mat;
+}
+/**
+Function projects 2D change mask into 3D using point correspondence between SIFT features and model 3D points.
+*/
+std::vector<vcg::Point3f> ImgIO::projChngMaskCorr(const cv::Mat &chng_mask, const std::vector<ImgFeature> &img_feats, const std::vector<PtCamCorr> &pts_corr){
+
+  std::vector<vcg::Point3f> out_pts;
+  
+  for(int i = 0 ; i < img_feats.size(); i++){
+    ImgFeature tmp_feat;
+    tmp_feat = img_feats[i];
+    
+    if(chng_mask.at<uchar>(tmp_feat.y,tmp_feat.x)>0)
+      out_pts.push_back(pts_corr[tmp_feat.idx].pts_3d);
+  }
+
+  return out_pts;
 }
 
 /**
@@ -368,13 +385,13 @@ std::vector<vcg::Shot<float> > FileIO::nvmCam2vcgShot(const std::vector<CameraT>
 /**
 Function loads data from NVM file
 */
-void FileIO::getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names, std::vector<PtCamCorr>& pt_cam_corr){
+void FileIO::getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names, std::vector<PtCamCorr>& pt_cam_corr, std::map<int, std::vector<ImgFeature> >& in_map){
   
 
   std::ifstream inFile(filename.c_str());
   
   std::cout<<"Loading NVM file... ";
-  if(LoadNVM(inFile, camera_data, names, pt_cam_corr))
+  if(LoadNVM(inFile, camera_data, names, pt_cam_corr, in_map))
     std::cout<<"Done!"<<endl;
   inFile.close();
 }

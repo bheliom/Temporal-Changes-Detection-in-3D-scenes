@@ -27,7 +27,6 @@ struct PtCamCorrespondence{
 
 };
 
-
 /*
 To run VisualSFM:
 
@@ -72,7 +71,9 @@ public:
   static std::vector<vcg::Point3f> projChngMask(const std::string&, const cv::Mat&, const vcg::Shot<float>&);
   static cv::Mat getRtMatrix(const vcg::Shot<float>&);
   static cv::Mat getIntrMatrix(const vcg::Shot<float>&);
-  static int getKNNcamData(const pcl::KdTreeFLANN<pcl::PointXYZ>&, pcl::PointXYZ&, const std::vector<std::string>&, std::vector<cv::Mat>&, int K);
+  static int getKNNcamData(const pcl::KdTreeFLANN<pcl::PointXYZ>&, pcl::PointXYZ&, const std::vector<std::string>&, std::vector<cv::Mat>&, int K, std::vector<int>&);
+
+  static std::vector<vcg::Point3f> projChngMaskCorr(const cv::Mat&, const std::vector<ImgFeature>&, const std::vector<PtCamCorr>&);
 
 };
 
@@ -88,7 +89,7 @@ class FileIO : public ChangeDetectorIO{
 
 public:
   FileIO(std::string inFile) : ChangeDetectorIO(inFile){};
-  static void getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names,std::vector<PtCamCorr>&); 
+  static void getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names,std::vector<PtCamCorr>&, std::map<int, std::vector<ImgFeature> >& in_map); 
   static std::vector<vcg::Shot<float> > nvmCam2vcgShot(const std::vector<CameraT> &camera_data, const std::vector<std::string> names);
   static void readNewFiles(const std::string&, std::vector<std::string>&);
 

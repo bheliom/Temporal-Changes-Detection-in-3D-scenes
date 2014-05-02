@@ -32,6 +32,19 @@ struct PtCamCorr{
   cv::Point3i ptc;
 };
 
+struct ImgFeature{
+  int idx;
+  int x;
+  int y;
+
+  ImgFeature(){}
+
+  ImgFeature(int in_idx,int in_x, int in_y){
+    idx = in_idx;
+    x = in_x;
+    y = in_y;
+  }
+};
 
 #endif
 

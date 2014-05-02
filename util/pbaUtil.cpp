@@ -2,7 +2,7 @@
 
 using namespace std;
 
-bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names, vector<PtCamCorr>& pt_corr)
+bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names, vector<PtCamCorr>& pt_corr, map<int,vector<ImgFeature> >& in_map)
 {
     int rotation_parameter_num = 4; 
     bool format_r9t = false;
@@ -24,8 +24,9 @@ bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names, 
     //read the camera parameters
     camera_data.resize(ncam); // allocate the camera data
     names.resize(ncam);
+    
     for(int i = 0; i < ncam; ++i)
-    {
+     {
         double f, q[9], c[3], d[2];
         in >> token >> f ;
         for(int j = 0; j < rotation_parameter_num; ++j) in >> q[j]; 
@@ -50,10 +51,12 @@ bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names, 
 
     in >> npoint;
     if(npoint <= 0){
-      std::cout << ncam << "new cameras\n";
+      std::cout << ncam << " new cameras\n";
       return true; 
     }
-     
+
+
+    
     //read image projections and 3D points.
     pt_corr.resize(npoint); 
     for(int i = 0; i < npoint; ++i)
@@ -63,14 +66,18 @@ bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names, 
 	float pt[3]; int cc[3], npj;
 	in  >> pt[0] >> pt[1] >> pt[2] 
 	    >> cc[0] >> cc[1] >> cc[2] >> npj;
+	
 	for(int j = 0; j < npj; ++j)
-	  {
+	  {	   
 	    int cidx, fidx; float imx, imy;
 	    in >> cidx >> fidx >> imx >> imy;
 	    
 	    tmp_corr.camidx.push_back(cidx);    //camera index
 	    tmp_corr.ptidx.push_back(i);        //point index
 	    
+	    ImgFeature tmp_img_feat(i, imx, imy); 
+	    in_map[cidx].push_back(tmp_img_feat);
+
 	    //add a measurment to the vector
 	    tmp_corr.feat_coords.push_back(cv::Point2i(imx, imy));
 	    nproj ++;

@@ -42,6 +42,6 @@ using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
 
-bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names, vector<PtCamCorr>& pt_corr);
+bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names, vector<PtCamCorr>& pt_corr, map<int, vector<ImgFeature> >&);
 
 #endif
