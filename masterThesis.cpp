@@ -52,32 +52,31 @@ void testPipeline(map<int,string> inputStrings){
 
   FileIO::getNVM(inputStrings[BUNDLER], camera_data, image_filenames, pt_cam_corr, cam_feat_map);
   shots = FileIO::nvmCam2vcgShot(camera_data, image_filenames);
-  
-  CmdIO::callCmd("cp "+inputStrings[PMVS]+" "+inputStrings[BUNDLER]+".txt");
 
+  CmdIO::callCmd("cp "+inputStrings[PMVS]+" "+inputStrings[BUNDLER]+".txt");
   CmdIO vsfmHandler("./");
 
   //HOOK TO WORK WITHOUT VisualSFM
-
-  vsfmHandler.callVsfm(" sfm+resume+fixcam "+inputStrings[BUNDLER]+" "+inputStrings[OUTDIR]);
+  //vsfmHandler.callVsfm(" sfm+resume+fixcam "+inputStrings[BUNDLER]+" "+inputStrings[OUTDIR]);
 
   /////////////////////////////
   //testing new algorithm
+  /*
+  int start_idx = camera_data.size();
+
   vector<CameraT> tmp_camera_data;
   vector<string> tmp_image_filenames;
   vector<PtCamCorr> tmp_pt_cam_corr;
   map<int, vector<ImgFeature> > tmp_cam_feat_map;
   FileIO::getNVM(inputStrings[OUTDIR], tmp_camera_data, tmp_image_filenames, tmp_pt_cam_corr, tmp_cam_feat_map);
+  */
   /////////////////////////
-
 
   FileIO::readNewFiles(inputStrings[PMVS], new_image_filenames);
   string  tmpString = "newNVM.nvm";
-
   FileProcessing fileProc;  
 
   //HOOK TO WORK WITHOUT VisualSFM
-
   fileProc.procNewNVMfile(inputStrings[OUTDIR], new_image_filenames, tmpString);
 
   FileIO::getNVM(tmpString, newCameraData, new_image_filenames, tmp_corr, cam_feat_map2);
@@ -87,6 +86,7 @@ void testPipeline(map<int,string> inputStrings){
 
   // Generate pointcloud data
   cloud->points.resize(shots.size());
+
   for (size_t i = 0; i < cloud->points.size (); ++i){
     cloud->points[i] = PclProcessing::vcg2pclPt(shots[i].Extrinsics.Tra());
   }
@@ -98,24 +98,35 @@ void testPipeline(map<int,string> inputStrings){
   set<int> new_imgs_idx;
 
   for(int i = 0 ; i < newShots.size(); i++){
-    //for(int i = 1 ; i < 2 ; i++){    
     searchPoint = PclProcessing::vcg2pclPt(newShots[i].Extrinsics.Tra());
 
     vector<int> pointIdxNKNSearch(K);
-    vector<cv::Mat> tmpImgs, nn_imgs;
-
+    vector<cv::Mat> nn_imgs;
+    
     if(ImgIO::getKNNcamData(kdtree, searchPoint, image_filenames, nn_imgs, K, pointIdxNKNSearch)>0){
 
       cv::Mat newImg( getImg(new_image_filenames[i]) );
 
-      /*    
-	    ostringstream of_stream;
-	    of_stream<<i;
-	    cv::imwrite("new.jpg", newImg);
+      /////////////////////////
+      /// testing new algorithm
+      /*
+	int tmp_idx = i + start_idx-1;
+	new_imgs_feat.insert(new_imgs_feat.end(),tmp_cam_feat_map[tmp_idx].begin(),tmp_cam_feat_map[tmp_idx].end());
+	new_imgs_idx.insert(i+start_idx-1);
       */
+      //////////////////////////
      
       for(int j = 0 ; j < K ; j++){
-	cv::Mat oldImg( nn_imgs[j] );
+	cv::Mat oldImg(nn_imgs[j]);
+	
+	///////////////////////////
+	/// testing new algorithm
+	/*
+	  old_imgs_feat.insert(old_imgs_feat.end(), tmp_cam_feat_map[pointIdxNKNSearch[j]].begin(), tmp_cam_feat_map[pointIdxNKNSearch[j]].end());
+
+	*/
+	//////////////////////////
+
 
 	/*	
 		of_stream<<j;
@@ -123,10 +134,11 @@ void testPipeline(map<int,string> inputStrings){
 		of_stream.clear();
 	*/	
 
-	cv::Mat finMask, H;
+      	cv::Mat finMask, H;
 	
 	if(ImgProcessing::getImgFundMat(newImg, oldImg, H)){
-	  
+
+
 	  ImgChangeDetector::imgDiffThres(newImg, oldImg, H, finMask);
 	  cv::Mat testImg;
 	  cv::Mat fin_mask2;
@@ -141,6 +153,7 @@ void testPipeline(map<int,string> inputStrings){
 	  
 	  if(mask_pts.size()>((fin_mask2.rows*fin_mask2.cols)/4))
 	    continue;
+	  
 	  //OVERLAY THE MASK
 	  /*
 	    for(int g = 0 ; g < mask_pts.size(); g++){
@@ -151,37 +164,27 @@ void testPipeline(map<int,string> inputStrings){
 	    }
 	  */
 
-	  //DISPLAY IMAGES
-	  /*
-	    tmpImgs.push_back(newImg);
-	    tmpImgs.push_back(oldImg);
-	    //	    tmpImgs.push_back(finMask);
-	    tmpImgs.push_back(testImg);
-	    ImgIO::dispImgs(tmpImgs);
-	  */
-
-	  //  cv::imwrite("outShelf/"+of_stream.str()+".jpg", testImg);
-	  	  
-	  /* TRIANGULATION
-	    
+	  /* TRIANGULATION	    
 	     cv::Mat mask_3d_pts(ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H));
 	     std::vector<vcg::Point3f> tmp_vec_pts;
-	     DataProcessing::cvt3Dmat2vcg(mask_3d_pts, tmp_vec_pts);
-		    
+	     DataProcessing::cvt3Dmat2vcg(mask_3d_pts, tmp_vec_pts);		    
 	     tmp_3d_masks.push_back(tmp_vec_pts);
 	  */  
     
-
 	  // RAY SHOOTING
 	  // tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i]));
-
+	
 	  // POINT CORRESPONDENCES
+
 	  tmp_3d_masks.push_back(ImgIO::projChngMaskCorr(fin_mask2, cam_feat_map[pointIdxNKNSearch[j]], pt_cam_corr));
 	}		
       }
     }
   }
-  MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask3d.ply");
+
+  //  tmp_3d_masks.push_back(ImgChangeDetector::imgFeatDiff(new_imgs_feat, old_imgs_feat, tmp_pt_cam_corr, new_imgs_idx));
+
+  MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask_ImgAbsDiffK1.ply");
 }
 
 void testNewNVM(map<int,string> inputStrings){
