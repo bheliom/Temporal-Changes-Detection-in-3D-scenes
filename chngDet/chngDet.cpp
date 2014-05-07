@@ -31,7 +31,7 @@ void ImgChangeDetector::imgDiffThres(cv::Mat im1, cv::Mat im2, cv::Mat H, cv::Ma
   cv::threshold(finThres, mask, 30, 255, CV_THRESH_OTSU);
 }
 
-std::vector<vcg::Point3f> ImgChangeDetector::imgFeatDiff(const std::vector<ImgFeature>& new_imgs_feat, const std::vector<ImgFeature>& old_imgs_feat, const std::vector<PtCamCorr>& pts_corr, const std::set<int>& new_imgs_idx){
+std::vector<vcg::Point3f> ImgChangeDetector::imgFeatDiff(const std::vector<ImgFeature>& new_imgs_feat, const std::vector<ImgFeature>& old_imgs_feat, const std::vector<PtCamCorr>& pts_corr, const std::set<int>& new_imgs_idx, const std::set<int>& old_imgs_idx){
 
   std::vector<vcg::Point3f> out_pts;
   bool add = false;
@@ -39,16 +39,31 @@ std::vector<vcg::Point3f> ImgChangeDetector::imgFeatDiff(const std::vector<ImgFe
   for(int i = 0 ; i < new_imgs_feat.size() ; i++){
     PtCamCorr tmp_corr = pts_corr[new_imgs_feat[i].idx];
     
-    if(tmp_corr.camidx.size()==new_imgs_idx.size()){
+    if(tmp_corr.camidx.size()<=new_imgs_idx.size()){
       add = true;
-      for(int j = 0 ; j < tmp_corr.camidx.size() ; j++){
+      for(int j = 0 ; j < tmp_corr.camidx.size()/2 ; j++)
 	if(new_imgs_idx.find(tmp_corr.camidx[j])==new_imgs_idx.end())
-	  add = false;
-      }
+	  add = false;      
     }
 
     if(add)
       out_pts.push_back(tmp_corr.pts_3d);    
+  }
+  
+  add = false;
+
+  for(int i = 0 ; i < old_imgs_feat.size() ; i++){
+    PtCamCorr tmp_corr = pts_corr[old_imgs_feat[i].idx];
+    
+    if(tmp_corr.camidx.size()<=old_imgs_idx.size()){
+      add = true;
+      for(int j = 0 ; j <tmp_corr.camidx.size(); j++)
+	if(new_imgs_idx.find(tmp_corr.camidx[j])!=new_imgs_idx.end())
+	  add = false;      
+    }
+    
+    if(add)
+      out_pts.push_back(tmp_corr.pts_3d);
   }
 
   return out_pts;

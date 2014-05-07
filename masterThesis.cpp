@@ -28,16 +28,14 @@ int main(int argc, char** argv){
   readCmdInput(inputStrings, argc, argv);
 
   //testPipeline(inputStrings);
-  pipelineCorrespondences(inputStrings);
+    pipelineCorrespondences(inputStrings);
 
   return 0;
 }
 
-
 void pipelineCorrespondences(map<int,string> inputStrings){
 
   vector<vector<vcg::Point3f> > tmp_3d_masks;
-  vector<vcg::Shot<float> > shots, newShots;
   vector<string> image_filenames, new_image_filenames;
   vector<CameraT> camera_data, newCameraData;
   pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
@@ -49,17 +47,12 @@ void pipelineCorrespondences(map<int,string> inputStrings){
   map<int, vector<ImgFeature> > cam_feat_map2;
 
   FileIO::getNVM(inputStrings[BUNDLER], camera_data, image_filenames, pt_cam_corr, cam_feat_map);
-  shots = FileIO::nvmCam2vcgShot(camera_data, image_filenames);
 
   CmdIO::callCmd("cp "+inputStrings[PMVS]+" "+inputStrings[BUNDLER]+".txt");
   CmdIO vsfmHandler("./");
 
-  //HOOK TO WORK WITHOUT VisualSFM
   vsfmHandler.callVsfm(" sfm+resume+fixcam "+inputStrings[BUNDLER]+" "+inputStrings[OUTDIR]);
 
-  /////////////////////////////
-  //testing new algorithm
-  
   int start_idx = camera_data.size();
 
   vector<CameraT> tmp_camera_data;
@@ -68,59 +61,49 @@ void pipelineCorrespondences(map<int,string> inputStrings){
   map<int, vector<ImgFeature> > tmp_cam_feat_map;
   FileIO::getNVM(inputStrings[OUTDIR], tmp_camera_data, tmp_image_filenames, tmp_pt_cam_corr, tmp_cam_feat_map);
   
-  /////////////////////////
-
   FileIO::readNewFiles(inputStrings[PMVS], new_image_filenames);
   string  tmpString = "newNVM.nvm";
   FileProcessing fileProc;  
 
-  //HOOK TO WORK WITHOUT VisualSFM
   fileProc.procNewNVMfile(inputStrings[OUTDIR], new_image_filenames, tmpString);
 
   FileIO::getNVM(tmpString, newCameraData, new_image_filenames, tmp_corr, cam_feat_map2);
-  newShots = FileIO::nvmCam2vcgShot(newCameraData, new_image_filenames);
 
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
 
   // Generate pointcloud data
-  cloud->points.resize(shots.size());
+  cloud->points.resize(camera_data.size());
 
-  for (size_t i = 0; i < cloud->points.size (); ++i){
-    cloud->points[i] = PclProcessing::vcg2pclPt(shots[i].Extrinsics.Tra());
-  }
+  for (size_t i = 0; i < cloud->points.size (); ++i)
+    cloud->points[i] = pcl::PointXYZ(camera_data[i].t[0], camera_data[i].t[1], camera_data[i].t[2]);
 
   kdtree.setInputCloud(cloud);
   int K = 1;
-
+ 
   vector<ImgFeature> new_imgs_feat, old_imgs_feat;
-  set<int> new_imgs_idx;
-
-  for(int i = 0 ; i < newShots.size(); i++){
-    searchPoint = PclProcessing::vcg2pclPt(newShots[i].Extrinsics.Tra());
+  set<int> new_imgs_idx, old_imgs_idx;
+ 
+  for(int i = 0 ; i < newCameraData.size(); i++){
+    pcl::PointXYZ tmp_pcl_pt(newCameraData[i].t[0], newCameraData[i].t[1], newCameraData[i].t[2]);
+    searchPoint = tmp_pcl_pt;
 
     vector<int> pointIdxNKNSearch(K);
     vector<cv::Mat> nn_imgs;
-    
+   
     if(ImgIO::getKNNcamData(kdtree, searchPoint, image_filenames, nn_imgs, K, pointIdxNKNSearch)>0){
-      /////////////////////////
-      /// testing new algorithm
-      
       int tmp_idx = i + start_idx-1;
       new_imgs_feat.insert(new_imgs_feat.end(),tmp_cam_feat_map[tmp_idx].begin(),tmp_cam_feat_map[tmp_idx].end());
       new_imgs_idx.insert(i+start_idx-1);
       
-      //////////////////////////
-      
       for(int j = 0 ; j < K ; j++){
-	///////////////////////////
-	/// testing new algorithm
-	old_imgs_feat.insert(old_imgs_feat.end(), tmp_cam_feat_map[pointIdxNKNSearch[j]].begin(), tmp_cam_feat_map[pointIdxNKNSearch[j]].end());
-	//////////////////////////
-	
+	old_imgs_feat.insert(old_imgs_feat.end(), tmp_cam_feat_map[pointIdxNKNSearch[j]].begin(), tmp_cam_feat_map[pointIdxNKNSearch[j]].end());	
+	old_imgs_idx.insert(pointIdxNKNSearch[j]);
       }
     }
   }
-  tmp_3d_masks.push_back(ImgChangeDetector::imgFeatDiff(new_imgs_feat, old_imgs_feat, tmp_pt_cam_corr, new_imgs_idx));
+  
+  tmp_3d_masks.push_back(ImgChangeDetector::imgFeatDiff(new_imgs_feat, old_imgs_feat, tmp_pt_cam_corr, new_imgs_idx, old_imgs_idx));
+  cout<<"Number of masks:"<<tmp_3d_masks.size()<<endl;
   MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask_ImgAbsDiffK1.ply");
 }
 
