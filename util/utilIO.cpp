@@ -24,8 +24,6 @@ void MeshIO::saveChngMask3d(const std::vector<std::vector<vcg::Point3f> > &pts_3
   int count = 0;
 
   for(int i = 0 ; i < pts_3d.size() ; i++){
-    DrawProgressBar(40, (double)i/(double)pts_3d.size());
-
     for(int j = 0 ; j < pts_3d[i].size(); j++){
       x = pts_3d[i].at(j).X();
       y = pts_3d[i].at(j).Y();
@@ -36,7 +34,6 @@ void MeshIO::saveChngMask3d(const std::vector<std::vector<vcg::Point3f> > &pts_3
     }
   }
 
-  DrawProgressBar(40, 1);
   vcg::tri::UpdateColor<MyMesh>::PerVertexConstant(m, vcg::Color4b::Red, true);
   std::cout<<"Vertices:"<<m.VN()<<std::endl;
   savePlyFileVcg(name,m);

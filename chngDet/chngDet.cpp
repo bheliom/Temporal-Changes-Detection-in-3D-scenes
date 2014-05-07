@@ -52,6 +52,4 @@ std::vector<vcg::Point3f> ImgChangeDetector::imgFeatDiff(const std::vector<ImgFe
   }
 
   return out_pts;
-  
-
 }
