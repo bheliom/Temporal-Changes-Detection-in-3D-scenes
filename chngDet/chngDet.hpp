@@ -40,7 +40,7 @@ public:
 
   static void imgDiffThres(cv::Mat, cv::Mat, cv::Mat, cv::Mat&);
   
-  static std::vector<vcg::Point3f> imgFeatDiff(const std::vector<ImgFeature>&, const std::vector<ImgFeature>&, const std::vector<PtCamCorr>&, const std::set<int>&, const std::set<int>&);
+  static std::vector<int> imgFeatDiff(const std::vector<ImgFeature>&, const std::vector<ImgFeature>&, const std::vector<PtCamCorr>&, const std::set<int>&, const std::set<int>&);
 };
 
 class MeshChangeDetector : public ChangeDetector{

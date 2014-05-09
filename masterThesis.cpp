@@ -28,7 +28,7 @@ int main(int argc, char** argv){
   readCmdInput(inputStrings, argc, argv);
 
   //testPipeline(inputStrings);
-    pipelineCorrespondences(inputStrings);
+  pipelineCorrespondences(inputStrings);
 
   return 0;
 }
@@ -46,27 +46,33 @@ void pipelineCorrespondences(map<int,string> inputStrings){
   map<int, vector<ImgFeature> > cam_feat_map;
   map<int, vector<ImgFeature> > cam_feat_map2;
 
+  //Get old NVM file
   FileIO::getNVM(inputStrings[BUNDLER], camera_data, image_filenames, pt_cam_corr, cam_feat_map);
 
+  //Copy list of new images into NVM file directory(VisualSFM requirements)
   CmdIO::callCmd("cp "+inputStrings[PMVS]+" "+inputStrings[BUNDLER]+".txt");
   CmdIO vsfmHandler("./");
 
+  //Run VisualSfM
   vsfmHandler.callVsfm(" sfm+resume+fixcam "+inputStrings[BUNDLER]+" "+inputStrings[OUTDIR]);
 
+  //After running VisualSfM in new NVM file, new images indeces will start at the end
   int start_idx = camera_data.size();
 
   vector<CameraT> tmp_camera_data;
   vector<string> tmp_image_filenames;
   vector<PtCamCorr> tmp_pt_cam_corr;
   map<int, vector<ImgFeature> > tmp_cam_feat_map;
+  
+  //Get new NVM file
   FileIO::getNVM(inputStrings[OUTDIR], tmp_camera_data, tmp_image_filenames, tmp_pt_cam_corr, tmp_cam_feat_map);
   
+  //Get image files directories
   FileIO::readNewFiles(inputStrings[PMVS], new_image_filenames);
   string  tmpString = "newNVM.nvm";
   FileProcessing fileProc;  
 
   fileProc.procNewNVMfile(inputStrings[OUTDIR], new_image_filenames, tmpString);
-
   FileIO::getNVM(tmpString, newCameraData, new_image_filenames, tmp_corr, cam_feat_map2);
 
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
@@ -101,8 +107,27 @@ void pipelineCorrespondences(map<int,string> inputStrings){
       }
     }
   }
+  vector<vcg::Point3f> out_pts_vect;
+  vector<int> corr_indeces = ImgChangeDetector::imgFeatDiff(new_imgs_feat, old_imgs_feat, tmp_pt_cam_corr, new_imgs_idx, old_imgs_idx);
   
-  tmp_3d_masks.push_back(ImgChangeDetector::imgFeatDiff(new_imgs_feat, old_imgs_feat, tmp_pt_cam_corr, new_imgs_idx, old_imgs_idx));
+  for( int k = 0 ; k < corr_indeces.size() ; k++){
+    PtCamCorr tmp_cam_corr = tmp_pt_cam_corr[corr_indeces[k]];
+
+    cv::Mat tmp_img = getImg(tmp_image_filenames[ tmp_cam_corr.camidx[0] ]);
+    cv::Point3i tmp_color = tmp_cam_corr.ptc;
+    cv::Point2i tmp_img_feat = tmp_cam_corr.feat_coords[0];
+    cv::Point3i tmp_img_color;
+
+    cv::Scalar intensity = tmp_img.at<uchar>(tmp_img_feat);
+    tmp_img_color.x = intensity.val[0];
+    tmp_img_color.y = intensity.val[1];
+    tmp_img_color.z = intensity.val[2];
+ 
+    if(cv::norm(tmp_color - tmp_img_color)<200)
+      out_pts_vect.push_back(tmp_pt_cam_corr[corr_indeces[k]].pts_3d);
+  }
+  tmp_3d_masks.push_back(out_pts_vect);
+
   cout<<"Number of masks:"<<tmp_3d_masks.size()<<endl;
   MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask_ImgAbsDiffK1.ply");
 }

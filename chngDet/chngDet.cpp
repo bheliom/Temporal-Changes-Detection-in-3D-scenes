@@ -1,5 +1,3 @@
-
-
 #include "chngDet.hpp"
 
 cv::Mat ImgChangeDetector::getImageDifference(cv::Mat img1, cv::Mat img2){
@@ -31,9 +29,9 @@ void ImgChangeDetector::imgDiffThres(cv::Mat im1, cv::Mat im2, cv::Mat H, cv::Ma
   cv::threshold(finThres, mask, 30, 255, CV_THRESH_OTSU);
 }
 
-std::vector<vcg::Point3f> ImgChangeDetector::imgFeatDiff(const std::vector<ImgFeature>& new_imgs_feat, const std::vector<ImgFeature>& old_imgs_feat, const std::vector<PtCamCorr>& pts_corr, const std::set<int>& new_imgs_idx, const std::set<int>& old_imgs_idx){
+std::vector<int> ImgChangeDetector::imgFeatDiff(const std::vector<ImgFeature>& new_imgs_feat, const std::vector<ImgFeature>& old_imgs_feat, const std::vector<PtCamCorr>& pts_corr, const std::set<int>& new_imgs_idx, const std::set<int>& old_imgs_idx){
 
-  std::vector<vcg::Point3f> out_pts;
+  std::vector<int> out_pts;
   bool add = false;
 
   for(int i = 0 ; i < new_imgs_feat.size() ; i++){
@@ -47,7 +45,7 @@ std::vector<vcg::Point3f> ImgChangeDetector::imgFeatDiff(const std::vector<ImgFe
     }
 
     if(add)
-      out_pts.push_back(tmp_corr.pts_3d);    
+      out_pts.push_back(new_imgs_feat[i].idx);    
   }
   
   add = false;
@@ -63,7 +61,7 @@ std::vector<vcg::Point3f> ImgChangeDetector::imgFeatDiff(const std::vector<ImgFe
     }
     
     if(add)
-      out_pts.push_back(tmp_corr.pts_3d);
+      out_pts.push_back(old_imgs_feat[i].idx);
   }
 
   return out_pts;
