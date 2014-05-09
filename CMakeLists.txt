@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-project(masterThesis)
+project(TempChangeDetect)
 
 find_package( OpenCV REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
@@ -10,9 +10,9 @@ include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-add_executable(masterThesis masterThesis.cpp util/utilIO.cpp util/meshProcess.cpp
+add_executable(TempChangeDetect masterThesis.cpp util/utilIO.cpp util/meshProcess.cpp
  /usr/include/wrap/ply/plylib.cpp util/pbaUtil.cpp chngDet/chngDet.cpp)
  
-target_link_libraries(masterThesis ${PCL_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
+target_link_libraries(TempChangeDetect ${PCL_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
 
-target_link_libraries(masterThesis ${OpenCV_LIBS})
+target_link_libraries(TempChangeDetect ${OpenCV_LIBS})
