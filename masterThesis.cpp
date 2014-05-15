@@ -21,7 +21,7 @@ void testNewNVM(map<int,string> inputStrings);
 void testPipeline(map<int,string> inputStrings);
 void testProjections(map<int,string> inputStrings);
 void pipelineCorrespondences(map<int,string> inputStrings);
-
+/*
 int main(int argc, char** argv){
   
   map<int,string> inputStrings;
@@ -32,7 +32,7 @@ int main(int argc, char** argv){
 
   return 0;
 }
-
+*/
 void pipelineCorrespondences(map<int,string> inputStrings){
 
   vector<vector<vcg::Point3f> > tmp_3d_masks;
@@ -127,6 +127,16 @@ void pipelineCorrespondences(map<int,string> inputStrings){
       out_pts_vect.push_back(tmp_pt_cam_corr[corr_indeces[k]].pts_3d);
   }
   tmp_3d_masks.push_back(out_pts_vect);
+
+  /*
+  MyMesh m;
+  getPlyFileVcg(inputStrings[MESH], m);
+  std::vector<vcg::Point3f> tmp_vcg_vec;
+
+  for(int i = 0 ; i < m.VN(); i++)
+    tmp_vcg_vec.push_back(m.vert[i].P());
+  tmp_3d_masks.push_back(tmp_vcg_vec);
+  */
 
   cout<<"Number of masks:"<<tmp_3d_masks.size()<<endl;
   MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask_ImgAbsDiffK1.ply");

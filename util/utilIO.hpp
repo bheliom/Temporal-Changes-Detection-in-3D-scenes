@@ -130,8 +130,6 @@ if(pcl::io::loadPLYFile<T> (filename, *outCloud) == -1)
  Function taken from http://stackoverflow.com/questions/60221/how-to-animate-the-command-line
  */
 
-
-
 inline void DrawProgressBar(int len, double percent) {
   std::cout << "\x1B[2K"; // Erase the entire current line.
   std::cout << "\x1B[0E"; // Move to the beginning of the current line.

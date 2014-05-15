@@ -273,6 +273,14 @@ pcl::PointXYZ PclProcessing::vcg2pclPt(vcg::Point3<float> inPt){
   return outPt;
 }
 
+void PclProcessing::changeCloudColor(pcl::PointCloud<pcl::PointXYZRGBA> &in_cloud, int r, int g, int b){
+
+  for(int i = 0 ; i < in_cloud.points.size(); i++){
+    int32_t rgb = (r << 16) | (g << 8) | b; 
+    in_cloud.points[i].rgb = *(float *)(&rgb); // makes the point red
+  }
+}
+
 /**
 Function calculates image coordinates of the point projected using vcg::Shot class member function
 */
