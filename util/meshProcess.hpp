@@ -70,6 +70,7 @@ public:
   PclProcessing() : DataProcessing(){};
   static pcl::PointXYZ vcg2pclPt(vcg::Point3<float> inPt);
   static vcg::Point3f pcl2vcgPt(pcl::PointXYZ inPt);
+  static vcg::Point3f pcl2vcgPt(pcl::PointXYZRGBA inPt);
   static void changeCloudColor(pcl::PointCloud<pcl::PointXYZRGBA>&, int, int, int );
 };
 

@@ -98,8 +98,8 @@ virtual
 LeafContainerT* findLeafN(unsigned int x, unsigned int y, unsigned z){
 return findLeaf(x,y,z);
 }
-
-void findNeighbors(const pcl::octree::OctreeKey&, std::vector<LeafContainerT*>&);
-
+  
+  void findNeighbors(const pcl::octree::OctreeKey&, std::vector<LeafContainerT*>&);
+  void findNeighbors(const pcl::octree::OctreeKey&, std::vector<pcl::octree::OctreeKey>&);
 };
 #endif

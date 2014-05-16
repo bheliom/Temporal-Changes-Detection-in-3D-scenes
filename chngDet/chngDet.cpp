@@ -1,14 +1,17 @@
 #include "chngDet.hpp"
 #include "../util/meshProcess.hpp"
+#include "../maxflowLib/graph.h"
 
 #include <pcl/octree/octree.h>
 #include <pcl/octree/octree_pointcloud_adjacency.h>
 #include <pcl/octree/octree_pointcloud_adjacency_container.h>
 #include <pcl/octree/octree_impl.h>
 #include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/io/ply_io.h>
 
 #include <iostream>
-
+#include <map>
+#include <cmath>
 cv::Mat ImgChangeDetector::getImageDifference(cv::Mat img1, cv::Mat img2){
   return cv::abs(img1 - img2);
 }
@@ -86,6 +89,7 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
 
   pcl::PointCloud<PointT>::Ptr merged_cloud(new pcl::PointCloud<PointT>);
   *merged_cloud = (*old_cloud)+(*chng_mask);
+  std::map<std::string, int> map_leafs;
 
   float resolution = 0.1f;
   MyOctree octree(resolution);
@@ -96,25 +100,97 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
   LeafContainerT *leaf_container;
   typename MyOctree::LeafNodeIterator leaf_itr;
 
+  int no_of_nodes = octree.getLeafCount();
+  typedef Graph<int,int,int> GraphType;
+  GraphType *g = new GraphType(/*estimated # of nodes*/ no_of_nodes, /*estimated # of edges*/ no_of_nodes*26); 
+
+  int count = 0;
+
   for(leaf_itr = octree.leaf_begin(); leaf_itr!=octree.leaf_end() ; ++leaf_itr){
-    int red_no = 0;
-    
-    leaf_itr.getNodeID();
-    
-    std::vector<int> pts_idx;
-    
+
+    pcl::octree::OctreeKey key_arg = leaf_itr.getCurrentOctreeKey();
+    std::ostringstream ss;
+    ss << key_arg.x << "-"<< key_arg.y<<"-"<<key_arg.z;
+    map_leafs[ss.str()]=count;
+    g->add_node();
+    count++;
+  }
+
+  
+  count = 0;
+
+  for(leaf_itr = octree.leaf_begin(); leaf_itr!=octree.leaf_end() ; ++leaf_itr){
+    int red_no = 0;   
+    std::vector<int> pts_idx;    
     pcl::octree::OctreeKey key_arg = leaf_itr.getCurrentOctreeKey ();
+    
     leaf_container = &(leaf_itr.getLeafContainer());
     leaf_container->getPointIndices(pts_idx);
 
     red_no = getRedCount(pts_idx, *merged_cloud);
 
-    if(red_no!=0)
-      std::cout<<"no of red: "<<red_no<<"no total:"<<pts_idx.size()<<std::endl;
-
+    g->add_tweights(count, 1, red_no);
+        
     std::vector<LeafContainerT*> tmp_vec;
+    std::vector<pcl::octree::OctreeKey> tmp_vec2;
     octree.findNeighbors(key_arg, tmp_vec);    
+    octree.findNeighbors(key_arg, tmp_vec2);
+  
+    for(int i = 0 ; i < tmp_vec.size(); i ++){
+      std::vector<int> neigh_idx;
+      tmp_vec[i]->getPointIndices(neigh_idx);
+      int red_n_no = getRedCount(neigh_idx, *merged_cloud);
+
+      pcl::octree::OctreeKey neigh_key = tmp_vec2[i];
+      std::ostringstream ss;
+      ss << neigh_key.x << "-"<< neigh_key.y<<"-"<<neigh_key.z;
+
+      int neigh_idx_single = map_leafs[ss.str()];
+      int coeff = 1;
+      int coeff2 = abs(red_no - red_n_no);
+
+      if(neigh_idx_single!=count){
+	int result = 2;
+
+	if(coeff2>0)
+	   result = coeff/coeff2;       
+	g->add_edge(count, neigh_idx_single, result , result);
+      }
+    }
+	count++;
   }
+
+  pcl::PointCloud<PointT>::Ptr out_cloud(new pcl::PointCloud<PointT>);
+  count = 0;
+  g->maxflow();
+
+  for(leaf_itr = octree.leaf_begin(); leaf_itr!=octree.leaf_end() ; ++leaf_itr){
+
+    if(g->what_segment(count) == GraphType::SINK){
+      
+      std::vector<int> pts_idx;
+      leaf_container = &(leaf_itr.getLeafContainer());
+      leaf_container->getPointIndices(pts_idx);
+      
+      for(int i = 0 ; i<pts_idx.size();i++)
+	out_cloud->points.push_back(merged_cloud->points[pts_idx[i]]);
+
+    }
+    count++;
+  }
+  
+  std::cout<<"stara: "<<chng_mask->points.size()<<" nowa:"<<out_cloud->points.size()<<std::endl;
+
+  std::vector<std::vector<vcg::Point3f> > out_points;
+  std::vector<vcg::Point3f> tmp_vcg_pts;
+
+  for(int i = 0 ; i < out_cloud->points.size();i++)
+    tmp_vcg_pts.push_back(PclProcessing::pcl2vcgPt(out_cloud->points[i]));
+
+  out_points.push_back(tmp_vcg_pts);
+  MeshIO::saveChngMask3d(out_points, "vcg_change.ply");
+
+  delete g;
 } 
 
 int MeshChangeDetector::getRedCount(const std::vector<int> &pts_idx, const pcl::PointCloud<pcl::PointXYZRGBA>& in_cloud){
@@ -126,6 +202,30 @@ int MeshChangeDetector::getRedCount(const std::vector<int> &pts_idx, const pcl::
     }  
   return count;
 }
+void MyOctree::findNeighbors(const pcl::octree::OctreeKey& key_arg, std::vector<pcl::octree::OctreeKey>& out_vec){
+
+ pcl::octree::OctreeKey neighbor_key;
+ 
+  for (int dx = -1; dx <= 1; ++dx)
+    {
+      for (int dy = -1; dy <= 1; ++dy)
+	{
+	  for (int dz = -1; dz <= 1; ++dz)
+	    {
+	      neighbor_key.x = key_arg.x + dx;
+	      neighbor_key.y = key_arg.y + dy;
+	      neighbor_key.z = key_arg.z + dz;
+
+	      LeafContainerT * neighbor = this->findLeaf(neighbor_key.x, neighbor_key.y, neighbor_key.z);
+	      if (neighbor)
+		{
+		  out_vec.push_back(neighbor_key);
+		}
+	    }
+	}
+    }
+}
+
 
 void MyOctree::findNeighbors(const pcl::octree::OctreeKey& key_arg, std::vector<LeafContainerT*>& out_vec){
 

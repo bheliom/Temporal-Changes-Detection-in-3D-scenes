@@ -261,6 +261,17 @@ vcg::Point3f PclProcessing::pcl2vcgPt(pcl::PointXYZ inPt){
   return outPt;
 }
 
+vcg::Point3f PclProcessing::pcl2vcgPt(pcl::PointXYZRGBA inPt){
+  vcg::Point3f outPt;
+ 
+  outPt[0] = inPt.x;
+  outPt[1] = inPt.y;
+  outPt[2] = inPt.z;
+ 
+  return outPt;
+}
+
+
 /**
 Function converts VCG 3D point into PCL point
 */

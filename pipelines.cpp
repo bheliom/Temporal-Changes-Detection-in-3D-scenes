@@ -4,6 +4,7 @@
 #include "util/pbaDataInterface.h"
 #include "common/globVariables.hpp"
 #include "util/utilIO.hpp"
+#include "maxflowLib/graph.h"
 
 #include <iostream>
 #include <fstream>
