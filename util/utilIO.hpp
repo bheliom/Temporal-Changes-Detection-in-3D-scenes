@@ -89,12 +89,13 @@ class FileIO : public ChangeDetectorIO{
 
 public:
   FileIO(std::string inFile) : ChangeDetectorIO(inFile){};
-  static void getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names,std::vector<PtCamCorr>&, std::map<int, std::vector<ImgFeature> >& in_map); 
+  static std::map<std::string,int> getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names,std::vector<PtCamCorr>&, std::map<int, std::vector<ImgFeature> >& in_map); 
   static std::vector<vcg::Shot<float> > nvmCam2vcgShot(const std::vector<CameraT> &camera_data, const std::vector<std::string> names);
   static void readNewFiles(const std::string&, std::vector<std::string>&);
+  static void getNewImgNN(const std::vector<std::string>&, std::vector<std::string>&, const std::string&);
+  static bool forceNVMsingleModel(std::ifstream&, const std::string&);
 
 };
-
 class CmdIO : public ChangeDetectorIO{
 
 public:

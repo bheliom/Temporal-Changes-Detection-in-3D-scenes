@@ -7,7 +7,8 @@
    BUNDLER,
    IMAGELIST,
    OUTDIR,
-   NVM
+   NVM,
+   CHANGEMASK
  };
 
 extern inputFiles inFiles;

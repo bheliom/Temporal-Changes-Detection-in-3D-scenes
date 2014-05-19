@@ -4,7 +4,6 @@
 #include "util/pbaDataInterface.h"
 #include "common/globVariables.hpp"
 #include "util/utilIO.hpp"
-#include "maxflowLib/graph.h"
 
 #include <iostream>
 #include <fstream>
@@ -18,10 +17,9 @@ void testEnerMin(map<int, string> input_strings){
   pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud2 (new pcl::PointCloud<pcl::PointXYZRGBA>);
 
   getPlyFilePCL(input_strings[MESH], cloud);
-  getPlyFilePCL(input_strings[BUNDLER], cloud2);
+  getPlyFilePCL(input_strings[CHANGEMASK], cloud2);
 
   mcd.energyMinimization(cloud, cloud2);
-
 }
 
 void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > new_cloud){
@@ -36,6 +34,11 @@ void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_
   vector<PtCamCorr> tmp_corr;
   map<int, vector<ImgFeature> > cam_feat_map;
   map<int, vector<ImgFeature> > cam_feat_map2;
+  
+  CmdIO::callCmd("cp "+inputStrings[BUNDLER]+" "+inputStrings[BUNDLER]+".bak");
+  
+  std::ifstream inFile(inputStrings[BUNDLER].c_str());
+  FileIO::forceNVMsingleModel(inFile, inputStrings[BUNDLER]);
 
   //Get old NVM file
   FileIO::getNVM(inputStrings[BUNDLER], camera_data, image_filenames, pt_cam_corr, cam_feat_map);
@@ -46,6 +49,7 @@ void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_
 
   //Run VisualSfM
   vsfmHandler.callVsfm(" sfm+resume+fixcam "+inputStrings[BUNDLER]+" "+inputStrings[OUTDIR]);
+  vsfmHandler.callVsfm(" sfm+skipsfm+exportp "+inputStrings[OUTDIR]+" out_matches.txt ");
 
   //After running VisualSfM in new NVM file, new images indeces will start at the end
   int start_idx = camera_data.size();
@@ -55,13 +59,17 @@ void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_
   vector<PtCamCorr> tmp_pt_cam_corr;
   map<int, vector<ImgFeature> > tmp_cam_feat_map;
   
+  map<string, int> img_idx_map;
   //Get new NVM file
-  FileIO::getNVM(inputStrings[OUTDIR], tmp_camera_data, tmp_image_filenames, tmp_pt_cam_corr, tmp_cam_feat_map);
+  img_idx_map = FileIO::getNVM(inputStrings[OUTDIR], tmp_camera_data, tmp_image_filenames, tmp_pt_cam_corr, tmp_cam_feat_map);
   
   //Get image files directories
   FileIO::readNewFiles(inputStrings[PMVS], new_image_filenames);
   string  tmpString = "newNVM.nvm";
   FileProcessing fileProc;  
+
+  std::vector<std::string> tmp_vec_vec;
+  FileIO::getNewImgNN(new_image_filenames, tmp_vec_vec, "out_matches.txt");
 
   fileProc.procNewNVMfile(inputStrings[OUTDIR], new_image_filenames, tmpString);
   FileIO::getNVM(tmpString, newCameraData, new_image_filenames, tmp_corr, cam_feat_map2);
@@ -78,13 +86,17 @@ void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_
  
   vector<ImgFeature> new_imgs_feat, old_imgs_feat;
   set<int> new_imgs_idx, old_imgs_idx;
- 
+  
   new_cloud->points.resize(newCameraData.size());
+  ofstream myfile;
+  myfile.open ("neighbor_cameras.txt");
 
   for(int i = 0 ; i < newCameraData.size(); i++){
     pcl::PointXYZ tmp_pcl_pt(newCameraData[i].t[0], newCameraData[i].t[1], newCameraData[i].t[2]);
     searchPoint = tmp_pcl_pt;
-
+    
+    myfile << tmp_vec_vec[i] <<"\n";
+    
     new_cloud->points[i] = tmp_pcl_pt;
 
     vector<int> pointIdxNKNSearch(K);
@@ -96,44 +108,24 @@ void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_
       new_imgs_idx.insert(i+start_idx-1);
       
       for(int j = 0 ; j < K ; j++){
-	old_imgs_feat.insert(old_imgs_feat.end(), tmp_cam_feat_map[pointIdxNKNSearch[j]].begin(), tmp_cam_feat_map[pointIdxNKNSearch[j]].end());	
-	old_imgs_idx.insert(pointIdxNKNSearch[j]);
+	//	int old_img_idx = pointIdxNKNSearch[j];
+
+        int old_img_idx = img_idx_map[tmp_vec_vec[i]];
+	old_imgs_feat.insert(old_imgs_feat.end(), tmp_cam_feat_map[old_img_idx].begin(), tmp_cam_feat_map[old_img_idx].end());	
+	old_imgs_idx.insert(old_img_idx);
       }
     }
   }
+  myfile.close();
+
   vector<vcg::Point3f> out_pts_vect;
   vector<int> corr_indeces = ImgChangeDetector::imgFeatDiff(new_imgs_feat, old_imgs_feat, tmp_pt_cam_corr, new_imgs_idx, old_imgs_idx);
   
-  for( int k = 0 ; k < corr_indeces.size() ; k++){
-    /*
-    PtCamCorr tmp_cam_corr = tmp_pt_cam_corr[corr_indeces[k]];
-
-    cv::Mat tmp_img = getImg(tmp_image_filenames[ tmp_cam_corr.camidx[0] ]);
-    cv::Point3i tmp_color = tmp_cam_corr.ptc;
-    cv::Point2i tmp_img_feat = tmp_cam_corr.feat_coords[0];
-    cv::Point3i tmp_img_color;
-
-    cv::Scalar intensity = tmp_img.at<uchar>(tmp_img_feat);
-    tmp_img_color.x = intensity.val[0];
-    tmp_img_color.y = intensity.val[1];
-    tmp_img_color.z = intensity.val[2];
-    
-    if(cv::norm(tmp_color - tmp_img_color)<200)
-    */
-      out_pts_vect.push_back(tmp_pt_cam_corr[corr_indeces[k]].pts_3d);
+  for(int i = 0 ; i < corr_indeces.size() ; i++){
+    out_pts_vect.push_back(tmp_pt_cam_corr[corr_indeces[i]].pts_3d);
   }
   
   tmp_3d_masks.push_back(out_pts_vect);
-
-  /*
-  MyMesh m;
-  getPlyFileVcg(inputStrings[MESH], m);
-  std::vector<vcg::Point3f> tmp_vcg_vec;
-
-  for(int i = 0 ; i < m.VN(); i++)
-    tmp_vcg_vec.push_back(m.vert[i].P());
-  tmp_3d_masks.push_back(tmp_vcg_vec);
-  */
 
   cout<<"Number of masks:"<<tmp_3d_masks.size()<<endl;
   MeshIO::saveChngMask3d(tmp_3d_masks, "change_mask.ply");

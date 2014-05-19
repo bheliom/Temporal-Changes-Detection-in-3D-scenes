@@ -67,9 +67,10 @@ std::vector<int> ImgChangeDetector::imgFeatDiff(const std::vector<ImgFeature>& n
     
     if(tmp_corr.camidx.size()<=old_imgs_idx.size()){
       add = true;
-      for(int j = 0 ; j <tmp_corr.camidx.size(); j++)
+      for(int j = 0 ; j < tmp_corr.camidx.size()/4; j++)
 	if(new_imgs_idx.find(tmp_corr.camidx[j])!=new_imgs_idx.end())
-	  add = false;      
+	  //	  	  add = false;      
+	  	  add = true;      
     }
     
     if(add)
@@ -81,19 +82,27 @@ std::vector<int> ImgChangeDetector::imgFeatDiff(const std::vector<ImgFeature>& n
 
 typedef pcl::octree::OctreeContainerPointIndices LeafContainerT;
 typedef pcl::PointXYZRGBA PointT;
-
+/**
+This function uses MRF approach and grapcuts for the energy minimazation problem in order to reduce noise in the output
+*/
 void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_cloud, pcl::PointCloud<PointT>::Ptr chng_mask){
 
+  // Set octree resolution
+  float resolution = 0.1f;
+
+  //Binarize input point clouds
   PclProcessing::changeCloudColor(*old_cloud, 255, 255, 255);
   PclProcessing::changeCloudColor(*chng_mask, 255, 0, 0);
 
+  //Merge input point clouds
   pcl::PointCloud<PointT>::Ptr merged_cloud(new pcl::PointCloud<PointT>);
   *merged_cloud = (*old_cloud)+(*chng_mask);
+
+  //Map connecting leaf indeces with their octree key
   std::map<std::string, int> map_leafs;
 
-  float resolution = 0.1f;
+  //Create octree
   MyOctree octree(resolution);
- 
   octree.setInputCloud (merged_cloud);
   octree.addPointsFromInputCloud ();
 
@@ -101,11 +110,15 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
   typename MyOctree::LeafNodeIterator leaf_itr;
 
   int no_of_nodes = octree.getLeafCount();
+  int avg_chng_pts_no = chng_mask->points.size()/no_of_nodes;
+
+  //Create graphcut solver instance
   typedef Graph<int,int,int> GraphType;
   GraphType *g = new GraphType(/*estimated # of nodes*/ no_of_nodes, /*estimated # of edges*/ no_of_nodes*26); 
 
   int count = 0;
 
+  //Iterate through octree to fill the map_leafs structure and add nodes to the solver
   for(leaf_itr = octree.leaf_begin(); leaf_itr!=octree.leaf_end() ; ++leaf_itr){
 
     pcl::octree::OctreeKey key_arg = leaf_itr.getCurrentOctreeKey();
@@ -115,80 +128,87 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
     g->add_node();
     count++;
   }
-
   
   count = 0;
 
+  //Iterate through octree leaves/nodes creating the graph for solver
   for(leaf_itr = octree.leaf_begin(); leaf_itr!=octree.leaf_end() ; ++leaf_itr){
+
     int red_no = 0;   
     std::vector<int> pts_idx;    
+    
+    //Get octree key for current node
     pcl::octree::OctreeKey key_arg = leaf_itr.getCurrentOctreeKey ();
     
+    //Get leaf container for current node
     leaf_container = &(leaf_itr.getLeafContainer());
+    //Get indices of points belonging to the node
     leaf_container->getPointIndices(pts_idx);
-
+    //Count the number of change(red) points
     red_no = getRedCount(pts_idx, *merged_cloud);
-
-    g->add_tweights(count, 1, red_no);
-        
+    
+    //Get octree keys of neighbors and their leafcontainers
     std::vector<LeafContainerT*> tmp_vec;
     std::vector<pcl::octree::OctreeKey> tmp_vec2;
     octree.findNeighbors(key_arg, tmp_vec);    
     octree.findNeighbors(key_arg, tmp_vec2);
   
+    int weight_count = 0;
+    //Iterate through node neighbors
     for(int i = 0 ; i < tmp_vec.size(); i ++){
+      //Get current neighbor points indices
       std::vector<int> neigh_idx;
       tmp_vec[i]->getPointIndices(neigh_idx);
+      
+      //Count the number of change(red) points in the neighbor node
       int red_n_no = getRedCount(neigh_idx, *merged_cloud);
-
+      weight_count+=red_n_no;
+      //Get graph index of the neighbor node using the map
       pcl::octree::OctreeKey neigh_key = tmp_vec2[i];
       std::ostringstream ss;
       ss << neigh_key.x << "-"<< neigh_key.y<<"-"<<neigh_key.z;
-
       int neigh_idx_single = map_leafs[ss.str()];
-      int coeff = 1;
+
+      int coeff = avg_chng_pts_no;
       int coeff2 = abs(red_no - red_n_no);
 
       if(neigh_idx_single!=count){
-	int result = 2;
+	int result = avg_chng_pts_no;
 
 	if(coeff2>0)
 	   result = coeff/coeff2;       
 	g->add_edge(count, neigh_idx_single, result , result);
       }
     }
-	count++;
+    //Add SOURCE/SINK weights for current node
+    g->add_tweights(count, avg_chng_pts_no, red_no);
+
+    count++;
   }
 
-  pcl::PointCloud<PointT>::Ptr out_cloud(new pcl::PointCloud<PointT>);
+  std::vector<std::vector<vcg::Point3f> > out_points;
+  std::vector<vcg::Point3f> tmp_vcg_pts;
+
   count = 0;
   g->maxflow();
 
   for(leaf_itr = octree.leaf_begin(); leaf_itr!=octree.leaf_end() ; ++leaf_itr){
-
-    if(g->what_segment(count) == GraphType::SINK){
-      
+    if(g->what_segment(count) == GraphType::SINK){      
       std::vector<int> pts_idx;
       leaf_container = &(leaf_itr.getLeafContainer());
       leaf_container->getPointIndices(pts_idx);
       
       for(int i = 0 ; i<pts_idx.size();i++)
-	out_cloud->points.push_back(merged_cloud->points[pts_idx[i]]);
-
+	tmp_vcg_pts.push_back(PclProcessing::pcl2vcgPt(merged_cloud->points[pts_idx[i]]));
     }
     count++;
   }
   
-  std::cout<<"stara: "<<chng_mask->points.size()<<" nowa:"<<out_cloud->points.size()<<std::endl;
-
-  std::vector<std::vector<vcg::Point3f> > out_points;
-  std::vector<vcg::Point3f> tmp_vcg_pts;
-
-  for(int i = 0 ; i < out_cloud->points.size();i++)
-    tmp_vcg_pts.push_back(PclProcessing::pcl2vcgPt(out_cloud->points[i]));
+  std::cout<<"Old mask size: "<<chng_mask->points.size()<<" New mask size: "<<tmp_vcg_pts.size()<<std::endl;
 
   out_points.push_back(tmp_vcg_pts);
-  MeshIO::saveChngMask3d(out_points, "vcg_change.ply");
+
+  MeshIO::saveChngMask3d(out_points, "change_mask_MRF.ply");
 
   delete g;
 } 

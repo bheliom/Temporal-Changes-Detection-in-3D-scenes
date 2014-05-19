@@ -2,7 +2,7 @@
 
 using namespace std;
 
-bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names, vector<PtCamCorr>& pt_corr, map<int,vector<ImgFeature> >& in_map)
+bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names, vector<PtCamCorr>& pt_corr, map<int,vector<ImgFeature> >& in_map, map<string,int>&)
 {
     int rotation_parameter_num = 4; 
     bool format_r9t = false;
@@ -24,11 +24,12 @@ bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names, 
     //read the camera parameters
     camera_data.resize(ncam); // allocate the camera data
     names.resize(ncam);
-    
+    std::map<std::string, int> tmp_map; 
     for(int i = 0; i < ncam; ++i)
      {
         double f, q[9], c[3], d[2];
         in >> token >> f ;
+	tmp_map[token] = i;
         for(int j = 0; j < rotation_parameter_num; ++j) in >> q[j]; 
         in >> c[0] >> c[1] >> c[2] >> d[0] >> d[1];
 
@@ -55,8 +56,6 @@ bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<string>& names, 
       return true; 
     }
 
-
-    
     //read image projections and 3D points.
     pt_corr.resize(npoint); 
     for(int i = 0; i < npoint; ++i)

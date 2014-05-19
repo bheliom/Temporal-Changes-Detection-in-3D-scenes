@@ -36,7 +36,8 @@ void MeshIO::saveChngMask3d(const std::vector<std::vector<vcg::Point3f> > &pts_3
 
   vcg::tri::UpdateColor<MyMesh>::PerVertexConstant(m, vcg::Color4b::Red, true);
   std::cout<<"Vertices:"<<m.VN()<<std::endl;
-  savePlyFileVcg(name,m);
+  if(m.VN()>0)
+    savePlyFileVcg(name,m);
 }
 
 /**
@@ -382,17 +383,107 @@ std::vector<vcg::Shot<float> > FileIO::nvmCam2vcgShot(const std::vector<CameraT>
 /**
 Function loads data from NVM file
 */
-void FileIO::getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names, std::vector<PtCamCorr>& pt_cam_corr, std::map<int, std::vector<ImgFeature> >& in_map){
+std::map<std::string, int> FileIO::getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names, std::vector<PtCamCorr>& pt_cam_corr, std::map<int, std::vector<ImgFeature> >& in_map){
   
+  std::map<std::string,int> out_map;
 
   std::ifstream inFile(filename.c_str());
   
   std::cout<<"Loading NVM file... ";
-  if(LoadNVM(inFile, camera_data, names, pt_cam_corr, in_map))
+  if(LoadNVM(inFile, camera_data, names, pt_cam_corr, in_map, out_map))
     std::cout<<"Done!"<<endl;
   inFile.close();
+  return out_map;
 }
 
+/**
+Function to ensure that NVM file has only one model
+*/
+bool FileIO::forceNVMsingleModel(std::ifstream& in, const std::string &nvm_name){
+  
+  std::ofstream tmp_os;
+  std::string token;
+  std::string tmp_name("tmp_os.nvm");
+  tmp_os.open(tmp_name.c_str());
+  
+  if(in.peek() == 'N') 
+    {
+      in >> token; 
+      tmp_os<<token<<"\n\n";
+    }
+  
+  int ncam = 0, npoint = 0, nproj = 0;   
+  in >> ncam;  if(ncam <= 1) return false; 
+  tmp_os<<ncam;
+  for(int i = 0; i < ncam+1; ++i)
+    {
+      getline(in, token);
+      tmp_os<<token<<"\n";
+    }
+  tmp_os<<"\n";
+  in >> npoint;
+
+  tmp_os<<npoint;
+  if(npoint <= 0)
+    {
+      std::cout << ncam << " new cameras\n";
+      return true; 
+    }
+  
+  for(int i = 0; i < npoint+1; ++i)
+    {
+      getline(in, token);
+      tmp_os<<token<<"\n";
+    }
+  tmp_os<<"\n0\n";
+  tmp_os<<"1 0\n";
+  tmp_os.close();
+
+  CmdIO::callCmd("cp "+tmp_name+" "+nvm_name);
+  return true;
+}
+
+/**
+Function reads K nearest neighbors for new images using feature matches
+ */
+
+void FileIO::getNewImgNN(const std::vector<std::string>& new_image_files, std::vector<std::string> &output, const std::string& matches_file){
+
+  std::ifstream in_file(matches_file.c_str());
+  std::cout<<"Finding nearest neighbors for new cameras... ";
+  
+  std::string tmp_string;
+  std::map<std::string,int> map_value;
+  std::map<std::string, std::string> n_map;
+  
+  for(int i = 0 ; i < new_image_files.size(); i++){
+    map_value[new_image_files[i]] = 0;
+  }
+
+  while(getline(in_file, tmp_string)){
+    if(tmp_string[0]!='/')
+      continue;
+    std::string first_file = tmp_string;
+    std::string second_file;
+
+    getline(in_file, second_file);
+    int no_of_matches = 0;
+    in_file>>no_of_matches;
+
+    std::map<std::string,int>::iterator tmp_itr = map_value.find(second_file);
+    if(tmp_itr!=map_value.end())
+      if(tmp_itr->second<no_of_matches){
+	tmp_itr->second=no_of_matches;
+	n_map[second_file] = first_file;
+      }
+  }
+ 
+  for(int i = 0 ; i < new_image_files.size(); i++){
+    output.push_back(n_map[new_image_files[i]]);
+  }
+ 
+  in_file.close();
+}
 
 void dispProjPt(const vcg::Point2i &inPt, cv::Mat &inImg){
   

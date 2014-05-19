@@ -60,26 +60,6 @@ static int getRedCount(const std::vector<int>&, const pcl::PointCloud<pcl::Point
   
 };
 
-class LaserChangeDetector : public ChangeDetector{
-
-public:
-
-  std::vector<float> getPofChange(){
-  }
-  std::vector<vcg::Point3f> getChangeMap(){
-  }
-
-};
-
-class MpImgChangeDetector : public ImgChangeDetector{
-
-public:
-  std::vector<float> getPofChange(){
-  }
-  std::vector<vcg::Point3f> getChangeMap(){
-  }
-
-};
 typedef pcl::octree::OctreeContainerPointIndices LeafContainerT;
 typedef pcl::PointXYZRGBA PointT;
 class MyOctree : public pcl::octree::OctreePointCloudSearch<PointT>{
