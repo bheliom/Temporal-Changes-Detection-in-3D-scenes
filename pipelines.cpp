@@ -10,19 +10,19 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <time.h>
 
-void testEnerMin(map<int, string> input_strings){
-
+void energyMin(map<int, string> input_strings, double resolution){
+  
   MeshChangeDetector mcd;
-  pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZRGBA>);
-  pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud2 (new pcl::PointCloud<pcl::PointXYZRGBA>);
-
+  pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
+  pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud2(new pcl::PointCloud<pcl::PointXYZRGBA>);
+  
   getPlyFilePCL(input_strings[MESH], cloud);
   getPlyFilePCL(input_strings[CHANGEMASK], cloud2);
 
-  mcd.energyMinimization(cloud, cloud2);
+  mcd.energyMinimization(cloud, cloud2, resolution);
 }
 
-void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > new_cloud){
+void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > new_cloud, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > view_points){
 
   vector<vector<vcg::Point3f> > tmp_3d_masks;
   vector<string> image_filenames, new_image_filenames;
@@ -34,20 +34,23 @@ void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_
   vector<PtCamCorr> tmp_corr;
   map<int, vector<ImgFeature> > cam_feat_map;
   map<int, vector<ImgFeature> > cam_feat_map2;
-  
+  vector<vcg::Shot<float> > new_shots;
+
+  //Make a backup copy of NVM file
   CmdIO::callCmd("cp "+inputStrings[BUNDLER]+" "+inputStrings[BUNDLER]+".bak");
   
+  //Process NVM file to leave only one model
   std::ifstream inFile(inputStrings[BUNDLER].c_str());
   FileIO::forceNVMsingleModel(inFile, inputStrings[BUNDLER]);
 
-  //Get old NVM file
+  //Read NVM file
   FileIO::getNVM(inputStrings[BUNDLER], camera_data, image_filenames, pt_cam_corr, cam_feat_map);
 
   //Copy list of new images into NVM file directory(VisualSFM requirements)
   CmdIO::callCmd("cp "+inputStrings[PMVS]+" "+inputStrings[BUNDLER]+".txt");
   CmdIO vsfmHandler("./");
 
-  //Run VisualSfM
+  //Run VisualSfM(currently to export matches it has to be done in two separate calls(VisualSfM bug))
   vsfmHandler.callVsfm(" sfm+resume+fixcam "+inputStrings[BUNDLER]+" "+inputStrings[OUTDIR]);
   vsfmHandler.callVsfm(" sfm+skipsfm+exportp "+inputStrings[OUTDIR]+" out_matches.txt ");
 
@@ -58,85 +61,79 @@ void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_
   vector<string> tmp_image_filenames;
   vector<PtCamCorr> tmp_pt_cam_corr;
   map<int, vector<ImgFeature> > tmp_cam_feat_map;
-  
   map<string, int> img_idx_map;
-  //Get new NVM file
+
+  //Read new NVM file
   img_idx_map = FileIO::getNVM(inputStrings[OUTDIR], tmp_camera_data, tmp_image_filenames, tmp_pt_cam_corr, tmp_cam_feat_map);
   
-  //Get image files directories
+  //Get new image files directories
   FileIO::readNewFiles(inputStrings[PMVS], new_image_filenames);
+
   string  tmpString = "newNVM.nvm";
   FileProcessing fileProc;  
+  
+  //Vector that for each new image contains vector of old image matched and sorted depending on number of matches
+  std::vector<std::vector<std::string> > tmp_vec_vec;
 
-  std::vector<std::string> tmp_vec_vec;
-  FileIO::getNewImgNN(new_image_filenames, tmp_vec_vec, "out_matches.txt");
+  //Get nearest neighbors from image matches
+  FileIO::getNewImgNN(new_image_filenames, tmp_vec_vec, "out_matches.txt", K);
 
+  //Process the NVM file to leave only new cameras parameters
   fileProc.procNewNVMfile(inputStrings[OUTDIR], new_image_filenames, tmpString);
   FileIO::getNVM(tmpString, newCameraData, new_image_filenames, tmp_corr, cam_feat_map2);
-
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-  
-  // Generate pointcloud data
-  cloud->points.resize(camera_data.size());
-
-  for (size_t i = 0; i < cloud->points.size (); ++i)
-    cloud->points[i] = pcl::PointXYZ(camera_data[i].t[0], camera_data[i].t[1], camera_data[i].t[2]);
-
-  kdtree.setInputCloud(cloud);
+  new_shots = FileIO::nvmCam2vcgShot(newCameraData, new_image_filenames);
  
   vector<ImgFeature> new_imgs_feat, old_imgs_feat;
   set<int> new_imgs_idx, old_imgs_idx;
-  
+ 
+  //Clouds for visualization in GUI
   new_cloud->points.resize(newCameraData.size());
+  view_points->points.resize(newCameraData.size());
+
+  //File for visualization in GUI
   ofstream myfile;
   myfile.open ("neighbor_cameras.txt");
-
+  
   for(int i = 0 ; i < newCameraData.size(); i++){
-    pcl::PointXYZ tmp_pcl_pt(newCameraData[i].t[0], newCameraData[i].t[1], newCameraData[i].t[2]);
-    searchPoint = tmp_pcl_pt;
-    
-    myfile << tmp_vec_vec[i] <<"\n";
-    
-    new_cloud->points[i] = tmp_pcl_pt;
 
-    vector<int> pointIdxNKNSearch(K);
-    vector<cv::Mat> nn_imgs;
-   
-    if(ImgIO::getKNNcamData(kdtree, searchPoint, image_filenames, nn_imgs, K, pointIdxNKNSearch)>0){
-      int tmp_idx = i + start_idx-1;
-      new_imgs_feat.insert(new_imgs_feat.end(),tmp_cam_feat_map[tmp_idx].begin(),tmp_cam_feat_map[tmp_idx].end());
-      new_imgs_idx.insert(i+start_idx-1);
-      
-      for(int j = 0 ; j < K ; j++){
-	//	int old_img_idx = pointIdxNKNSearch[j];
+    //Saving camera positions
+    new_cloud->points[i] = PclProcessing::vcg2pclPt(new_shots[i].Extrinsics.Tra());
+    view_points->points[i] = PclProcessing::vcg2pclPt(new_shots[i].GetViewPoint());
 
-        int old_img_idx = img_idx_map[tmp_vec_vec[i]];
-	old_imgs_feat.insert(old_imgs_feat.end(), tmp_cam_feat_map[old_img_idx].begin(), tmp_cam_feat_map[old_img_idx].end());	
-	old_imgs_idx.insert(old_img_idx);
-      }
-    }
+    // Get features from new image
+    int tmp_idx = i + start_idx-1;
+    new_imgs_feat.insert(new_imgs_feat.end(),tmp_cam_feat_map[tmp_idx].begin(),tmp_cam_feat_map[tmp_idx].end());
+    new_imgs_idx.insert(i+start_idx-1);
+    
+    //Get features of K neighbors from old image set
+    for(int j = 0 ; j < K ; j++){
+      myfile << tmp_vec_vec[i][j] <<"\n";
+      int old_img_idx = img_idx_map[tmp_vec_vec[i][j]];
+      old_imgs_feat.insert(old_imgs_feat.end(), tmp_cam_feat_map[old_img_idx].begin(), tmp_cam_feat_map[old_img_idx].end());	
+      old_imgs_idx.insert(old_img_idx);
+    }    
   }
   myfile.close();
-
+  
+  //Run detection using feature grouping
   vector<vcg::Point3f> out_pts_vect;
+  vector<vcg::Color4b> pts_colors;
   vector<int> corr_indeces = ImgChangeDetector::imgFeatDiff(new_imgs_feat, old_imgs_feat, tmp_pt_cam_corr, new_imgs_idx, old_imgs_idx);
-  
+ 
   for(int i = 0 ; i < corr_indeces.size() ; i++){
+    cv::Point3i c = tmp_pt_cam_corr[corr_indeces[i]].ptc;
+ 
     out_pts_vect.push_back(tmp_pt_cam_corr[corr_indeces[i]].pts_3d);
+    pts_colors.push_back(vcg::Color4b(c.x, c.y, c.z, 0));
   }
-  
+
   tmp_3d_masks.push_back(out_pts_vect);
 
   cout<<"Number of masks:"<<tmp_3d_masks.size()<<endl;
-  MeshIO::saveChngMask3d(tmp_3d_masks, "change_mask.ply");
+  MeshIO::saveChngMask3d(tmp_3d_masks, pts_colors, "change_mask.ply");
 }
 
-void testProjections(map<int,string> inputStrings){
-  MyMesh m;
-  getPlyFileVcg(inputStrings[MESH],m);
-}
-
-void testPipeline(map<int,string> inputStrings){
+void pipelineImgDifference(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > new_cloud, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > view_points, int proj_method){
 
   vector<vector<vcg::Point3f> > tmp_3d_masks;
   vector<vcg::Shot<float> > shots, newShots;
@@ -163,7 +160,6 @@ void testPipeline(map<int,string> inputStrings){
   string  tmpString = "newNVM.nvm";
   FileProcessing fileProc;  
 
-  //HOOK TO WORK WITHOUT VisualSFM
   fileProc.procNewNVMfile(inputStrings[OUTDIR], new_image_filenames, tmpString);
 
   FileIO::getNVM(tmpString, newCameraData, new_image_filenames, tmp_corr, cam_feat_map2);
@@ -179,27 +175,30 @@ void testPipeline(map<int,string> inputStrings){
   }
 
   kdtree.setInputCloud(cloud);
-  int K = 1;
-
+  
   vector<ImgFeature> new_imgs_feat, old_imgs_feat;
   set<int> new_imgs_idx;
+  
+  new_cloud->points.resize(newCameraData.size());
 
   for(int i = 0 ; i < newShots.size(); i++){
     searchPoint = PclProcessing::vcg2pclPt(newShots[i].Extrinsics.Tra());
+    view_points->points[i] = PclProcessing::vcg2pclPt(newShots[i].GetViewPoint());
 
     vector<int> pointIdxNKNSearch(K);
     vector<cv::Mat> nn_imgs;
-    
+    new_cloud->points[i] = searchPoint;
+
     if(ImgIO::getKNNcamData(kdtree, searchPoint, image_filenames, nn_imgs, K, pointIdxNKNSearch)>0){
 
-      cv::Mat newImg( getImg(new_image_filenames[i]) );
+      cv::Mat newImg(getImg(new_image_filenames[i]));
 
       for(int j = 0 ; j < K ; j++){
 	cv::Mat oldImg(nn_imgs[j]);	  
       	cv::Mat finMask, H;
-	
-	if(ImgProcessing::getImgFundMat(newImg, oldImg, H)){
 
+	if(ImgProcessing::getImgFundMat(newImg, oldImg, H)){
+	  
 	  ImgChangeDetector::imgDiffThres(newImg, oldImg, H, finMask);
 	  cv::Mat testImg;
 	  cv::Mat fin_mask2;
@@ -216,6 +215,7 @@ void testPipeline(map<int,string> inputStrings){
 	    continue;
 	  
 	  //OVERLAY THE MASK
+
 	  /*
 	    for(int g = 0 ; g < mask_pts.size(); g++){
 	    cv::Point2f tmp_pt2 = mask_pts[g];
@@ -225,101 +225,40 @@ void testPipeline(map<int,string> inputStrings){
 	    }
 	  */
 
-	  /* TRIANGULATION	    
-	     cv::Mat mask_3d_pts(ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H));
-	     std::vector<vcg::Point3f> tmp_vec_pts;
-	     DataProcessing::cvt3Dmat2vcg(mask_3d_pts, tmp_vec_pts);		    
-	     tmp_3d_masks.push_back(tmp_vec_pts);
-	  */  
-    
-	  // RAY SHOOTING
-	  // tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i]));
-	
-	  // POINT CORRESPONDENCES
+	  switch(proj_method){
 
-	  tmp_3d_masks.push_back(ImgIO::projChngMaskCorr(fin_mask2, cam_feat_map[pointIdxNKNSearch[j]], pt_cam_corr));
+	  case 0:
+	    {//TRIANGULATION
+	      std::cout<<"Projection by triangulation in progress..."<<std::endl;
+	      cv::Mat mask_3d_pts(ImgIO::projChngMaskTo3D(finMask, newShots[i], shots[pointIdxNKNSearch[0]], H));
+	      std::vector<vcg::Point3f> tmp_vec_pts;
+	      DataProcessing::cvt3Dmat2vcg(mask_3d_pts, tmp_vec_pts);		    
+	      tmp_3d_masks.push_back(tmp_vec_pts);
+	      break;
+	    }
+	  case 1: 	    	    
+	    // RAY SHOOTING
+	    tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i]));
+	    break;
+	    
+	  case 2:
+	    // POINT CORRESPONDENCES
+	    std::cout<<"Projection through point correspondences in progress..."<<std::endl;
+	    tmp_3d_masks.push_back(ImgIO::projChngMaskCorr(fin_mask2, cam_feat_map[pointIdxNKNSearch[j]], pt_cam_corr));
+	    break;
+	  }
 	}		
       }
     }
   }
-  MeshIO::saveChngMask3d(tmp_3d_masks, "chngMask_ImgAbsDiffK1.ply");
+
+  vector<vcg::Color4b> pts_colors(0);
+  MeshIO::saveChngMask3d(tmp_3d_masks, pts_colors, "change_mask.ply");
 }
 
-void testNewNVM(map<int,string> inputStrings){
-  
-  FileProcessing fileProc;
-  
-  ifstream inFile(inputStrings[IMAGELIST].c_str());
-  
-  string tmpString;
-  vector<string> new_image_filenames;
-
-  while(getline(inFile,tmpString))
-    new_image_filenames.push_back(tmpString);
-  
-  fileProc.procNewNVMfile(inputStrings[MESH], new_image_filenames, "newNVM.nvm");
-}
-
-void testNVM(map<int,string> inputStrings){
-
-  vector<CameraT> camera_data;
-  vector<string> names;
-  vector<PtCamCorr> tmp_corr;
-  map<int, vector<ImgFeature> > cam_feat_map;
-
-  FileIO::getNVM(inputStrings[MESH], camera_data, names, tmp_corr,cam_feat_map);
-
-  vector<vcg::Shot<float> > shots = FileIO::nvmCam2vcgShot(camera_data, names);
-
-}
-void testVid(map<int,string> inputStrings){
-  VidIO procVid(inputStrings[IMAGELIST]);
-  procVid.saveImgFromVideo(inputStrings[OUTDIR], atoi(inputStrings[BUNDLER].c_str()));
-}
-void test2(){
-
-  string dataPath("./");
-  string outputPath(".");
-
-  CmdIO testIt(dataPath);
-  testIt.callVsfm(outputPath);
-}
-
-void test3(string filename){
-  MyMesh m;
-  getPlyFileVcg(filename, m);
-}
-
-void testRemove(string filename){
-
-  MyMesh m;
-  getPlyFileVcg(filename, m); 
-  
-  removeUnnFaces(m,20);
-
-  savePlyFileVcg("testMesh.ply",m);
-}
+//////////////////////// UNFINISHED VISIBILITY ESTIMATION ////////////////////////////////////////////
 
 
-void testBundler(string filename, string filename2, string filename3){
-
-  MyMesh m;
-  getPlyFileVcg(filename, m); 
-
-  vector<vcg::Shot<float> > shots;
-  vector<string> image_filenames;
-
-  getBundlerFile(m, filename2, filename3, shots, image_filenames);
-
-  cout<<shots.size()<<endl;
-  cout<<image_filenames.size()<<endl;
-  cout<<image_filenames[0].c_str()<<endl;
-
-  MyMesh::PerVertexAttributeHandle<vcg::tri::io::CorrVec> named_hv = vcg::tri::Allocator<MyMesh>:: GetPerVertexAttribute<vcg::tri::io::CorrVec> (m,std::string("correspondences"));
-
-  cout<<named_hv[2].at(0).id_img<<endl;
-
-}
 /*
   void testNN(map<int,string> inputStrings){
 

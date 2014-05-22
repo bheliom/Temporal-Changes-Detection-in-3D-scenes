@@ -12,18 +12,8 @@
 
 using namespace std;
 
-void testEnerMin(map<int,string> input_strings);
-
-void testBundler(string filename, string filename2, string filename3);
-void test2();
-void test3(string filename);
-void testRemove(string filename);
-void testNN(map<int,string> inputStrings);
-void testVid(map<int,string> inputStrings);
-void testNVM(map<int,string> inputStrings);
-void testNewNVM(map<int,string> inputStrings);
-void testPipeline(map<int,string> inputStrings);
-void testProjections(map<int,string> inputStrings);
-void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> >);
+void energyMin(map<int,string> input_strings, double);
+void pipelineImgDifference(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> >, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> >, int);
+void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> >, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> >);
 
 #endif

@@ -15,10 +15,10 @@
 /**
    Function creates a mesh from 3D change mask points and saves the PLY file.
 */
-void MeshIO::saveChngMask3d(const std::vector<std::vector<vcg::Point3f> > &pts_3d, const std::string &name){
+void MeshIO::saveChngMask3d(const std::vector<std::vector<vcg::Point3f> > &pts_3d, const std::vector<vcg::Color4b> &pts_colors, const std::string &name){
   
   std::cout<<"Saving change 3D mask.."<<std::endl;
-  
+  int colors_size = pts_colors.size();
   MyMesh m;
   float x, y, z;
   int count = 0;
@@ -28,13 +28,19 @@ void MeshIO::saveChngMask3d(const std::vector<std::vector<vcg::Point3f> > &pts_3
       x = pts_3d[i].at(j).X();
       y = pts_3d[i].at(j).Y();
       z = pts_3d[i].at(j).Z();
-
-      vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(x,y,z));
-      m.vert[count++].SetS();
+      
+      if(colors_size>0)
+	vcg::tri::Allocator<MyMesh>::AddVertex(m,
+					       MyMesh::CoordType(x,y,z),
+					       pts_colors[j]);
+      else{
+	vcg::tri::Allocator<MyMesh>::AddVertex(m, MyMesh::CoordType(x,y,z));	
+	m.vert[count++].SetS();
+      }
     }
   }
-
-  vcg::tri::UpdateColor<MyMesh>::PerVertexConstant(m, vcg::Color4b::Red, true);
+  if(colors_size<0)
+    vcg::tri::UpdateColor<MyMesh>::PerVertexConstant(m, vcg::Color4b::Red, true);
   std::cout<<"Vertices:"<<m.VN()<<std::endl;
   if(m.VN()>0)
     savePlyFileVcg(name,m);
@@ -168,7 +174,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   shot.Extrinsics.Tra().ToEigenVector(cloud->sensor_origin_);
 
   voxel_grid.setInputCloud(cloud);
-  voxel_grid.setLeafSize (0.1f, 0.1f, 0.1f);
+  voxel_grid.setLeafSize (0.5f, 0.5f, 0.5f);
   voxel_grid.initializeVoxelGrid();
     
   getPtsFromMask(chng_mask, mask_pts);
@@ -444,10 +450,10 @@ bool FileIO::forceNVMsingleModel(std::ifstream& in, const std::string &nvm_name)
 }
 
 /**
-Function reads K nearest neighbors for new images using feature matches
+Function reads K nearest neighbors for new images using feature matches stored in txt file
  */
 
-void FileIO::getNewImgNN(const std::vector<std::string>& new_image_files, std::vector<std::string> &output, const std::string& matches_file){
+void FileIO::getNewImgNN(const std::vector<std::string>& new_image_files, std::vector<std::vector<std::string> > &output, const std::string& matches_file, int K){
 
   std::ifstream in_file(matches_file.c_str());
   std::cout<<"Finding nearest neighbors for new cameras... ";
@@ -455,33 +461,48 @@ void FileIO::getNewImgNN(const std::vector<std::string>& new_image_files, std::v
   std::string tmp_string;
   std::map<std::string,int> map_value;
   std::map<std::string, std::string> n_map;
-  
+  std::map<std::string, int> idx_map;
+  output.resize(new_image_files.size());
+
+  //Create a map that for each new image containing integer value(highest number of matches) and a map with image indeces
   for(int i = 0 ; i < new_image_files.size(); i++){
     map_value[new_image_files[i]] = 0;
+    idx_map[new_image_files[i]] = i;
   }
 
+  //Iterate through file
   while(getline(in_file, tmp_string)){
+    
+    //Check if it's a directory
     if(tmp_string[0]!='/')
       continue;
+    
     std::string first_file = tmp_string;
     std::string second_file;
 
     getline(in_file, second_file);
     int no_of_matches = 0;
     in_file>>no_of_matches;
-
+    
+    //Find the file directory in the map
     std::map<std::string,int>::iterator tmp_itr = map_value.find(second_file);
+
+    //Check if if the file is from new image set
     if(tmp_itr!=map_value.end())
-      if(tmp_itr->second<no_of_matches){
-	tmp_itr->second=no_of_matches;
-	n_map[second_file] = first_file;
-      }
+
+      //Check if the nearest neighbor is not and image from the new set
+      if(map_value.find(first_file)==map_value.end())	
+
+	//Check if the number of matches is greater than the current one
+	if(tmp_itr->second <= no_of_matches){	  	 
+	  tmp_itr->second = no_of_matches;
+	  n_map[second_file] = first_file;
+	  
+	  //Insert old file name at the beginning so in the result we get sorted vector of neighbors depending on number of matches
+	  int idx = idx_map[second_file];
+	  output[idx].insert(output[idx].begin(), first_file);
+	}     
   }
- 
-  for(int i = 0 ; i < new_image_files.size(); i++){
-    output.push_back(n_map[new_image_files[i]]);
-  }
- 
   in_file.close();
 }
 

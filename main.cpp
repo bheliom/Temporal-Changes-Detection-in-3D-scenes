@@ -15,17 +15,23 @@ int main(int argc, char** argv){
   map<int,string> inputStrings;
   readCmdInput(inputStrings, argc, argv);
 
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+  vcg::Color4b ver_col(1,2,3,0);
 
-  CmdIO::callCmd("cp "+inputStrings[BUNDLER]+" "+inputStrings[BUNDLER]+".bak");
+  // MyMesh m;
   
-  std::ifstream inFile(inputStrings[BUNDLER].c_str());
-  FileIO::forceNVMsingleModel(inFile, inputStrings[BUNDLER]);
+  // getPlyFileVcg(inputStrings[MESH], m);
+  // ver_col[0] = m.vert[0].r;
+  // ver_col[1] = m.vert[0].g;
+  // ver_col[2] = m.vert[0].b;
+  // std::cout << ver_col[0]<<" "<<ver_col[1]<<" "<<ver_col[2]<<std::endl;
 
 
-  //testPipeline(inputStrings);
+
+  //  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+  //pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2(new pcl::PointCloud<pcl::PointXYZ>);
+  //pipelineImgDifference(inputStrings, 1 , cloud, 1);
   
-  //  pipelineCorrespondences(inputStrings, 1, cloud);
+  //   pipelineCorrespondences(inputStrings, 1, cloud, cloud2l);
 
   //inputStrings[CHANGEMASK] = "change_mask.ply";
   // testEnerMin(inputStrings);

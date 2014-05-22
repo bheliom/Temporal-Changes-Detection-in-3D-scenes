@@ -54,7 +54,7 @@ MeshChangeDetector() : ChangeDetector(){};
   std::vector<vcg::Point3f> getChangeMap(){
   }
   
-static void energyMinimization(pcl::PointCloud<pcl::PointXYZRGBA>::Ptr, pcl::PointCloud<pcl::PointXYZRGBA>::Ptr);
+  static void energyMinimization(pcl::PointCloud<pcl::PointXYZRGBA>::Ptr, pcl::PointCloud<pcl::PointXYZRGBA>::Ptr, double);
 
 static int getRedCount(const std::vector<int>&, const pcl::PointCloud<pcl::PointXYZRGBA>&);
   

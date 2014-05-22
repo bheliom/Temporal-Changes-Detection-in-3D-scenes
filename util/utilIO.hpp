@@ -49,7 +49,7 @@ class MeshIO : public ChangeDetectorIO{
 
 public:
   MeshIO() : ChangeDetectorIO(){};
-  static void saveChngMask3d(const std::vector<std::vector<vcg::Point3f> >&, const std::string&);
+  static void saveChngMask3d(const std::vector<std::vector<vcg::Point3f> >&, const std::vector<vcg::Color4b>&, const std::string&);
 
   template <typename T>
   static void getPlyFilePCL(const std::string filename, boost::shared_ptr<pcl::PointCloud<T> > outCloud){  
@@ -92,7 +92,7 @@ public:
   static std::map<std::string,int> getNVM(std::string filename, std::vector<CameraT>& camera_data, std::vector<std::string>& names,std::vector<PtCamCorr>&, std::map<int, std::vector<ImgFeature> >& in_map); 
   static std::vector<vcg::Shot<float> > nvmCam2vcgShot(const std::vector<CameraT> &camera_data, const std::vector<std::string> names);
   static void readNewFiles(const std::string&, std::vector<std::string>&);
-  static void getNewImgNN(const std::vector<std::string>&, std::vector<std::string>&, const std::string&);
+  static void getNewImgNN(const std::vector<std::string>&, std::vector<std::vector<std::string> >&, const std::string&, int);
   static bool forceNVMsingleModel(std::ifstream&, const std::string&);
 
 };

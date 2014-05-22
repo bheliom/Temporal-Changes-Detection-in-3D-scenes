@@ -141,15 +141,26 @@ bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
   cv::SurfFeatureDetector detector( minHessian );
   std::vector<cv::KeyPoint> keyPtsImg1, keyPtsImg2;
 
-  detector.detect( img1, keyPtsImg1 );
-  detector.detect( img2, keyPtsImg2 );
+  detector.detect(img1, keyPtsImg1);
+  detector.detect(img2, keyPtsImg2);
 
   //-- Step 2: Calculate descriptors (feature vectors)
   cv::SurfDescriptorExtractor extractor;
   cv::Mat descriptors_object, descriptors_scene;
 
-  extractor.compute( img1, keyPtsImg1, descriptors_object );
-  extractor.compute( img2, keyPtsImg2, descriptors_scene );
+  extractor.compute(img1, keyPtsImg1, descriptors_object);
+  extractor.compute(img2, keyPtsImg2, descriptors_scene);
+
+  if ( descriptors_object.empty() || descriptors_scene.empty())
+    return false;
+  
+  if(descriptors_object.type()!=CV_32F) {
+    descriptors_object.convertTo(descriptors_object, CV_32F);
+  }
+
+  if(descriptors_scene.type()!=CV_32F) {
+    descriptors_scene.convertTo(descriptors_scene, CV_32F);
+  }
 
   //-- Step 3: Matching descriptor vectors using FLANN matcher
   cv::FlannBasedMatcher matcher;

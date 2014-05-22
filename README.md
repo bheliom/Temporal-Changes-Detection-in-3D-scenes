@@ -12,9 +12,10 @@ Dependencies:
 - OpenCV v.2.4.8
 - PCL 1.3 lib
 - boost lib
+- maxflow-v3.01 (maxflow/mincut lib from http://vision.csd.uwo.ca/code/)
 
 Important info:
-- VisualSfM command line functionality requires CUDA enabled hardware if SIFT features have to be computed. In order to use the code on computers without CUDA, SIFT features have to be precomputed for new set of images before calling the change detector.
+- VisualSfM command line functionality requires CUDA enabled hardware if SIFT features and image matches have to be computed. In order to use the code on computers without CUDA, SIFT and matches have to be precomputed for new set of images before calling the change detector.
 
 - in CMakeLists on line 13 there is a fixed directory to VCG wrap module /usr/include/wrap/ply/plylib.cpp which has to be changed if your dirrectory of plylib.cpp is different. Also you can just put compiled plylib.cpp file in the build directory.
 

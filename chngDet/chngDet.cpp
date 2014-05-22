@@ -51,8 +51,8 @@ std::vector<int> ImgChangeDetector::imgFeatDiff(const std::vector<ImgFeature>& n
     
     if(tmp_corr.camidx.size()<=new_imgs_idx.size()){
       add = true;
-      for(int j = 0 ; j < tmp_corr.camidx.size()/2 ; j++)
-	if(new_imgs_idx.find(tmp_corr.camidx[j])==new_imgs_idx.end())
+      for(int j = 0 ; j < tmp_corr.camidx.size(); j++)
+	if(old_imgs_idx.find(tmp_corr.camidx[j])!=old_imgs_idx.end())
 	  add = false;      
     }
 
@@ -67,10 +67,9 @@ std::vector<int> ImgChangeDetector::imgFeatDiff(const std::vector<ImgFeature>& n
     
     if(tmp_corr.camidx.size()<=old_imgs_idx.size()){
       add = true;
-      for(int j = 0 ; j < tmp_corr.camidx.size()/4; j++)
+      for(int j = 0 ; j < tmp_corr.camidx.size(); j++)
 	if(new_imgs_idx.find(tmp_corr.camidx[j])!=new_imgs_idx.end())
-	  //	  	  add = false;      
-	  	  add = true;      
+	  add = false;      
     }
     
     if(add)
@@ -85,10 +84,7 @@ typedef pcl::PointXYZRGBA PointT;
 /**
 This function uses MRF approach and grapcuts for the energy minimazation problem in order to reduce noise in the output
 */
-void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_cloud, pcl::PointCloud<PointT>::Ptr chng_mask){
-
-  // Set octree resolution
-  float resolution = 0.1f;
+void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_cloud, pcl::PointCloud<PointT>::Ptr chng_mask, double resolution){
 
   //Binarize input point clouds
   PclProcessing::changeCloudColor(*old_cloud, 255, 255, 255);
@@ -142,8 +138,10 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
     
     //Get leaf container for current node
     leaf_container = &(leaf_itr.getLeafContainer());
+    
     //Get indices of points belonging to the node
     leaf_container->getPointIndices(pts_idx);
+    
     //Count the number of change(red) points
     red_no = getRedCount(pts_idx, *merged_cloud);
     
@@ -154,8 +152,10 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
     octree.findNeighbors(key_arg, tmp_vec2);
   
     int weight_count = 0;
+    
     //Iterate through node neighbors
     for(int i = 0 ; i < tmp_vec.size(); i ++){
+    
       //Get current neighbor points indices
       std::vector<int> neigh_idx;
       tmp_vec[i]->getPointIndices(neigh_idx);
@@ -163,6 +163,7 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
       //Count the number of change(red) points in the neighbor node
       int red_n_no = getRedCount(neigh_idx, *merged_cloud);
       weight_count+=red_n_no;
+      
       //Get graph index of the neighbor node using the map
       pcl::octree::OctreeKey neigh_key = tmp_vec2[i];
       std::ostringstream ss;
@@ -174,14 +175,27 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
 
       if(neigh_idx_single!=count){
 	int result = avg_chng_pts_no;
-
-	if(coeff2>0)
-	   result = coeff/coeff2;       
-	g->add_edge(count, neigh_idx_single, result , result);
+	
+	if(red_no!=red_n_no){
+	  if(red_no == 0 || red_n_no == 0)
+	    g->add_edge(count, neigh_idx_single, 0 , 0);
+	  else
+	    g->add_edge(count, neigh_idx_single, red_n_no, red_no);
+	}
+	else
+	  if(red_no>0)
+	    g->add_edge(count,neigh_idx_single, red_no, red_no);
+	  else
+	    g->add_edge(count, neigh_idx_single, 2, 2);
+	/*
+	  if(coeff2>0)
+	  result = coeff/coeff2;       
+	  g->add_edge(count, neigh_idx_single, result , result);
+	*/
       }
     }
     //Add SOURCE/SINK weights for current node
-    g->add_tweights(count, avg_chng_pts_no, red_no);
+    g->add_tweights(count, 2, red_no);
 
     count++;
   }
@@ -207,8 +221,8 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
   std::cout<<"Old mask size: "<<chng_mask->points.size()<<" New mask size: "<<tmp_vcg_pts.size()<<std::endl;
 
   out_points.push_back(tmp_vcg_pts);
-
-  MeshIO::saveChngMask3d(out_points, "change_mask_MRF.ply");
+  std::vector<vcg::Color4b> pts_color(0);
+  MeshIO::saveChngMask3d(out_points, pts_color, "change_mask_MRF.ply");
 
   delete g;
 } 
