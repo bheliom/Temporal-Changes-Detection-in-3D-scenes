@@ -44,11 +44,11 @@ void ImgChangeDetector::imgDiffThres(cv::Mat im1, cv::Mat im2, cv::Mat H, cv::Ma
 std::vector<int> ImgChangeDetector::imgFeatDiff(const std::vector<ImgFeature>& new_imgs_feat, const std::vector<ImgFeature>& old_imgs_feat, const std::vector<PtCamCorr>& pts_corr, const std::set<int>& new_imgs_idx, const std::set<int>& old_imgs_idx){
 
   std::vector<int> out_pts;
-  bool add = false;
-
+  
   for(int i = 0 ; i < new_imgs_feat.size() ; i++){
     PtCamCorr tmp_corr = pts_corr[new_imgs_feat[i].idx];
-    
+    bool add = false;
+  
     if(tmp_corr.camidx.size()<=new_imgs_idx.size()){
       add = true;
       for(int j = 0 ; j < tmp_corr.camidx.size(); j++)
@@ -59,23 +59,22 @@ std::vector<int> ImgChangeDetector::imgFeatDiff(const std::vector<ImgFeature>& n
     if(add)
       out_pts.push_back(new_imgs_feat[i].idx);    
   }
-  
-  add = false;
-
+    
   for(int i = 0 ; i < old_imgs_feat.size() ; i++){
     PtCamCorr tmp_corr = pts_corr[old_imgs_feat[i].idx];
-    
+    bool add = false;    
+
     if(tmp_corr.camidx.size()<=old_imgs_idx.size()){
       add = true;
       for(int j = 0 ; j < tmp_corr.camidx.size(); j++)
 	if(new_imgs_idx.find(tmp_corr.camidx[j])!=new_imgs_idx.end())
-	  add = false;      
+	  add = false;      	  
     }
     
     if(add)
       out_pts.push_back(old_imgs_feat[i].idx);
   }
-
+  
   return out_pts;
 }
 
@@ -85,6 +84,11 @@ typedef pcl::PointXYZRGBA PointT;
 This function uses MRF approach and grapcuts for the energy minimazation problem in order to reduce noise in the output
 */
 void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_cloud, pcl::PointCloud<PointT>::Ptr chng_mask, double resolution){
+  
+  CmdIO::callCmd("rm change_mask_MRF.ply");
+  int m = 1000;
+  pcl::PointCloud<PointT>::Ptr copy1 = old_cloud;
+  pcl::PointCloud<PointT>::Ptr copy2 = chng_mask;
 
   //Binarize input point clouds
   PclProcessing::changeCloudColor(*old_cloud, 255, 255, 255);
@@ -92,7 +96,9 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
 
   //Merge input point clouds
   pcl::PointCloud<PointT>::Ptr merged_cloud(new pcl::PointCloud<PointT>);
+  pcl::PointCloud<PointT>::Ptr merged_copy(new pcl::PointCloud<PointT>);
   *merged_cloud = (*old_cloud)+(*chng_mask);
+  *merged_copy = (*copy1)+(*copy2);
 
   //Map connecting leaf indeces with their octree key
   std::map<std::string, int> map_leafs;
@@ -107,6 +113,7 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
 
   int no_of_nodes = octree.getLeafCount();
   int avg_chng_pts_no = chng_mask->points.size()/no_of_nodes;
+  int avg_white_pts = old_cloud->points.size()/no_of_nodes;
 
   //Create graphcut solver instance
   typedef Graph<int,int,int> GraphType;
@@ -175,7 +182,12 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
 
       if(neigh_idx_single!=count){
 	int result = avg_chng_pts_no;
-	
+	double exp_result = static_cast<double>(m)*static_cast<double>(exp(-(abs(red_no-red_n_no))));
+	result = static_cast<int>(exp_result);
+
+	g->add_edge(count, neigh_idx_single, result , result);
+
+	/*	
 	if(red_no!=red_n_no){
 	  if(red_no == 0 || red_n_no == 0)
 	    g->add_edge(count, neigh_idx_single, 0 , 0);
@@ -184,18 +196,15 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
 	}
 	else
 	  if(red_no>0)
-	    g->add_edge(count,neigh_idx_single, red_no, red_no);
+	    g->add_edge(count,neigh_idx_single, red_n_no, red_no);
 	  else
-	    g->add_edge(count, neigh_idx_single, 2, 2);
-	/*
-	  if(coeff2>0)
-	  result = coeff/coeff2;       
-	  g->add_edge(count, neigh_idx_single, result , result);
+	    g->add_edge(count, neigh_idx_single, avg_chng_pts_no, avg_chng_pts_no);
 	*/
       }
     }
     //Add SOURCE/SINK weights for current node
-    g->add_tweights(count, 2, red_no);
+
+    g->add_tweights(count, 100*(pts_idx.size()-red_no), 100*red_no);
 
     count++;
   }

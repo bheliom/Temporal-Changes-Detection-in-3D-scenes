@@ -174,7 +174,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   shot.Extrinsics.Tra().ToEigenVector(cloud->sensor_origin_);
 
   voxel_grid.setInputCloud(cloud);
-  voxel_grid.setLeafSize (0.5f, 0.5f, 0.5f);
+  voxel_grid.setLeafSize (0.1f, 0.1f, 0.1f);
   voxel_grid.initializeVoxelGrid();
     
   getPtsFromMask(chng_mask, mask_pts);
@@ -220,8 +220,6 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
    Function projects 2D change mask into 3-dimensional space using triangulation.
 */
 cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> &cam1, const vcg::Shot<float> &cam2, const cv::Mat &H){
-
-  const clock_t begin_time = clock();
   
   std::vector<cv::Point2f> cam1_points, cam2_points;
 
@@ -239,19 +237,11 @@ cv::Mat ImgIO::projChngMaskTo3D(const cv::Mat &chngMask, const vcg::Shot<float> 
   cam1_fmat = cam1_intr*cam1_Rt;
   cam2_fmat = cam2_intr*cam2_Rt;
 
-  std::cout<<"Rt 1:\n"<<cam1_Rt<<"\n intr 1:\n"<<cam1_intr<<std::endl;
-
   cv::perspectiveTransform(cam1_points, cam2_points, H);  
- 
-  std::cout<<"P1 size:"<<cam1_points.size()<<" P2 size:"<<cam2_points.size()<<std::endl;
-  std::cout<<"Sum of chng:"<<cv::sum(chngMask).val[0]/255<<std::endl;
 
   cv::Mat pnts3D(1, cam1_points.size(), CV_64FC4);
 
   cv::triangulatePoints(cam1_fmat, cam2_fmat, cam1_points, cam2_points, pnts3D); 
-  
-  std::cout << "Time:"<<float( clock () - begin_time ) /  CLOCKS_PER_SEC << std::endl;
-  std::cout << "No of 3D points:"<<pnts3D.size() << std::endl;
   
   return pnts3D;
 }
@@ -453,21 +443,26 @@ bool FileIO::forceNVMsingleModel(std::ifstream& in, const std::string &nvm_name)
 Function reads K nearest neighbors for new images using feature matches stored in txt file
  */
 
-void FileIO::getNewImgNN(const std::vector<std::string>& new_image_files, std::vector<std::vector<std::string> > &output, const std::string& matches_file, int K){
-
+void FileIO::getNewImgNN(const std::vector<std::string>& new_image_files, std::vector<std::vector<std::string> > &output, const std::string& matches_file, int K, std::vector<std::vector<std::vector<std::pair<int,int> > > > &feat_pairs){
+  
   std::ifstream in_file(matches_file.c_str());
+
   std::cout<<"Finding nearest neighbors for new cameras... ";
   
   std::string tmp_string;
   std::map<std::string,int> map_value;
   std::map<std::string, std::string> n_map;
   std::map<std::string, int> idx_map;
-  output.resize(new_image_files.size());
 
+  output.resize(new_image_files.size());
+  feat_pairs.resize(new_image_files.size());
+  
   //Create a map that for each new image containing integer value(highest number of matches) and a map with image indeces
   for(int i = 0 ; i < new_image_files.size(); i++){
     map_value[new_image_files[i]] = 0;
     idx_map[new_image_files[i]] = i;
+    output[i].resize(K);
+    feat_pairs[i].resize(K);
   }
 
   //Iterate through file
@@ -501,6 +496,16 @@ void FileIO::getNewImgNN(const std::vector<std::string>& new_image_files, std::v
 	  //Insert old file name at the beginning so in the result we get sorted vector of neighbors depending on number of matches
 	  int idx = idx_map[second_file];
 	  output[idx].insert(output[idx].begin(), first_file);
+
+	  //Get feature pairs
+	  std::vector<std::pair<int,int> > tmp_pairs(no_of_matches);
+	  
+	  for(int i = 0; i < no_of_matches; ++i)
+	    in_file>>tmp_pairs[i].first;
+	  for(int i = 0; i < no_of_matches; ++i)
+	    in_file>>tmp_pairs[i].second;
+	  
+	  feat_pairs[idx].insert(feat_pairs[idx].begin(), tmp_pairs);
 	}     
   }
   in_file.close();
@@ -516,7 +521,6 @@ void dispProjPt(const vcg::Point2i &inPt, cv::Mat &inImg){
   cv::imshow( "Display window", inImg);                   // Show our image inside it.
       
   cv::waitKey(0);                        
-
 }
 
 void getImgSet(std::vector<std::string> fileDirs, std::vector<cv::Mat> &outImgSet){

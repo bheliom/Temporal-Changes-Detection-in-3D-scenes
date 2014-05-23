@@ -136,24 +136,38 @@ cv::Mat ImgProcessing::diffThres(cv::Mat img1, cv::Mat img2){
 */
 bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
 
-  //-- Step 1: Detect the keypoints using SURF Detector
+  //-- Step 1: Detect the keypoints using Detector
   int minHessian = 400;
-  cv::SurfFeatureDetector detector( minHessian );
+
+  cv::Ptr<cv::FeatureDetector> detector;
+  cv::Ptr<cv::DescriptorExtractor> extractor;
+  cv::Ptr<cv::DescriptorMatcher > matcher;
+
+  //  detector = new cv::OrbFeatureDetector(minHessian);
+  //  extractor = new cv::OrbDescriptorExtractor;
+
+  detector = new  cv::SurfFeatureDetector( minHessian );
+  extractor = new  cv::SurfDescriptorExtractor;
+
+  //  detector = new  cv::SiftFeatureDetector(minHessian);
+  //  extractor = new  cv::SiftDescriptorExtractor;
+
+  matcher = new cv::FlannBasedMatcher;
+
   std::vector<cv::KeyPoint> keyPtsImg1, keyPtsImg2;
 
-  detector.detect(img1, keyPtsImg1);
-  detector.detect(img2, keyPtsImg2);
+  detector->detect(img1, keyPtsImg1);
+  detector->detect(img2, keyPtsImg2);
 
   //-- Step 2: Calculate descriptors (feature vectors)
-  cv::SurfDescriptorExtractor extractor;
   cv::Mat descriptors_object, descriptors_scene;
 
-  extractor.compute(img1, keyPtsImg1, descriptors_object);
-  extractor.compute(img2, keyPtsImg2, descriptors_scene);
+  extractor->compute(img1, keyPtsImg1, descriptors_object);
+  extractor->compute(img2, keyPtsImg2, descriptors_scene);
 
   if ( descriptors_object.empty() || descriptors_scene.empty())
     return false;
-  
+
   if(descriptors_object.type()!=CV_32F) {
     descriptors_object.convertTo(descriptors_object, CV_32F);
   }
@@ -163,11 +177,10 @@ bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
   }
 
   //-- Step 3: Matching descriptor vectors using FLANN matcher
-  cv::FlannBasedMatcher matcher;
   std::vector< cv::DMatch > matches;
-  matcher.match( descriptors_object, descriptors_scene, matches );
+  matcher->match( descriptors_object, descriptors_scene, matches );
 
-  double max_dist = 0; double min_dist = 50;
+  double max_dist = 0; double min_dist = 100;
 
   //-- Quick calculation of max and min distances between keypoints
   for( int i = 0; i < descriptors_object.rows; i++ )
@@ -194,10 +207,7 @@ bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
       img2_pts.push_back( keyPtsImg2[ good_matches[i].trainIdx ].pt );
     }
 
-  if(good_matches.size()>200 || good_matches.size()<4)
-    return false;
-
-  H = cv::findHomography(img1_pts, img2_pts, CV_RANSAC, 5);
+  H = cv::findHomography(img1_pts, img2_pts, CV_RANSAC, 10);
 
   return true;
 }
