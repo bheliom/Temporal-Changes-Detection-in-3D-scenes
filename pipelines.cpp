@@ -237,10 +237,14 @@ void pipelineImgDifference(map<int,string> inputStrings, int K, boost::shared_pt
 	cv::Mat oldImg(getImg(tmp_vec_vec[i][j]));
 	////////
 	
-	if(oldImg.rows!=newImg.rows){
-	  cv::transpose(oldImg, oldImg);
-	  cv::flip(oldImg, oldImg, 1);
-	}
+	if(oldImg.size() != newImg.size())
+	  if(oldImg.rows==newImg.cols && oldImg.cols == newImg.rows){
+	    cv::transpose(oldImg, oldImg);
+	    cv::flip(oldImg, oldImg, 1);
+	  }
+	  else
+	    continue;
+		
 	//cv::Mat oldImg(nn_imgs[j]);	  
       	cv::Mat finMask, H;
 
