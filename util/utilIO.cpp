@@ -139,16 +139,23 @@ cv::Mat ImgIO::getIntrMatrix(const vcg::Shot<float> &shot){
 /**
 Function projects 2D change mask into 3D using point correspondence between SIFT features and model 3D points.
 */
-std::vector<vcg::Point3f> ImgIO::projChngMaskCorr(const cv::Mat &chng_mask, const std::vector<ImgFeature> &img_feats, const std::vector<PtCamCorr> &pts_corr){
+std::vector<vcg::Point3f> ImgIO::projChngMaskCorr(const cv::Mat &chng_mask, const std::vector<ImgFeature> &img_feats, const std::vector<PtCamCorr> &pts_corr, std::set<int> &out_idx){
 
+  //Vector of result 3D points
   std::vector<vcg::Point3f> out_pts;
   
+  //Iterate through features present in given image
   for(int i = 0 ; i < img_feats.size(); i++){
+
+    //Extract the feature
     ImgFeature tmp_feat;
     tmp_feat = img_feats[i];
     
-    if(chng_mask.at<uchar>(tmp_feat.y,tmp_feat.x)>0)
+    //Check if feature lies under change area in the change mask
+    if(chng_mask.at<uchar>(tmp_feat.y,tmp_feat.x) > 0){
       out_pts.push_back(pts_corr[tmp_feat.idx].pts_3d);
+      out_idx.insert(tmp_feat.idx);
+    }
   }
 
   return out_pts;
@@ -157,13 +164,14 @@ std::vector<vcg::Point3f> ImgIO::projChngMaskCorr(const cv::Mat &chng_mask, cons
 /**
    Function projects 2D change mask into 3-dimensional space using point cloud voxelization and computation of ray intersections with the voxels
 */
-std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const cv::Mat &chng_mask, const vcg::Shot<float> &shot){
+std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const cv::Mat &chng_mask, const vcg::Shot<float> &shot, double resolution){
   
-  std::cout<<"Projecting 2D change mask into 3D space..." <<std::endl;
+  std::cout<<"Projecting 2D change mask into 3D space using ray shooting..." <<std::endl;
   std::vector<vcg::Point3f> out_pts;
   std::vector<cv::Point2f> mask_pts;
   rayBox voxel_grid;
   Eigen::Vector4f origin;
+  Eigen::Vector4f origin2;
   vcg::Point3f tmp_pt;
   double prog_perc = 0;
 
@@ -171,12 +179,14 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
   
   MeshIO::getPlyFilePCL(filename, cloud);
 
-  shot.Extrinsics.Tra().ToEigenVector(cloud->sensor_origin_);
+  shot.Extrinsics.Tra().ToEigenVector(origin2);
 
   voxel_grid.setInputCloud(cloud);
-  voxel_grid.setLeafSize (0.1f, 0.1f, 0.1f);
+  voxel_grid.setLeafSize (resolution, resolution, resolution);
   voxel_grid.initializeVoxelGrid();
-    
+ 
+  voxel_grid.setSensorOrigin(origin2);
+
   getPtsFromMask(chng_mask, mask_pts);
 
   shot.Extrinsics.Tra().ToEigenVector(origin);  
@@ -189,7 +199,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
     }
 
     Eigen::Vector4f direction;
-    vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].x, mask_pts[i].y), 1000);
+    vcg::Point3f tmp_dir = shot.UnProject(vcg::Point2f(mask_pts[i].y, mask_pts[i].x), 100);
 
     tmp_dir.ToEigenVector(direction);
 
@@ -207,10 +217,10 @@ std::vector<vcg::Point3f> ImgIO::projChngMask(const std::string &filename, const
       pcl::PointXYZ fin_pt = cloud->points[cloud_idx];
       
       tmp_pt = PclProcessing::pcl2vcgPt(fin_pt);    
-      tmp_pt *= rand()%-3+3;
       out_pts.push_back(tmp_pt);
     }
   } 
+
   DrawProgressBar(40, 1);
   std::cout<<"\n";
   return out_pts;

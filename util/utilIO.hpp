@@ -68,12 +68,12 @@ public:
   static void dispImgs(const std::vector<cv::Mat>&);
   static void getPtsFromMask(const cv::Mat&, std::vector<cv::Point2f>&);
   static cv::Mat projChngMaskTo3D(const cv::Mat&, const vcg::Shot<float>&, const vcg::Shot<float>&, const cv::Mat&);
-  static std::vector<vcg::Point3f> projChngMask(const std::string&, const cv::Mat&, const vcg::Shot<float>&);
+  static std::vector<vcg::Point3f> projChngMask(const std::string&, const cv::Mat&, const vcg::Shot<float>&, double);
   static cv::Mat getRtMatrix(const vcg::Shot<float>&);
   static cv::Mat getIntrMatrix(const vcg::Shot<float>&);
   static int getKNNcamData(const pcl::KdTreeFLANN<pcl::PointXYZ>&, pcl::PointXYZ&, const std::vector<std::string>&, std::vector<cv::Mat>&, int K, std::vector<int>&);
 
-  static std::vector<vcg::Point3f> projChngMaskCorr(const cv::Mat&, const std::vector<ImgFeature>&, const std::vector<PtCamCorr>&);
+  static std::vector<vcg::Point3f> projChngMaskCorr(const cv::Mat&, const std::vector<ImgFeature>&, const std::vector<PtCamCorr>&, std::set<int>&);
 
 };
 

@@ -95,7 +95,10 @@ void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_
   //File for visualization in GUI
   ofstream myfile;
   myfile.open ("neighbor_cameras.txt");
-  
+
+  set<int> detected_feat_indeces;
+  set<int> gt_change_indeces;
+
   for(int i = 0 ; i < newCameraData.size(); i++){
 
     //Saving camera positions
@@ -105,7 +108,7 @@ void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_
     // Get features from new image
     int tmp_idx = i + start_idx-1;
     new_imgs_feat.insert(new_imgs_feat.end(),tmp_cam_feat_map[tmp_idx].begin(),tmp_cam_feat_map[tmp_idx].end());
-    new_imgs_idx.insert(i+start_idx-1);
+    new_imgs_idx.insert(tmp_idx);
     
     //Get features of K neighbors from old image set
     for(int j = 0 ; j < K ; j++){
@@ -124,6 +127,7 @@ void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_
   cout<<"Total features to investigate: "<<new_imgs_feat.size()+old_imgs_feat.size()<<endl;
   cout<<"Old features: " <<old_imgs_feat.size()<<" New features: "<<new_imgs_feat.size()<<endl;
   cout<<"size: "<<new_imgs_idx.size()<<endl;
+
   vector<int> corr_indeces = ImgChangeDetector::imgFeatDiff(new_imgs_feat, old_imgs_feat, tmp_pt_cam_corr, new_imgs_idx, old_imgs_idx);
  
   for(int i = 0 ; i < corr_indeces.size() ; i++){
@@ -139,7 +143,7 @@ void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_
   MeshIO::saveChngMask3d(tmp_3d_masks, pts_colors, "change_mask.ply");
 }
 
-void pipelineImgDifference(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > new_cloud, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > view_points, int proj_method){
+void pipelineImgDifference(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > new_cloud, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > view_points, int proj_method, double resolutionVox){
 
   vector<vector<vcg::Point3f> > tmp_3d_masks;
   vector<vcg::Shot<float> > shots, newShots;
@@ -211,16 +215,20 @@ void pipelineImgDifference(map<int,string> inputStrings, int K, boost::shared_pt
   myfile.open("neighbor_cameras.txt");
   myfile2.open("transformation.txt");
 
+  set<int> detected_feat_indeces;
+  set<int> gt_change_indeces;
+
   for(int i = 0 ; i < newShots.size(); i++){
+
     searchPoint = PclProcessing::vcg2pclPt(newShots[i].Extrinsics.Tra());
     view_points->points[i] = PclProcessing::vcg2pclPt(newShots[i].GetViewPoint());
-    new_cloud->points[i] = searchPoint;
 
     vector<int> pointIdxNKNSearch(K);
     vector<cv::Mat> nn_imgs;
 
     if(ImgIO::getKNNcamData(kdtree, searchPoint, image_filenames, nn_imgs, K, pointIdxNKNSearch)>0){
       
+      new_cloud->points[i] = searchPoint;
       cv::Mat newImg(getImg(new_image_filenames[i]));
 
       for(int j = 0 ; j < K ; j++){
@@ -229,10 +237,11 @@ void pipelineImgDifference(map<int,string> inputStrings, int K, boost::shared_pt
 	cv::Mat oldImg(getImg(tmp_vec_vec[i][j]));
 	////////
 	
-	if(oldImg.rows!=newImg.rows)
+	if(oldImg.rows!=newImg.rows){
 	  cv::transpose(oldImg, oldImg);
-	
-	//	cv::Mat oldImg(nn_imgs[j]);	  
+	  cv::flip(oldImg, oldImg, 1);
+	}
+	//cv::Mat oldImg(nn_imgs[j]);	  
       	cv::Mat finMask, H;
 
 	if(ImgProcessing::getImgFundMat(newImg, oldImg, H)){
@@ -241,21 +250,29 @@ void pipelineImgDifference(map<int,string> inputStrings, int K, boost::shared_pt
 	  
 	  cv::Mat testImg;
 	  cv::Mat fin_mask2;
-	  stringstream tmp_if;
-	  tmp_if<<i<<j;
 	  cv::Mat psaImg;
+
 	  warpPerspective(newImg, psaImg, H, oldImg.size());
 	  
-	  cv::imwrite(tmp_if.str()+"jo.jpg", psaImg);
-	  myfile2<<tmp_if.str()+"trans.jpg\n";
+	  //Save new img, old img and change mask
+	  stringstream tmp_if;
+	  tmp_if<<i<<j;	  
+	  cv::imwrite(tmp_if.str()+"old.jpg", oldImg);
+	  cv::imwrite(tmp_if.str()+"new.jpg", psaImg);
 
 	  warpPerspective(finMask, fin_mask2, H, finMask.size());	  
+	  
 	  oldImg.copyTo(testImg, 255 - fin_mask2);
 
 	  std::vector<cv::Point2f> mask_pts;
-	  ImgIO::getPtsFromMask(fin_mask2, mask_pts);
+	  std::vector<cv::Point2f> mask_pts2;
 
+	  ImgIO::getPtsFromMask(fin_mask2, mask_pts);
+	  ImgIO::getPtsFromMask(finMask, mask_pts2);
+
+	  myfile2<<tmp_if.str()+"mask.jpg\n";
 	  cv::imwrite(tmp_if.str()+"mask.jpg", fin_mask2);
+	  cv::imwrite(tmp_if.str()+"mask2.jpg", finMask);
 
 	  cout<<"Change mask detected points: "<<mask_pts.size()<<endl;
 	  //OVERLAY THE MASK
@@ -286,21 +303,36 @@ void pipelineImgDifference(map<int,string> inputStrings, int K, boost::shared_pt
 	    }
 	  case 1: 	    	    
 	    // RAY SHOOTING
-	    tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i]));
+	    tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i], resolutionVox));
 	    break;
 	    
 	  case 2:
-	    // POINT CORRESPONDENCES
+	    {// POINT CORRESPONDENCES
 	    std::cout<<"Projection through point correspondences in progress... img: "<<i<<std::endl;
 	    int old_img_idx = img_idx_map[tmp_vec_vec[i][j]];
-	    tmp_3d_masks.push_back(ImgIO::projChngMaskCorr(fin_mask2, cam_feat_map[old_img_idx], pt_cam_corr));
-	    tmp_3d_masks.push_back(ImgIO::projChngMaskCorr(fin_mask2, cam_feat_map2[i], pt_cam_corr));
+	    tmp_3d_masks.push_back(ImgIO::projChngMaskCorr(fin_mask2, tmp_cam_feat_map[old_img_idx], pt_cam_corr, detected_feat_indeces));
+	    tmp_3d_masks.push_back(ImgIO::projChngMaskCorr(finMask, tmp_cam_feat_map[start_idx+i-1], pt_cam_corr, detected_feat_indeces));
+	    }
+	    break;
+	    
+	  case 3:
+	    {//Get GT
+	    cv::Mat new_img_gt_mask(getImg("GT/"+tmp_if.str()+"new_gt.jpg"));
+	    cv::Mat old_img_gt_mask(getImg("GT/"+tmp_if.str()+"old_gt.jpg"));
+
+	    int old_img_idx = img_idx_map[tmp_vec_vec[i][j]];
+	    
+	    ImgIO::projChngMaskCorr(new_img_gt_mask, tmp_cam_feat_map[start_idx+1-1], pt_cam_corr, gt_change_indeces);
+	    ImgIO::projChngMaskCorr(old_img_gt_mask, tmp_cam_feat_map[old_img_idx], pt_cam_corr, gt_change_indeces);
+	    }
 	    break;
 	  }
 	}		
       }
     }
-			  }
+  }
+
+  cout<<"Total detected unique change points:"<<detected_feat_indeces.size()<<endl;
   myfile.close();
   myfile2.close();
   vector<vcg::Color4b> pts_colors(0);
@@ -308,7 +340,7 @@ void pipelineImgDifference(map<int,string> inputStrings, int K, boost::shared_pt
 }
 
 
-void pipelinePSA(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > new_cloud, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > view_points, int proj_method){
+void pipelinePSA(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > new_cloud, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > view_points, int proj_method, double resolutionVox){
 
   vector<vector<vcg::Point3f> > tmp_3d_masks;
   vector<vcg::Shot<float> > shots, newShots;
@@ -386,6 +418,9 @@ void pipelinePSA(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::Poi
   ofstream myfile;
   myfile.open ("../matlabFiles/neighbor_cameras_psa.txt");
 
+  set<int> detected_feat_indeces;
+  set<int> gt_change_indeces;
+
   for(int i = 0 ; i < newShots.size(); i++){
     searchPoint = PclProcessing::vcg2pclPt(newShots[i].Extrinsics.Tra());
     view_points->points[i] = PclProcessing::vcg2pclPt(newShots[i].GetViewPoint());
@@ -461,14 +496,14 @@ void pipelinePSA(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::Poi
 	  }
 	case 1: 	    	    
 	  // RAY SHOOTING
-	  tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i]));
+	  tmp_3d_masks.push_back(ImgIO::projChngMask(inputStrings[MESH], finMask, newShots[i], resolutionVox));
 	    break;
 	    
 	case 2:
 	  // POINT CORRESPONDENCES
 	  std::cout<<"Projection through point correspondences in progress... img: "<<i<<std::endl;
 	  int old_img_idx = img_idx_map[tmp_vec_vec[i][j]];
-	  tmp_3d_masks.push_back(ImgIO::projChngMaskCorr(fin_mask2, cam_feat_map[old_img_idx], pt_cam_corr));
+	  tmp_3d_masks.push_back(ImgIO::projChngMaskCorr(fin_mask2, cam_feat_map[old_img_idx], pt_cam_corr, detected_feat_indeces));
 	  break;
 	}	
       }

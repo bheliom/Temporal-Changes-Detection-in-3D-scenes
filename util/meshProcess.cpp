@@ -20,7 +20,6 @@ int rayBox::getFirstOccl(const Eigen::Vector4f& origin, const Eigen::Vector4f& d
   // coordinate of the boundary of the voxel grid
   Eigen::Vector4f start = origin + t_min * direction;
    
-  start*=0.5;
   // i,j,k coordinate of the voxel were the ray enters the voxel grid
   Eigen::Vector3i ijk = getGridCoordinatesRound (start[0], start[1], start[2]);
    
@@ -206,6 +205,9 @@ bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
       img1_pts.push_back( keyPtsImg1[ good_matches[i].queryIdx ].pt );
       img2_pts.push_back( keyPtsImg2[ good_matches[i].trainIdx ].pt );
     }
+
+  if(img1_pts.size()<4 || img2_pts.size()<4)
+    return false;
 
   H = cv::findHomography(img1_pts, img2_pts, CV_RANSAC, 10);
 

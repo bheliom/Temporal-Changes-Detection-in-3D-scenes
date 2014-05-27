@@ -27,6 +27,9 @@ public:
     return getGridCoordinatesRound(x,y,z);
   }
   int getFirstOccl(const Eigen::Vector4f& origin, const Eigen::Vector4f& direction, const float t_min);
+  void setSensorOrigin(Eigen::Vector4f origin){
+    this->sensor_origin_ = origin;
+  }
 };
 
 class DataProcessing{

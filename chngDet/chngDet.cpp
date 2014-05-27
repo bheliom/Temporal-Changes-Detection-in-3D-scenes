@@ -185,8 +185,10 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
 	double exp_result = static_cast<double>(m)*static_cast<double>(exp(-(abs(red_no-red_n_no))));
 	result = static_cast<int>(exp_result);
 
-	g->add_edge(count, neigh_idx_single, result , result);
-
+	if(red_no>0 && red_n_no>0)	  
+	  g->add_edge(count, neigh_idx_single, 2 , 2);
+	else
+	  g->add_edge(count, neigh_idx_single, 0 , 0);
 	/*	
 	if(red_no!=red_n_no){
 	  if(red_no == 0 || red_n_no == 0)
@@ -204,7 +206,8 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
     }
     //Add SOURCE/SINK weights for current node
 
-    g->add_tweights(count, 100*(pts_idx.size()-red_no), 100*red_no);
+    //    g->add_tweights(count, avg_chng_pts_no , red_no);
+    g->add_tweights(count, 2, red_no);
 
     count++;
   }
