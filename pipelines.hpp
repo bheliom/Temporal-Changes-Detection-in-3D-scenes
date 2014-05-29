@@ -17,4 +17,6 @@ void pipelineImgDifference(map<int,string> inputStrings, int K, boost::shared_pt
 void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> >, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> >);
 
 void pipelinePSA(map<int,string> , int, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> >, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> >, int, double);
+
+void generateGTcloud(map<int,string>, int , boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > , boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > , int, double);
 #endif

@@ -315,6 +315,47 @@ void PclProcessing::changeCloudColor(pcl::PointCloud<pcl::PointXYZRGBA> &in_clou
   }
 }
 
+void PclProcessing::getROCparameters(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > gt_cloud, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZRGBA> > change_cloud, std::map<std::string,double> &parameters_map, const double &distance_threshold, const double &cloud_size){
+
+  pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+  std::set<int> tp_set;
+  double fp, fn, tn;
+
+  int K = 1;
+  std::vector<int> pointIdxNKNSearch(K);
+  std::vector<float> pointNKNSquaredDistance(K);
+
+  kdtree.setInputCloud(gt_cloud);
+
+  fp = 0;
+
+  for(int i = 0; i < change_cloud->points.size(); i++){
+    pcl::PointXYZ searchPoint = change_cloud->points[i];
+    if(kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0){
+      if(pointNKNSquaredDistance[0]<=distance_threshold)
+	tp_set.insert(pointIdxNKNSearch[0]);
+      else
+	fp++;
+    }
+  }
+  
+  std::set<int>::iterator it;
+
+  fn=0;
+  for(int i = 0 ; i < gt_cloud->points.size(); i++){
+    if(tp_set.find(i)==tp_set.end())
+      fn++;
+  }
+  
+
+  parameters_map["TP"] = tp_set.size();
+  parameters_map["FP"] = fp;
+  //  parameters_map["TN"] = 
+  parameters_map["FN"] = fn;
+  
+}
+
+
 /**
 Function calculates image coordinates of the point projected using vcg::Shot class member function
 */

@@ -5,6 +5,7 @@
 
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/voxel_grid_occlusion_estimation.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include <fstream>
 #include <sstream>
@@ -141,6 +142,16 @@ Function projects 2D change mask into 3D using point correspondence between SIFT
 */
 std::vector<vcg::Point3f> ImgIO::projChngMaskCorr(const cv::Mat &chng_mask, const std::vector<ImgFeature> &img_feats, const std::vector<PtCamCorr> &pts_corr, std::set<int> &out_idx){
 
+  cv::Mat mask_copy1(chng_mask.clone());
+  cv::Mat mask_copy;
+  
+  if(mask_copy1.type()!=CV_8UC1){
+    //    mask_copy1.convertTo(mask_copy, CV_8UC1);
+    cv::cvtColor(mask_copy1, mask_copy, CV_BGR2GRAY);
+  }
+  else
+    mask_copy = mask_copy1;
+
   //Vector of result 3D points
   std::vector<vcg::Point3f> out_pts;
   
@@ -150,14 +161,13 @@ std::vector<vcg::Point3f> ImgIO::projChngMaskCorr(const cv::Mat &chng_mask, cons
     //Extract the feature
     ImgFeature tmp_feat;
     tmp_feat = img_feats[i];
-    
+
     //Check if feature lies under change area in the change mask
-    if(chng_mask.at<uchar>(tmp_feat.y,tmp_feat.x) > 0){
+    if(mask_copy.at<uchar>(tmp_feat.y+chng_mask.rows/2, tmp_feat.x+chng_mask.cols/2) > 0){    
       out_pts.push_back(pts_corr[tmp_feat.idx].pts_3d);
       out_idx.insert(tmp_feat.idx);
     }
   }
-
   return out_pts;
 }
 
