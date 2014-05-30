@@ -13,6 +13,23 @@
 #include "opencv2/calib3d/calib3d.hpp"
 #include <ctime>
 
+
+void MeshIO::saveOldModelAsPCL(const std::vector<PtCamCorr> &feat_vec, const std::string &filename){
+
+  vector<vcg::Point3f> out_pts_vect;
+  vector<vcg::Color4b> pts_colors;
+  vector<vector<vcg::Point3f> > mask_pts;
+
+  for(int i = 0 ; i < feat_vec.size() ; i ++){
+    cv::Point3i c = feat_vec[i].ptc;
+    out_pts_vect.push_back(feat_vec[i].pts_3d);
+    pts_colors.push_back(vcg::Color4b(c.x, c.y, c.z, 0));
+  }
+
+  mask_pts.push_back(out_pts_vect);
+  MeshIO::saveChngMask3d(mask_pts, pts_colors, filename);
+}
+
 /**
    Function creates a mesh from 3D change mask points and saves the PLY file.
 */

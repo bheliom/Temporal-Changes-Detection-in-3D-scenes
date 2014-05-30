@@ -83,7 +83,7 @@ typedef pcl::PointXYZRGBA PointT;
 /**
 This function uses MRF approach and grapcuts for the energy minimazation problem in order to reduce noise in the output
 */
-void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_cloud, pcl::PointCloud<PointT>::Ptr chng_mask, double resolution){
+void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_cloud, pcl::PointCloud<PointT>::Ptr chng_mask, double resolution, const double &alpha){
   
   CmdIO::callCmd("rm change_mask_MRF.ply");
   int m = 1000;
@@ -106,7 +106,7 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
   //Create octree
   MyOctree octree(resolution);
   octree.setInputCloud (merged_cloud);
-  octree.addPointsFromInputCloud ();
+  octree.addPointsFromInputCloud();
 
   LeafContainerT *leaf_container;
   typename MyOctree::LeafNodeIterator leaf_itr;
@@ -186,9 +186,17 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
 	result = static_cast<int>(exp_result);
 
 	if(red_no>0 && red_n_no>0)	  
-	  g->add_edge(count, neigh_idx_single, 2 , 2);
+	  g->add_edge(count, neigh_idx_single, 1 , 1);
 	else
-	  g->add_edge(count, neigh_idx_single, 0 , 0);
+	  if(red_no==0 && red_n_no>0)
+	    g->add_edge(count, neigh_idx_single, 1 , 0);
+	  else
+	    if(red_no>0 &&red_n_no==0)
+	      g->add_edge(count,neigh_idx_single, 0 , 1);
+	    else
+	      g->add_edge(count, neigh_idx_single, 1, 1);
+	
+	
 	/*	
 	if(red_no!=red_n_no){
 	  if(red_no == 0 || red_n_no == 0)
@@ -207,7 +215,7 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
     //Add SOURCE/SINK weights for current node
 
     //    g->add_tweights(count, avg_chng_pts_no , red_no);
-    g->add_tweights(count, 2, red_no);
+    g->add_tweights(count, 1, alpha*red_no);
 
     count++;
   }

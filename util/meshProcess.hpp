@@ -75,7 +75,7 @@ public:
   static vcg::Point3f pcl2vcgPt(pcl::PointXYZ inPt);
   static vcg::Point3f pcl2vcgPt(pcl::PointXYZRGBA inPt);
   static void changeCloudColor(pcl::PointCloud<pcl::PointXYZRGBA>&, int, int, int );
-  static void getROCparameters(pcl::PointCloud<pcl::PointXYZRGBA>&, pcl::PointCloud<pcl::PointXYZRGBA>&,std::map<std::string,double>&,const double &distance_threshold, const double cloud_size);
+  static void getROCparameters(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZRGBA> >, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZRGBA> >, std::map<std::string,double>&, const double &distance_threshold, const double &cloud_size);
 };
 
 vcg::Point2i getPtImgCoord(const vcg::Point2f &inPoint, const vcg::Shot<float> &inShot);

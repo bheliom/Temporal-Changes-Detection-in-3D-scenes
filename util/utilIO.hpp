@@ -56,6 +56,7 @@ public:
     if(pcl::io::loadPLYFile<T> (filename, *outCloud) == -1)
       PCL_ERROR ("Couldn't read file\n"); 
   }
+  static void saveOldModelAsPCL(const std::vector<PtCamCorr>&, const std::string&);
   
 };
 

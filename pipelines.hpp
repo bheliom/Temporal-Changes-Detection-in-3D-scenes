@@ -12,7 +12,7 @@
 
 using namespace std;
 
-void energyMin(map<int,string> input_strings, double);
+void energyMin(map<int,string> input_strings, double, const double&);
 void pipelineImgDifference(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> >, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> >, int, double);
 void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> >, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> >);
 

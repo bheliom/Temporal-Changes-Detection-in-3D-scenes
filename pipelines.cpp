@@ -11,7 +11,7 @@
 #include <opencv2/calib3d/calib3d.hpp>
 #include <time.h>
 
-void energyMin(map<int, string> input_strings, double resolution){
+void energyMin(map<int, string> input_strings, double resolution, const double &alpha){
   
   MeshChangeDetector mcd;
   pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
@@ -20,7 +20,7 @@ void energyMin(map<int, string> input_strings, double resolution){
   getPlyFilePCL(input_strings[MESH], cloud);
   getPlyFilePCL(input_strings[CHANGEMASK], cloud2);
 
-  mcd.energyMinimization(cloud, cloud2, resolution);
+  mcd.energyMinimization(cloud, cloud2, resolution, alpha);
 }
 
 void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > new_cloud, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > view_points){
@@ -131,14 +131,17 @@ void pipelineCorrespondences(map<int,string> inputStrings, int K, boost::shared_
  
   for(int i = 0 ; i < corr_indeces.size() ; i++){
     cv::Point3i c = tmp_pt_cam_corr[corr_indeces[i]].ptc;
- 
     out_pts_vect.push_back(tmp_pt_cam_corr[corr_indeces[i]].pts_3d);
     pts_colors.push_back(vcg::Color4b(c.x, c.y, c.z, 0));
+
+    detected_feat_indeces.insert(corr_indeces[i]);
   }
 
   tmp_3d_masks.push_back(out_pts_vect);
-
+  cout<<"Number of unique points: "<< detected_feat_indeces.size()<<endl;
+  cout<<"TN: "<<tmp_pt_cam_corr.size()-detected_feat_indeces.size()<<endl;
   cout<<"Number of masks:"<<tmp_3d_masks.size()<<endl;
+  MeshIO::saveOldModelAsPCL(tmp_pt_cam_corr, "old_model.ply");
   MeshIO::saveChngMask3d(tmp_3d_masks, pts_colors, "change_mask.ply");
 }
 
@@ -332,6 +335,7 @@ void pipelineImgDifference(map<int,string> inputStrings, int K, boost::shared_pt
   }
 
   cout<<"Total detected unique change points:"<<detected_feat_indeces.size()<<endl;
+  cout<<"TN: "<<tmp_pt_cam_corr.size()-detected_feat_indeces.size()<<endl;
   myfile.close();
   myfile2.close();
   vector<vcg::Color4b> pts_colors(0);
@@ -525,7 +529,6 @@ void generateGTcloud(map<int,string> inputStrings, int K, boost::shared_ptr<pcl:
   vector<vcg::Color4b> pts_colors(0);
   MeshIO::saveChngMask3d(tmp_3d_masks, pts_colors, "gt_cloud.ply");
 }
-
 
 //////////////////////// UNFINISHED VISIBILITY ESTIMATION ////////////////////////////////////////////
 
