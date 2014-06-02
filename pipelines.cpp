@@ -413,7 +413,7 @@ void pipelinePSA(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::Poi
   for(int i = 0 ; i < newShots.size(); i++){
 
     stringstream ss;
-
+    stringstream ss2;
     searchPoint = PclProcessing::vcg2pclPt(newShots[i].Extrinsics.Tra());
     view_points->points[i] = PclProcessing::vcg2pclPt(newShots[i].GetViewPoint());
 
@@ -424,8 +424,9 @@ void pipelinePSA(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::Poi
     cv::Mat newImg(getImg(new_image_filenames[i]));
     
     ss<<i;
-    cv::imwrite("out_files/"+ss.str()+".jpg", newImg);
-
+    ss2<<i;
+    cv::imwrite("out_files/"+ss.str()+"new.jpg", newImg);
+    CmdIO::callCmd("mkdir out_files/PSM/"+ss2.str());
     for(int j = 0 ; j < K ; j++){
 
       ss<<j;
@@ -447,11 +448,14 @@ void pipelinePSA(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::Poi
 	  continue;      
       
       cv::Mat H;
-      
-      if(ImgProcessing::getImgFundMat(newImg, oldImg, H)){
+      cv::imwrite("out_files/PSM/"+ss2.str()+"/"+ss2.str()+"new.jpg", newImg);	      
+
+      if(ImgProcessing::getImgFundMat(oldImg, newImg, H)){
 	int old_img_idx = img_idx_map[tmp_vec_vec[i][j]];
 	myfile3<<old_img_idx<<"\n";
-	cv::imwrite("out_files/"+ss.str()+".jpg",oldImg);	
+	cv::Mat psaImg;
+	warpPerspective(oldImg, psaImg, H, oldImg.size());
+	cv::imwrite("out_files/PSM/"+ss2.str()+"/"+ss.str()+"old.jpg", psaImg);
 
 	//OVERLAY THE MASK
 	
@@ -492,16 +496,6 @@ void generateGTcloud(map<int,string> inputStrings, int K, boost::shared_ptr<pcl:
   cv::Mat show_img(getImg(tmp_image_filenames[0]));
 
   vector<ImgFeature> tmp_feat_now = tmp_cam_feat_map[0];
-  /*
-    for(int k = 0 ; k < tmp_feat_now.size(); k++){
-    cv::Point center(tmp_feat_now[k].x + show_img.cols/2, tmp_feat_now[k].y + show_img.rows/2);
-    cv::circle(show_img,   center, 2, cv::Scalar( 0, 0, 255 ), 10, 8);      
-    }
-    
-    vector<cv::Mat> show_imgs;
-    show_imgs.push_back(show_img);  
-    ImgIO::dispImgs(show_imgs);
-  */
 
   FileIO::readNewFiles(inputStrings[1], new_gt_filenames);
   FileIO::readNewFiles(inputStrings[2], old_gt_filenames);
@@ -528,6 +522,57 @@ void generateGTcloud(map<int,string> inputStrings, int K, boost::shared_ptr<pcl:
   cout<<"Total detected unique change points:"<<detected_feat_indeces.size()<<endl;
   vector<vcg::Color4b> pts_colors(0);
   MeshIO::saveChngMask3d(tmp_3d_masks, pts_colors, "gt_cloud.ply");
+}
+
+void usePSMmasks(map<int,string> inputStrings, int K, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > new_cloud, boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > view_points, int proj_method, double resolutionVox){
+
+  vector<vector<vcg::Point3f> > tmp_3d_masks;
+  vector<string> image_filenames, new_image_filenames;
+
+  vector<string> new_gt_filenames, old_gt_filenames;
+  //////// Correspondence search//////////////////////////////////////
+  vector<CameraT> tmp_camera_data;
+  vector<string> tmp_image_filenames;
+  vector<PtCamCorr> pt_cam_corr;
+  map<int, vector<ImgFeature> > tmp_cam_feat_map;
+  map<string, int> img_idx_map;
+
+  img_idx_map = FileIO::getNVM(inputStrings[0], tmp_camera_data, tmp_image_filenames, pt_cam_corr, tmp_cam_feat_map);
+  //////////////////////////////////////////////////////////
+
+  vector<ImgFeature> tmp_feat_now = tmp_cam_feat_map[0];
+
+  FileIO::readNewFiles(inputStrings[1], new_gt_filenames);
+
+  set<int> detected_feat_indeces;
+  
+  ifstream in_stream(inputStrings[3].c_str());
+  int new_img_start_idx = 0;
+
+  in_stream>>new_img_start_idx;
+
+  for(int i = 0 ; i < new_gt_filenames.size(); i++){  
+    int old_img_idx;
+    in_stream>>old_img_idx;
+
+    cv::Mat newImg(getImg(new_gt_filenames[i]));                     
+    cv::Mat newImg1(getImg(tmp_image_filenames[new_img_start_idx+1]));                     
+    cv::Mat oldImg(getImg(tmp_image_filenames[old_img_idx]));
+
+    cv::Mat H;
+
+    if(ImgProcessing::getImgFundMat(newImg1, oldImg, H)){
+      cv::Mat mask2;
+      warpPerspective(newImg, mask2, H, newImg.size());
+      tmp_3d_masks.push_back(ImgIO::projChngMaskCorr(mask2, tmp_cam_feat_map[old_img_idx], pt_cam_corr, detected_feat_indeces));         
+    }        
+    tmp_3d_masks.push_back(ImgIO::projChngMaskCorr(newImg, tmp_cam_feat_map[new_img_start_idx+i], pt_cam_corr, detected_feat_indeces));         
+  }
+    
+  cout<<"Total detected unique change points:"<<detected_feat_indeces.size()<<endl;
+  cout<<"TN: "<<pt_cam_corr.size()-detected_feat_indeces.size()<<endl;
+  vector<vcg::Color4b> pts_colors(0);
+  MeshIO::saveChngMask3d(tmp_3d_masks, pts_colors, "change_mask.ply");
 }
 
 //////////////////////// UNFINISHED VISIBILITY ESTIMATION ////////////////////////////////////////////

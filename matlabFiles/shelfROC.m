@@ -73,6 +73,46 @@ xlabel('False Positive Rate(Specificity)');
 legend('K = 1', 'K = 2', 'K = 3', 'Diagonal');
 title('Feature grouping - Shelf dataset');
 grid on
+
+%% PSM K = 2 
+
+TN = 9413;
+FP2=5/TN;TPR2=0.000774593;
+FP3=5/TN;TPR3=0.00542215;
+FP4=5/TN;TPR4=0.00619675;
+FP5=5/TN;TPR5=0.00619675;
+FP6=5/TN;TPR6=0.00619675;
+FP7=14/TN;TPR7=0.00619675;
+FP8=26/TN;TPR8=0.00697134;
+FP20=69/TN;TPR20=0.0162665;
+FP50=103/TN;TPR50=0.0185902;
+FP100=103/TN;TPR100=0.0185902;
+FP1000=103/TN;TPR1000=0.0185902;
+
+x1 = [0 TPR2 TPR3 TPR4 TPR5 TPR6 TPR7 TPR8 TPR20 TPR50 TPR100 TPR1000];
+y1 = [0 FP2 FP3 FP4 FP5 FP6 FP7 FP8 FP20 FP50 FP100 FP1000];
+
+plot(y1,x1)
+%% PSM K = 3
+
+TN = 9225;
+
+FP1=0/TN;TPR1=0.000774593;
+FP5=12/TN;TPR5=0.00464756;
+FP10=50/TN;TPR10=0.00464756;
+FP100=769/TN;TPR100=0.00464756;
+FP200=769/TN;TPR200=0.00464756;
+FP2000=769/TN;TPR2000=0.00464756;
+
+x2 = [0 TPR1 TPR5 TPR10 TPR100 TPR200 TPR2000]; 
+y2 = [0 FP1 FP5 FP10 FP100 FP200 FP2000];
+
+plot(y1,x1,y2,x2,'k-','LineWidth',3)
+ylabel('True Positive Rate(Sensitivity)');
+xlabel('False Positive Rate(Specificity)');
+legend('K = 1', 'K = 2', 'K = 3', 'Diagonal');
+title('Image absolute difference - Shelf dataset');
+grid on
 %% Img diff K = 1, alpha: 1 ... t =22.21
 TN = 8327;
 

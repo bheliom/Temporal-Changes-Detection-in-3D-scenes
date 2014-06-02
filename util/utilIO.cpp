@@ -161,7 +161,7 @@ std::vector<vcg::Point3f> ImgIO::projChngMaskCorr(const cv::Mat &chng_mask, cons
 
   cv::Mat mask_copy1(chng_mask.clone());
   cv::Mat mask_copy;
-  
+
   if(mask_copy1.type()!=CV_8UC1){
     //    mask_copy1.convertTo(mask_copy, CV_8UC1);
     cv::cvtColor(mask_copy1, mask_copy, CV_BGR2GRAY);
@@ -171,7 +171,6 @@ std::vector<vcg::Point3f> ImgIO::projChngMaskCorr(const cv::Mat &chng_mask, cons
 
   //Vector of result 3D points
   std::vector<vcg::Point3f> out_pts;
-  
   //Iterate through features present in given image
   for(int i = 0 ; i < img_feats.size(); i++){
 

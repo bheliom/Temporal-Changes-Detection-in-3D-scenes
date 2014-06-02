@@ -150,8 +150,8 @@ bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
   detector = new  cv::SurfFeatureDetector( minHessian );
   extractor = new  cv::SurfDescriptorExtractor;
 
-  //  detector = new  cv::SiftFeatureDetector(minHessian);
-  //  extractor = new  cv::SiftDescriptorExtractor;
+  //    detector = new  cv::SiftFeatureDetector(minHessian);
+  // extractor = new  cv::SiftDescriptorExtractor;
 
   matcher = new cv::FlannBasedMatcher;
 
@@ -181,7 +181,7 @@ bool ImgProcessing::getImgFundMat(cv::Mat img1, cv::Mat img2, cv::Mat &H){
   std::vector< cv::DMatch > matches;
   matcher->match( descriptors_object, descriptors_scene, matches );
 
-  double max_dist = 0; double min_dist = 100;
+  double max_dist = 0; double min_dist = 1000;
 
   //-- Quick calculation of max and min distances between keypoints
   for( int i = 0; i < descriptors_object.rows; i++ )
@@ -330,6 +330,7 @@ void PclProcessing::getROCparameters(boost::shared_ptr<pcl::PointCloud<pcl::Poin
 
   fp = 0;
 
+  
   for(int i = 0; i < change_cloud->points.size(); i++){
     std::vector<int> pointIdxNKNSearch(K);
     std::vector<float> pointNKNSquaredDistance(K);
