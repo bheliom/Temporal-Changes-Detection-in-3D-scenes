@@ -1,9 +1,12 @@
+UPDATE(25.08.2014): FINAL VERSION OF THE SOFTWARE WITH INSTRUCTIONS WILL BE REALEASED SOON.
+
+============
 Temporal changes detection in scenes reconstructed using VisualSfM
 ============
 
 Source code of the project developed for the master thesis "5D scene reconstruction using crowdsourcing cameras".
 
-Author: Waldemar Franczak
+Author: Waldemar Franczak.
 Year: 2014
 
 Dependencies:
