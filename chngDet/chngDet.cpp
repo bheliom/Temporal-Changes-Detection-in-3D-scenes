@@ -191,7 +191,7 @@ void MeshChangeDetector::energyMinimization(pcl::PointCloud<PointT>::Ptr old_clo
 	  if(red_no==0 && red_n_no>0)
 	    g->add_edge(count, neigh_idx_single, 1 , 0);
 	  else
-	    if(red_no>0 &&red_n_no==0)
+	    if(red_no>0 && red_n_no==0)
 	      g->add_edge(count,neigh_idx_single, 0 , 1);
 	    else
 	      g->add_edge(count, neigh_idx_single, 1, 1);
