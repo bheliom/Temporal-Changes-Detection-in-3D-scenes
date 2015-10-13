@@ -1,4 +1,4 @@
-UPDATE(25.08.2014): FINAL VERSION OF THE SOFTWARE WITH INSTRUCTIONS WILL BE REALEASED SOON.
+UPDATE(13.10.2015): Code requires number of fixes and proper refactoring.
 
 ============
 Temporal changes detection in scenes reconstructed using VisualSfM
