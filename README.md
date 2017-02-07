@@ -6,7 +6,7 @@
 
 Source code of the project developed for the master thesis "5D scene reconstruction using crowdsourcing cameras".
 
-- Author: Waldemar Franczak.
+- Author: Waldemar Franczak
 - Year: 2014
 
 # Dependencies:
