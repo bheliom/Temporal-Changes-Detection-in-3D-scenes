@@ -10,7 +10,7 @@ Source code of the project developed for the master thesis "5D scene reconstruct
 - Year: 2014
 
 # Dependencies:
-- VisualSFM(command line functionality is required )
+- VisualSFM(command line functionality is required)
 - VCG lib
 - OpenCV v.2.4.8
 - PCL 1.3 lib
